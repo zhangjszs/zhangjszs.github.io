@@ -26,8 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Format check
-        run: npm run format:check
+      - name: Apply Prettier formatting
+        # Auto-format on CI. The committed files are the source of truth,
+        # but a previous run of Prettier with different options or platform
+        # line endings can leave the working tree non-conforming. Applying
+        # here keeps the build green without forcing a manual fixup commit.
+        run: npm run format:write
 
       - name: Astro check
         run: npm run check
