@@ -21,14 +21,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: package.json
+          # Pin to Node 22 LTS (matches the engines requirement in
+          # package.json). Using a fixed version avoids the deprecation
+          # warning that the default Node 20 runner triggers when an
+          # action requests Node 24.
+          node-version: "22"
           cache: npm
 
       - name: Install dependencies
-        # Use `npm install` instead of `npm ci` because this repo does not
-        # commit `package-lock.json` (it is generated on demand and the
-        # ~260 KB file is excluded from version control). `npm install`
-        # will resolve and lock from `package.json` directly.
+        # Use `npm install` because this repo does not commit
+        # `package-lock.json`. `npm install` will resolve and lock from
+        # `package.json` directly.
         run: npm install --no-audit --no-fund
 
       - name: Format check
