@@ -9,16 +9,16 @@ const footerLinks = [
 		links: [
 			{ label: 'Home', href: '/' },
 			{ label: 'Projects', href: '/projects/' },
-			{ label: 'Deep Dives', href: '/deep-dives/' },
+			{ label: 'Blog', href: '/blog/' },
 			{ label: 'About', href: '/about/' },
 		],
 	},
 	{
 		title: 'Connect',
+		// TODO: 替换为你自己的社交链接
 		links: [
-			{ label: 'GitHub', href: 'https://github.com/kerwin-lab' },
-			{ label: 'X / Twitter', href: 'https://x.com/jszs15' },
-			{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com' },
+			{ label: 'GitHub', href: 'https://github.com/your-username' },
+			{ label: 'Email', href: 'mailto:your-email@example.com' },
 		],
 	},
 ];
@@ -30,9 +30,10 @@ const footerLinks = [
 			<div class="footer-brand">
 				<a href="/" class="brand-link">
 					<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
-					<span class="brand-name">Kerwin's Labwork</span>
+					<span class="brand-name">你的名字</span>
 				</a>
-				<p class="brand-desc">A curated showcase of computer science coursework and projects from HUAT.</p>
+				<!-- TODO: 替换为你的站点简介 -->
+				<p class="brand-desc">个人主页：项目作品、博客文章与联系方式。</p>
 			</div>
 			<div class="footer-links">
 				{
@@ -60,18 +61,16 @@ const footerLinks = [
 		</div>
 		<div class="footer-bottom">
 			<p class="copyright">
-				&copy; {currentYear} Kerwin Zhang. <span data-i18n="footer.builtWith">Built with</span>
+				&copy; {currentYear} 你的名字. <span data-i18n="footer.builtWith">Built with</span>
 				<a href="https://astro.build/">Astro</a>
 				<Icon icon="rocket-launch" size="1.2em" />
 			</p>
 			<div class="socials">
-				<a href="https://github.com/kerwin-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+				<!-- TODO: 替换为你自己的社交链接 -->
+				<a href="https://github.com/your-username" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
 					<Icon icon="github-logo" size="1.2em" />
 				</a>
-				<a href="https://x.com/jszs15" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter">
-					<Icon icon="twitter-logo" size="1.2em" />
-				</a>
-				<a href="mailto:zhangjszs@foxmail.com" aria-label="Email">
+				<a href="mailto:your-email@example.com" aria-label="Email">
 					<Icon icon="envelope" size="1.2em" />
 				</a>
 			</div>

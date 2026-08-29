@@ -8,7 +8,7 @@ import CodePreview from '../../components/CodePreview.astro';
 import FileTree from '../../components/FileTree.astro';
 
 export async function getStaticPaths() {
-	const articles = await getCollection('deep-dives');
+	const articles = await getCollection('blog');
 	return articles.map((article) => ({
 		params: { slug: article.id },
 		props: { article },
@@ -20,14 +20,14 @@ const { Content } = await render(article);
 const { title, description, date, tags, relatedProject } = article.data;
 ---
 
-<BaseLayout title={`${title} | Deep Dives`} description={description}>
+<BaseLayout title={`${title} | 博客`} description={description}>
 	<article class="article-page">
 		<header class="article-hero">
 			<div class="wrapper hero-content">
 				<div class="breadcrumbs">
-					<a href="/" data-i18n="deepdives.breadcrumbs.home">Home</a>
+					<a href="/" data-i18n="project.breadcrumbs.home">首页</a>
 					<span>/</span>
-					<a href="/deep-dives" data-i18n="deepdives.breadcrumbs.articles">Deep Dives</a>
+					<a href="/blog" data-i18n="blog.breadcrumbs.articles">博客</a>
 					<span>/</span>
 					<span class="current">{title}</span>
 				</div>
@@ -53,14 +53,14 @@ const { title, description, date, tags, relatedProject } = article.data;
 
 		<nav class="article-nav">
 			<div class="wrapper">
-				<a href="/deep-dives" class="back-link">
+				<a href="/blog" class="back-link">
 					<Icon icon="arrow-left" size="1.2em" />
-					<span data-i18n="deepdives.back">Back to all articles</span>
+					<span data-i18n="blog.back">返回全部文章</span>
 				</a>
 				{
 					relatedProject && (
 						<a href={`/projects/${relatedProject}`} class="related-link">
-							<span data-i18n="deepdives.relatedProject">View Related Project</span>
+							<span data-i18n="blog.relatedProject">查看相关作品</span>
 							<Icon icon="arrow-right" size="1.2em" />
 						</a>
 					)
@@ -262,12 +262,12 @@ const { title, description, date, tags, relatedProject } = article.data;
 			font-weight: 500;
 			border-radius: 0.5rem;
 			transition: all 0.2s ease;
-			box-shadow: 0 4px 20px rgba(118, 17, 166, 0.3);
+			box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
 		}
 
 		.related-link:hover {
 			transform: translateX(4px);
-			box-shadow: 0 8px 30px rgba(118, 17, 166, 0.4);
+			box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
 		}
 	</style>
 </BaseLayout>

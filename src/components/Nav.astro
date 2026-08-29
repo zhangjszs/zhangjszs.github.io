@@ -5,18 +5,19 @@ import LangSwitcher from './LangSwitcher.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 /** Main menu items */
+// TODO: 如需调整导航（如新增独立"联系"页），在下方数组增删即可
 const textLinks: { label: string; href: string; i18n: string }[] = [
 	{ label: 'Home', href: '/', i18n: 'nav.home' },
 	{ label: 'Projects', href: '/projects/', i18n: 'nav.projects' },
-	{ label: 'Deep Dives', href: '/deep-dives/', i18n: 'nav.deepDives' },
+	{ label: 'Blog', href: '/blog/', i18n: 'nav.blog' },
 	{ label: 'About', href: '/about/', i18n: 'nav.about' },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
+// TODO: 替换为你自己的社交链接
 const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[] = [
-	{ label: 'GitHub', href: 'https://github.com/kerwin-lab', icon: 'github-logo' },
-	{ label: 'X', href: 'https://x.com/jszs15', icon: 'twitter-logo' },
-	{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com', icon: 'envelope' },
+	{ label: 'GitHub', href: 'https://github.com/your-username', icon: 'github-logo' },
+	{ label: 'Email', href: 'mailto:your-email@example.com', icon: 'envelope' },
 ];
 
 /** Test if a link is pointing to the current page. */
@@ -32,7 +33,8 @@ const isCurrentPage = (href: string) => {
 	<div class="menu-header">
 		<a href="/" class="site-title">
 			<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
-			Kerwin's Labwork
+			<!-- TODO: 替换为你的站点名/个人品牌名 -->
+			你的名字
 		</a>
 		<menu-button>
 			<template>

@@ -7,13 +7,23 @@ import Grid from '../components/Grid.astro';
 import Typewriter from '../components/Typewriter.astro';
 
 const allProjects = await getCollection('projects');
-const featuredProjects = allProjects.filter((p) => p.data.featured);
-const recentProjects = allProjects
+// 个人项目排在前面，课程实验（labwork）靠后
+const sortedProjects = allProjects.sort((a, b) => {
+	if (a.data.category !== b.data.category) return a.data.category === 'personal' ? -1 : 1;
+	return 0;
+});
+const featuredProjects = sortedProjects.filter((p) => p.data.featured);
+const recentProjects = sortedProjects
 	.sort((a, b) => {
 		if (!a.data.date || !b.data.date) return 0;
 		return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
 	})
 	.slice(0, 6);
+
+// 最新博客文章（首页展示前 3 篇）
+const latestPosts = (await getCollection('blog'))
+	.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+	.slice(0, 3);
 
 const allTags = [...new Set(allProjects.flatMap((p) => p.data.tags))].sort();
 const allTech = [...new Set(allProjects.flatMap((p) => p.data.techStack))].sort();
@@ -47,10 +57,7 @@ allProjects.forEach((p) => {
 const languages = [...langSet];
 ---
 
-<BaseLayout
-	title="HUAT Labwork Showcase"
-	description="A curated showcase of computer science coursework and projects from HUAT."
->
+<BaseLayout title="你的名字 | 个人主页" description="个人主页：项目作品、博客文章与联系方式。">
 	<!-- Hero Section -->
 	<section class="hero-section">
 		<div class="hero-blobs" aria-hidden="true">
@@ -61,12 +68,10 @@ const languages = [...langSet];
 		<div class="wrapper hero-content">
 			<div class="hero-text">
 				<h1 class="hero-title">
-					<Typewriter text="Kerwin's" class="gradient-text" speed={100} /> Labwork
+					<!-- TODO: 替换为你的名字/个人品牌名 -->
+					<Typewriter text="你好，我是" class="gradient-text" speed={100} /> 你的名字
 				</h1>
-				<p class="hero-tagline" data-i18n="hero.tagline">
-					Computer Science coursework & projects from Hubei University of Automotive Technology. Open-source, polyglot,
-					and always learning.
-				</p>
+				<p class="hero-tagline" data-i18n="hero.tagline">在这里记录我的项目实践、技术探索与学习心得。</p>
 				<div class="hero-roles">
 					{languages.map((lang) => <span class="role-pill">{lang}</span>)}
 					{languages.length === 0 && ['Java', 'Python', 'C++'].map((lang) => <span class="role-pill">{lang}</span>)}
@@ -76,22 +81,22 @@ const languages = [...langSet];
 				<div class="stat-card reveal">
 					<span class="stat-icon"><Icon icon="code" size="1.5em" /></span>
 					<span class="stat-number" data-target={totalProjects}>{totalProjects}</span>
-					<span class="stat-label" data-i18n="stats.projects">Projects</span>
+					<span class="stat-label" data-i18n="stats.projects">项目</span>
 				</div>
 				<div class="stat-card reveal">
 					<span class="stat-icon"><Icon icon="terminal-window" size="1.5em" /></span>
 					<span class="stat-number" data-target={totalTech}>{totalTech}</span>
-					<span class="stat-label" data-i18n="stats.technologies">Technologies</span>
+					<span class="stat-label" data-i18n="stats.technologies">技术</span>
 				</div>
 				<div class="stat-card reveal">
 					<span class="stat-icon"><Icon icon="list" size="1.5em" /></span>
 					<span class="stat-number" data-target={totalTags}>{totalTags}</span>
-					<span class="stat-label" data-i18n="stats.tags">Tags</span>
+					<span class="stat-label" data-i18n="stats.tags">标签</span>
 				</div>
 				<div class="stat-card reveal">
 					<span class="stat-icon"><Icon icon="calendar" size="1.5em" /></span>
 					<span class="stat-number">{yearSpan}</span>
-					<span class="stat-label" data-i18n="stats.timeline">Timeline</span>
+					<span class="stat-label" data-i18n="stats.timeline">时间线</span>
 				</div>
 			</div>
 		</div>
@@ -109,16 +114,16 @@ const languages = [...langSet];
 				<section class="section reveal">
 					<header class="section-header">
 						<span class="section-eyebrow" data-i18n="section.eyebrow.featured">
-							Highlights
+							精选
 						</span>
 						<h2 class="section-title">
-							<span data-i18n="section.title.featured">Featured</span>{' '}
+							<span data-i18n="section.title.featured">精选</span>{' '}
 							<span class="gradient-text" data-i18n="section.title.featuredAccent">
-								Projects
+								作品
 							</span>
 						</h2>
 						<p class="section-desc" data-i18n="section.desc.featured">
-							Work that represents depth and technical breadth.
+							代表技术深度与广度的作品。
 						</p>
 					</header>
 					<div class="gallery">
@@ -137,12 +142,12 @@ const languages = [...langSet];
 		<!-- Recent Projects -->
 		<section class="section reveal">
 			<header class="section-header">
-				<span class="section-eyebrow" data-i18n="section.eyebrow.recent">Latest Work</span>
+				<span class="section-eyebrow" data-i18n="section.eyebrow.recent">最新作品</span>
 				<h2 class="section-title">
-					<span data-i18n="section.title.recent">Recent</span>
-					<span class="gradient-text" data-i18n="section.title.recentAccent">Projects</span>
+					<span data-i18n="section.title.recent">最近</span>
+					<span class="gradient-text" data-i18n="section.title.recentAccent">项目</span>
 				</h2>
-				<p class="section-desc" data-i18n="section.desc.recent">Browse the latest coursework and experiments.</p>
+				<p class="section-desc" data-i18n="section.desc.recent">浏览最新的项目与实验。</p>
 			</header>
 			<div class="gallery">
 				<Grid variant="offset">
@@ -157,21 +162,72 @@ const languages = [...langSet];
 			</div>
 			<div class="cta">
 				<a href="/projects" class="cta-button" data-i18n="section.cta.viewAll">
-					View All Projects
+					查看全部作品
 					<Icon icon="arrow-right" size="1.2em" />
 				</a>
 			</div>
 		</section>
 
+		<!-- Latest Blog Posts -->
+		{
+			latestPosts.length > 0 && (
+				<section class="section reveal">
+					<header class="section-header">
+						<span class="section-eyebrow" data-i18n="section.eyebrow.blog">
+							Writing
+						</span>
+						<h2 class="section-title">
+							<span data-i18n="section.title.blog">Latest</span>
+							<span class="gradient-text" data-i18n="section.title.blogAccent">
+								Posts
+							</span>
+						</h2>
+						<p class="section-desc" data-i18n="section.desc.blog">
+							记录项目实践中的思考与总结。
+						</p>
+					</header>
+					<div class="posts-grid">
+						{latestPosts.map((post) => (
+							<article class="post-card">
+								<div class="post-meta">
+									<span class="post-date">
+										<Icon icon="calendar" size="0.9em" />
+										{post.data.date}
+									</span>
+									{post.data.tags.slice(0, 2).map((tag) => (
+										<span class="post-tag">{tag}</span>
+									))}
+								</div>
+								<h3 class="post-title">
+									<a href={`/blog/${post.id}`}>{post.data.title}</a>
+								</h3>
+								<p class="post-desc">{post.data.description}</p>
+								<a href={`/blog/${post.id}`} class="post-link" data-i18n="blog.readMore">
+									阅读全文
+									<Icon icon="arrow-right" size="0.9em" />
+								</a>
+							</article>
+						))}
+					</div>
+					<div class="cta">
+						<a href="/blog" class="cta-button" data-i18n="section.cta.viewAllPosts">
+							查看全部文章
+							<Icon icon="arrow-right" size="1.2em" />
+						</a>
+					</div>
+				</section>
+			)
+		}
+
 		<!-- Tech Stack -->
 		<section class="section reveal">
 			<header class="section-header">
-				<span class="section-eyebrow" data-i18n="section.eyebrow.tech">Toolbox</span>
+				<span class="section-eyebrow" data-i18n="section.eyebrow.tech">工具箱</span>
 				<h2 class="section-title">
-					<span data-i18n="section.title.tech">Tech</span>
-					<span class="gradient-text" data-i18n="section.title.techAccent">Stack</span>
+					<span data-i18n="section.title.tech">技术</span>
+					<span class="gradient-text" data-i18n="section.title.techAccent">栈</span>
 				</h2>
-				<p class="section-desc" data-i18n="section.desc.tech">Technologies and tools used across all projects.</p>
+				<p class="section-desc" data-i18n="section.desc.tech">所有项目中使用的技术与工具。</p>
 			</header>
 			<div class="tech-grid">
 				{allTech.map((tech) => <span class="tech-item">{tech}</span>)}
@@ -181,12 +237,12 @@ const languages = [...langSet];
 		<!-- Tag Cloud -->
 		<section class="section reveal">
 			<header class="section-header">
-				<span class="section-eyebrow" data-i18n="section.eyebrow.tags">Explore</span>
+				<span class="section-eyebrow" data-i18n="section.eyebrow.tags">探索</span>
 				<h2 class="section-title">
-					<span data-i18n="section.title.tags">Browse by</span>
-					<span class="gradient-text" data-i18n="section.title.tagsAccent">Tag</span>
+					<span data-i18n="section.title.tags">按标签</span>
+					<span class="gradient-text" data-i18n="section.title.tagsAccent">浏览</span>
 				</h2>
-				<p class="section-desc" data-i18n="section.desc.tags">Filter projects by technology, domain, or course.</p>
+				<p class="section-desc" data-i18n="section.desc.tags">按技术、领域或类型筛选项目。</p>
 			</header>
 			<div class="tag-cloud">
 				{
@@ -259,7 +315,7 @@ const languages = [...langSet];
 		.blob-1 {
 			width: 500px;
 			height: 500px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
 			top: -10%;
 			left: -5%;
 			animation: float 12s ease-in-out infinite;
@@ -486,12 +542,12 @@ const languages = [...langSet];
 			transition:
 				transform 0.2s ease,
 				box-shadow 0.2s ease;
-			box-shadow: 0 4px 20px rgba(118, 17, 166, 0.3);
+			box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
 		}
 
 		.cta-button:hover {
 			transform: translateY(-2px);
-			box-shadow: 0 8px 30px rgba(118, 17, 166, 0.4);
+			box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
 		}
 
 		/* ===== Tech Grid ===== */
@@ -559,6 +615,101 @@ const languages = [...langSet];
 			padding: 0.6rem 1.4rem;
 			background: var(--gray-700);
 			color: var(--gray-100);
+		}
+
+		/* ===== Blog Post Cards ===== */
+		.posts-grid {
+			display: grid;
+			gap: 1.5rem;
+			grid-template-columns: 1fr;
+		}
+
+		.post-card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.6rem;
+			padding: 1.75rem;
+			background: var(--gray-999);
+			border: 1px solid var(--gray-800);
+			border-radius: 1rem;
+			transition:
+				transform 0.3s ease,
+				box-shadow 0.3s ease,
+				border-color 0.3s ease;
+		}
+
+		.post-card:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+			border-color: var(--accent-regular);
+		}
+
+		.post-meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			align-items: center;
+		}
+
+		.post-date {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.3rem;
+			font-size: var(--text-sm);
+			color: var(--gray-400);
+		}
+
+		.post-tag {
+			padding: 0.2rem 0.6rem;
+			background: var(--accent-subtle-overlay);
+			color: var(--accent-regular);
+			border-radius: 999px;
+			font-size: var(--text-xs);
+			font-weight: 500;
+		}
+
+		.post-title {
+			margin: 0;
+			font-size: var(--text-lg);
+			line-height: 1.35;
+		}
+
+		.post-title a {
+			color: var(--gray-0);
+			text-decoration: none;
+			transition: color 0.2s;
+		}
+
+		.post-title a:hover {
+			color: var(--accent-regular);
+		}
+
+		.post-desc {
+			margin: 0;
+			flex: 1;
+			color: var(--gray-300);
+			font-size: var(--text-sm);
+			line-height: 1.6;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.post-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			font-size: var(--text-sm);
+			font-weight: 500;
+			color: var(--accent-regular);
+			text-decoration: none;
+			transition: gap 0.2s;
+		}
+
+		.post-link:hover {
+			gap: 0.55rem;
+			text-decoration: underline;
 		}
 
 		/* ===== Responsive ===== */

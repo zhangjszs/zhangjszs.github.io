@@ -13,17 +13,8 @@ difficulty: '进阶'
 status: 'Completed'
 architecture: '编译器前端架构：词法分析器将源代码转换为 Token 流，语法分析器基于文法规则构建语法树，表达式计算器实现算术表达式求值。CMake 管理多模块构建。'
 challenges:
-  [
-    '正则表达式到有限自动机的转换实现',
-    '递归下降分析法处理算术表达式的优先级和结合性',
-    '符号表的设计与作用域管理',
-  ]
-lessons:
-  [
-    '深入理解了编译器前端的工作原理',
-    '掌握了词法分析和语法分析的核心算法',
-    '学会了用 CMake 组织多文件 C++ 项目',
-  ]
+  ['正则表达式到有限自动机的转换实现', '递归下降分析法处理算术表达式的优先级和结合性', '符号表的设计与作用域管理']
+lessons: ['深入理解了编译器前端的工作原理', '掌握了词法分析和语法分析的核心算法', '学会了用 CMake 组织多文件 C++ 项目']
 ---
 
 ## 项目背景
@@ -53,8 +44,9 @@ graph LR
         B1[Character Stream] --> B2[State Machine]
         B2 --> B3[Token Output]
     end
+
 `}
-	caption="Compiler Frontend Pipeline"
+caption="Compiler Frontend Pipeline"
 />
 
 ## 项目结构

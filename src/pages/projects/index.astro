@@ -7,13 +7,24 @@ import Grid from '../../components/Grid.astro';
 import Icon from '../../components/Icon.astro';
 
 const projects = await getCollection('projects');
+// 个人项目排在前面，课程实验（labwork）靠后
+const sortedProjects = projects.sort((a, b) => {
+	if (a.data.category !== b.data.category) return a.data.category === 'personal' ? -1 : 1;
+	return 0;
+});
 const allTags = projects.flatMap((p) => p.data.tags);
 const uniqueTags = [...new Set(allTags)];
 const allTech = [...new Set(projects.flatMap((p) => p.data.techStack))];
 const featuredCount = projects.filter((p) => p.data.featured).length;
+
+// 分类筛选按钮（i18n key 见 src/i18n/dictionary.ts）
+const categories = [
+	{ value: 'personal', i18n: 'projects.category.personal', label: '个人项目' },
+	{ value: 'labwork', i18n: 'projects.category.labwork', label: '课程实验' },
+];
 ---
 
-<BaseLayout title="All Projects | HUAT Labwork" description="Browse all computer science projects and coursework.">
+<BaseLayout title="作品 | 你的名字" description="个人项目与课程实验作品集。">
 	<section class="hero-section">
 		<div class="hero-blobs" aria-hidden="true">
 			<div class="blob blob-1"></div>
@@ -21,49 +32,48 @@ const featuredCount = projects.filter((p) => p.data.featured).length;
 		</div>
 		<div class="wrapper hero-content">
 			<div class="hero-text">
-				<span class="eyebrow" data-i18n="projects.eyebrow">Portfolio</span>
+				<span class="eyebrow" data-i18n="projects.eyebrow">作品集</span>
 				<h1 class="hero-title">
-					<span data-i18n="projects.title">All</span>
-					<span class="gradient-text" data-i18n="projects.titleAccent">Projects</span>
+					<span data-i18n="projects.title">全部</span>
+					<span class="gradient-text" data-i18n="projects.titleAccent">作品</span>
 				</h1>
 				<p class="hero-tagline" data-i18n="projects.tagline">
-					Browse {projects.length} projects across {uniqueTags.length} categories. From Java Web to Machine Learning, from
-					Android to Computer Networks.
+					这里收录了我的个人项目与课程实验，涵盖 Web 开发、算法、机器学习等多个方向。
 				</p>
 			</div>
 			<div class="stats-grid">
 				<div class="stat-card">
 					<Icon icon="code" size="1.5em" />
 					<span class="stat-number">{projects.length}</span>
-					<span class="stat-label" data-i18n="stats.projects">Projects</span>
+					<span class="stat-label" data-i18n="stats.projects">项目</span>
 				</div>
 				<div class="stat-card">
 					<Icon icon="terminal-window" size="1.5em" />
 					<span class="stat-number">{allTech.length}</span>
-					<span class="stat-label" data-i18n="stats.technologies">Technologies</span>
+					<span class="stat-label" data-i18n="stats.technologies">技术</span>
 				</div>
 				<div class="stat-card">
 					<Icon icon="list" size="1.5em" />
 					<span class="stat-number">{uniqueTags.length}</span>
-					<span class="stat-label" data-i18n="projects.stats.categories">Categories</span>
+					<span class="stat-label" data-i18n="projects.stats.categories">类别</span>
 				</div>
 				<div class="stat-card">
 					<Icon icon="star" size="1.5em" />
 					<span class="stat-number">{featuredCount}</span>
-					<span class="stat-label" data-i18n="projects.stats.featured">Featured</span>
+					<span class="stat-label" data-i18n="projects.stats.featured">精选</span>
 				</div>
 			</div>
 		</div>
 	</section>
 
 	<main class="wrapper stack gap-20">
-		<TagFilter tags={allTags} />
+		<TagFilter tags={allTags} categories={categories} />
 
 		<div class="projects-grid reveal">
 			<Grid variant="offset">
 				{
-					projects.map((project) => (
-						<li data-project-tags={JSON.stringify(project.data.tags)}>
+					sortedProjects.map((project) => (
+						<li data-project-tags={JSON.stringify(project.data.tags)} data-project-category={project.data.category}>
 							<ProjectCard project={project} />
 						</li>
 					))
@@ -97,7 +107,7 @@ const featuredCount = projects.filter((p) => p.data.featured).length;
 		.blob-1 {
 			width: 450px;
 			height: 450px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
 			top: -20%;
 			left: 10%;
 			animation: float 12s ease-in-out infinite;

@@ -1,19 +1,16 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 
-const articles = await getCollection('deep-dives');
+const articles = await getCollection('blog');
 const sortedArticles = articles.sort((a, b) => {
 	if (!a.data.date || !b.data.date) return 0;
 	return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
 });
 ---
 
-<BaseLayout
-	title="Deep Dives | HUAT Labwork"
-	description="In-depth technical write-ups on architecture, algorithms, and engineering decisions."
->
+<BaseLayout title="博客 | 你的名字" description="技术随笔、项目复盘与学习笔记。">
 	<section class="hero-section">
 		<div class="hero-blobs" aria-hidden="true">
 			<div class="blob blob-1"></div>
@@ -21,14 +18,12 @@ const sortedArticles = articles.sort((a, b) => {
 		</div>
 		<div class="wrapper hero-content">
 			<div class="hero-text">
-				<span class="eyebrow">Technical Writing</span>
+				<span class="eyebrow" data-i18n="blog.eyebrow">博客</span>
 				<h1 class="hero-title">
-					Deep <span class="gradient-text">Dives</span>
+					<span data-i18n="blog.title">全部</span>
+					<span class="gradient-text" data-i18n="blog.titleAccent">文章</span>
 				</h1>
-				<p class="hero-tagline">
-					In-depth articles on architecture, algorithms, and engineering decisions. Written while building real
-					projects.
-				</p>
+				<p class="hero-tagline" data-i18n="blog.tagline">技术随笔、项目复盘与学习笔记。</p>
 			</div>
 		</div>
 	</section>
@@ -50,13 +45,13 @@ const sortedArticles = articles.sort((a, b) => {
 							))}
 						</div>
 						<h2 class="article-title">
-							<a href={`/deep-dives/${article.id}`}>{article.data.title}</a>
+							<a href={`/blog/${article.id}`}>{article.data.title}</a>
 						</h2>
 						<p class="article-desc">{article.data.description}</p>
 						{article.data.relatedProject && (
 							<a href={`/projects/${article.data.relatedProject}`} class="related-link">
 								<Icon icon="arrow-right" size="0.9em" />
-								Related Project
+								<span data-i18n="blog.relatedProject">查看相关作品</span>
 							</a>
 						)}
 					</article>
@@ -90,7 +85,7 @@ const sortedArticles = articles.sort((a, b) => {
 		.blob-1 {
 			width: 450px;
 			height: 450px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
 			top: -20%;
 			left: 10%;
 			animation: float 12s ease-in-out infinite;

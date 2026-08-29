@@ -20,12 +20,11 @@ const { Content } = await render(project);
 const {
 	title,
 	description,
+	repoUrl,
 	repoPath,
 	tags,
 	keywords,
 	techStack,
-	screenshotsDir,
-	codeSnippets,
 	demoUrl,
 	externalDeployUrl,
 	date,
@@ -35,9 +34,14 @@ const {
 	challenges,
 	lessons,
 } = project.data;
+
+// 源码链接：个人项目直接使用 repoUrl；课程实验回退到 HUAT-kerwin-labwork 仓库子目录
+// TODO: 如课程实验仓库地址有变，请修改下面的回退地址
+const sourceUrl =
+	repoUrl ?? (repoPath ? `https://github.com/kerwin-lab/HUAT-kerwin-labwork/tree/main/${repoPath}` : undefined);
 ---
 
-<BaseLayout title={`${title} | HUAT Labwork`} description={description}>
+<BaseLayout title={`${title} | 你的名字`} description={description}>
 	<article class="project-article">
 		<!-- Hero -->
 		<header class="project-hero">
@@ -71,15 +75,14 @@ const {
 					{techStack.map((tech) => <span class="tech-badge">{tech}</span>)}
 				</div>
 				<div class="hero-actions">
-					<a
-						class="btn btn-primary"
-						href={`https://github.com/kerwin-lab/HUAT-kerwin-labwork/tree/main/${repoPath}`}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Icon icon="github-logo" size="1.2em" />
-						<span data-i18n="project.viewSource">View Source</span>
-					</a>
+					{
+						sourceUrl && (
+							<a class="btn btn-primary" href={sourceUrl} target="_blank" rel="noopener noreferrer">
+								<Icon icon="github-logo" size="1.2em" />
+								<span data-i18n="project.viewSource">查看源码</span>
+							</a>
+						)
+					}
 					{
 						demoUrl && (
 							<a class="btn btn-secondary" href={demoUrl} target="_blank" rel="noopener noreferrer">
@@ -116,9 +119,9 @@ const {
 						</div>
 					</div>
 					<div class="overview-card">
-						<h3><Icon icon="magnifying-glass" size="1.2em" /> <span data-i18n="project.keywords">Keywords</span></h3>
+						<h3><Icon icon="magnifying-glass" size="1.2em" /> <span data-i18n="project.keywords">关键词</span></h3>
 						<div class="keyword-list">
-							{keywords.map((kw) => <span class="keyword-pill">{kw}</span>)}
+							{(keywords ?? []).map((kw) => <span class="keyword-pill">{kw}</span>)}
 						</div>
 					</div>
 					<div class="overview-card wide">
@@ -238,7 +241,7 @@ const {
 		.blob-1 {
 			width: 400px;
 			height: 400px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
 			top: -20%;
 			right: -5%;
 			animation: float 12s ease-in-out infinite;
@@ -385,12 +388,12 @@ const {
 		.btn-primary {
 			background: var(--gradient-accent);
 			color: var(--gray-999);
-			box-shadow: 0 4px 20px rgba(118, 17, 166, 0.3);
+			box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
 		}
 
 		.btn-primary:hover {
 			transform: translateY(-2px);
-			box-shadow: 0 8px 30px rgba(118, 17, 166, 0.4);
+			box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
 		}
 
 		.btn-secondary {

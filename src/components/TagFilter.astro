@@ -2,16 +2,26 @@
 interface Props {
 	tags: string[];
 	selected?: string[];
+	/** 作品分类筛选（可选）：value 对应 frontmatter 的 category 字段 */
+	categories?: { value: string; i18n: string; label: string }[];
 }
 
-const { tags, selected = [] } = Astro.props;
+const { tags, selected = [], categories = [] } = Astro.props;
 const uniqueTags = [...new Set(tags)].sort();
 ---
 
 <div class="tag-filter" data-selected={JSON.stringify(selected)}>
-	<span class="label" data-i18n="projects.filter">Filter:</span>
+	<span class="label" data-i18n="projects.filter">筛选：</span>
 	<div class="tags">
-		<button class="tag-btn active" data-tag="all" data-i18n="projects.filter.all">All</button>
+		<button class="tag-btn active" data-tag="all" data-i18n="projects.filter.all">全部</button>
+		{
+			// 分类筛选按钮（个人项目 / 课程实验）
+			categories.map((cat) => (
+				<button class="tag-btn" data-tag={`category:${cat.value}`} data-i18n={cat.i18n}>
+					{cat.label}
+				</button>
+			))
+		}
 		{
 			uniqueTags.map((tag) => (
 				<button class="tag-btn" data-tag={tag}>
@@ -34,13 +44,21 @@ const uniqueTags = [...new Set(tags)].sort();
 			if (activeBtn) activeBtn.classList.add('active');
 			else buttons[0]?.classList.add('active');
 
+			// 以 category: 开头的按钮按分类过滤，其余按标签过滤
+			const isCategory = tag.startsWith('category:');
+			const categoryValue = isCategory ? tag.slice('category:'.length) : null;
+
 			projects.forEach((project) => {
-				const tags = JSON.parse(project.getAttribute('data-project-tags') || '[]');
-				if (tag === 'all' || tags.includes(tag)) {
-					(project as HTMLElement).style.display = '';
+				let show: boolean;
+				if (tag === 'all') {
+					show = true;
+				} else if (isCategory) {
+					show = project.getAttribute('data-project-category') === categoryValue;
 				} else {
-					(project as HTMLElement).style.display = 'none';
+					const tags = JSON.parse(project.getAttribute('data-project-tags') || '[]');
+					show = tags.includes(tag);
 				}
+				(project as HTMLElement).style.display = show ? '' : 'none';
 			});
 		};
 

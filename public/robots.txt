@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://huat-showcase.pages.dev/sitemap-index.xml
+Sitemap: https://your-username.github.io/sitemap-index.xml

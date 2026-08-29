@@ -1,15 +1,21 @@
 ---
 import '../styles/global.css';
 
+// ============================================================
+// TODO: 站点基础信息占位符 —— 以下三处替换为你自己的信息
+// ============================================================
+const SITE_NAME = '你的名字'; // TODO: 你的站点名/个人品牌名
+const SITE_DESCRIPTION = '个人主页：项目作品、博客文章与联系方式。'; // TODO: 站点描述（会用于 SEO / 社交分享）
+
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
 }
 
-const {
-	title = "Kerwin's Labwork",
-	description = 'A curated showcase of computer science coursework and projects from HUAT.',
-} = Astro.props;
+const { title = SITE_NAME, description = SITE_DESCRIPTION } = Astro.props;
+
+// 社交分享图的完整地址由 astro.config.mjs 的 site 派生
+const ogImage = new URL('/og-image.png', Astro.site);
 ---
 
 <meta charset="UTF-8" />
@@ -21,12 +27,12 @@ const {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Kerwin's Labwork" />
-<meta property="og:image" content="https://huat-showcase.pages.dev/og-image.png" />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://huat-showcase.pages.dev/og-image.png" />
+<meta name="twitter:image" content={ogImage} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 
@@ -51,7 +57,7 @@ const {
 
 	// Set html lang from localStorage (synced with LangSwitcher)
 	if (typeof localStorage !== 'undefined') {
-		const lang = localStorage.getItem('preferred-lang') || 'en';
+		const lang = localStorage.getItem('preferred-lang') || 'zh'; // 默认语言为中文
 		document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
 	}
 

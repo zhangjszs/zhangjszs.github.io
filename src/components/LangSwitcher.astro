@@ -15,7 +15,7 @@ const currentPath = Astro.url.pathname;
 	import type { Lang } from '../i18n/dictionary';
 
 	const STORAGE_KEY = 'preferred-lang';
-	const DEFAULT_LANG: Lang = 'en';
+	const DEFAULT_LANG: Lang = 'zh'; // 默认显示中文
 
 	const getStoredLang = (): Lang => {
 		if (typeof localStorage === 'undefined') return DEFAULT_LANG;
