@@ -22,11 +22,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install, build, and format-check
-        uses: withastro/action@v3
+      # 显式 install + build：避免 withastro/action 内部重复 upload artifact 触发 409
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           # 项目要求 Node ≥ 22.12.0（见 package.json engines）
-          node-version: 22
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
 
       - name: Enable Pages
         uses: actions/configure-pages@v5
