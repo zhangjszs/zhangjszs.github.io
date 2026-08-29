@@ -1,55 +1,141 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import type { iconPaths } from '../components/IconPaths';
 import RadarChart from '../components/RadarChart.astro';
 
 // ============================================================
-// TODO: 以下个人信息全部为占位内容，请替换为你自己的资料
+// 静态个人信息（站名、身份、时间线"现在"段、联系方式）
+// 改这里就行；下面的"技能/标签/时间线"是项目数据自动聚合的
 // ============================================================
 
-// 技能雷达图数据（level 为 0-100 的自评分数）
-const radarCategories = [
-	{ category: '语言', skills: ['Java', 'Python', 'TypeScript'], level: 85 },
-	{ category: '前端', skills: ['HTML/CSS', 'React', 'Astro'], level: 75 },
-	{ category: '后端', skills: ['Node.js', 'SQL', 'API 设计'], level: 80 },
-	{ category: '工具', skills: ['Git', 'Linux', 'Docker'], level: 70 },
-	{ category: '数据', skills: ['Pandas', 'SQL', '可视化'], level: 65 },
-	{ category: '其他', skills: ['算法', '网络', '设计'], level: 60 },
+/** 身份标签 */
+const ROLE = '自动驾驶工程学生 / 湖北汽车工业学院 FSAC 车队';
+
+/** 个人简介段落（出现在 About 背景区，可写多段） */
+const ABOUT_PARAGRAPHS: string[] = [
+	'我是 Kerwin Zhang，湖北汽车工业学院的本科生，目前在 FSAC 车队做自动驾驶相关工作，方向覆盖感知、定位、规划与控制全流程。',
+	'研究兴趣集中在 LiDAR 地面分割与锥桶检测 / 聚类，常用 RANSAC 与区域建模做实时点云处理；车队里负责从感知到规控的工程化与 rosbag 复现实验。',
+	'这里记录我在 ROS（C++/Python）、CUDA、PyTorch 上的学习轨迹和项目实践，欢迎通过下方渠道交流。',
 ];
 
-// 技能分组
-const skills = [
-	{ category: '语言', items: ['Java', 'Python', 'TypeScript', 'SQL'] },
-	{ category: '前端', items: ['HTML/CSS', 'Astro', 'React', 'Vite'] },
-	{ category: '后端', items: ['Node.js', 'REST API', 'PostgreSQL'] },
-	{ category: '工具', items: ['Git', 'Linux', 'Docker', 'CI/CD'] },
-];
+/** 时间线「现在」段（手动维护；其余按年聚合自项目数据） */
+const NOW_ITEM = {
+	period: '现在',
+	title: '核心成员',
+	org: 'FSAC Team of HUAT · https://github.com/HUAT-FSAC',
+	desc: '本科生在读，关注 LiDAR 地面分割、自动驾驶赛车算法与 ROS 2 工程化。',
+};
 
-// 个人时间线
-const timeline = [
-	{
-		period: '现在',
-		title: '开发者 / 学生',
-		org: 'TODO: 你的学校或公司',
-		desc: 'TODO: 一句话介绍你当前的状态与方向。',
-	},
-	{
-		period: '过往',
-		title: '课程实验与个人项目',
-		org: '本站作品集',
-		desc: '完成了数据结构、算法、Web 开发等多个方向的课程实验，并持续维护个人项目。',
-	},
-];
-
-// 联系方式（TODO: 替换为你自己的链接）
+/** 联系方式 */
 const contactLinks: { label: string; href: string; icon: keyof typeof iconPaths }[] = [
-	{ label: 'GitHub', href: 'https://github.com/your-username', icon: 'github-logo' },
-	{ label: 'Email', href: 'mailto:your-email@example.com', icon: 'envelope' },
+	{ label: 'GitHub', href: 'https://github.com/zhangjszs', icon: 'github-logo' },
+	{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com', icon: 'envelope' },
+	{ label: 'CSDN', href: 'https://blog.csdn.net/zcw_jszs', icon: 'pencil-line' },
+	{ label: 'CNBlogs', href: 'https://www.cnblogs.com/jszs0013/', icon: 'globe' },
 ];
+
+// ============================================================
+// B 路线：项目数据自动聚合（不引外部图表库，纯前端聚合 + 现有 RadarChart）
+// ============================================================
+
+const allProjects = await getCollection('projects');
+// 只看 personal（个人项目），不混入课程实验
+const personalProjects = allProjects.filter((p) => p.data.category === 'personal');
+
+// 技术栈关键词到 6 大类（语言/前端/后端/工具/数据/其他）的映射
+// 匹配时大小写不敏感、包含匹配（如 "TypeScript" 命中 "typescript"）
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+	语言: ['c++', 'c', 'python', 'cuda', 'rust', 'matlab', 'typescript', 'java', 'go'],
+	前端: ['html', 'css', 'sass', 'react', 'vue', 'svelte', 'astro', 'vite', 'tailwind', 'webpack', 'figma'],
+	后端: [
+		'node.js',
+		'nodejs',
+		'express',
+		'django',
+		'flask',
+		'spring',
+		'postgresql',
+		'mysql',
+		'mongodb',
+		'redis',
+		'rest',
+	],
+	工具: ['ros', 'ros2', 'git', 'docker', 'cmake', 'linux', 'ubuntu', 'github actions', 'ci/cd', 'cloudflare', 'aws'],
+	数据: [
+		'lidar',
+		'点云',
+		'slam',
+		'opencv',
+		'eigen',
+		'pcl',
+		'pytorch',
+		'tensorflow',
+		'pandas',
+		'numpy',
+		'matplotlib',
+		'jupyter',
+	],
+	其他: ['自动驾驶', 'fsac', '路径规划', '感知', '定位', '控制', '算法', '数据结构', '网络', '操作系统'],
+};
+
+const RADAR_CATEGORY_ORDER: Array<keyof typeof CATEGORY_KEYWORDS> = ['语言', '前端', '后端', '工具', '数据', '其他'];
+
+/** 频次统计：每个技术栈出现次数 */
+const techFreq = new Map<string, number>();
+personalProjects.forEach((p) => {
+	p.data.techStack.forEach((tech) => {
+		const key = tech.trim();
+		if (key) techFreq.set(key, (techFreq.get(key) || 0) + 1);
+	});
+});
+const allTechSorted = [...techFreq.entries()].sort((a, b) => b[1] - a[1]);
+
+/** 6 类雷达：每类的 level = 该类技术累计频次 / 该类项目数 × 100（封顶 100） */
+const radarCategories = RADAR_CATEGORY_ORDER.map((cat) => {
+	const kws = CATEGORY_KEYWORDS[cat].map((k) => k.toLowerCase());
+	const hits = allTechSorted.filter(([tech]) => kws.some((k) => tech.toLowerCase().includes(k)));
+	const skills = hits.slice(0, 3).map(([t]) => t);
+	const totalCount = hits.reduce((s, [, c]) => s + c, 0);
+	// level 归一化：每类至少要 1 个项目才显示数据；按"累计使用次数 / 项目数"映射到 0-100
+	const level =
+		personalProjects.length === 0 ? 0 : Math.min(100, Math.round((totalCount / personalProjects.length) * 60 + 20));
+	return { category: cat, skills, level };
+});
+
+/** 技能分组卡片（按 6 大类聚合） */
+const skills = RADAR_CATEGORY_ORDER.map((cat) => {
+	const kws = CATEGORY_KEYWORDS[cat].map((k) => k.toLowerCase());
+	const items = allTechSorted.filter(([tech]) => kws.some((k) => tech.toLowerCase().includes(k))).map(([t]) => t);
+	return { category: cat, items };
+}).filter((g) => g.items.length > 0);
+
+/** 时间线：按项目 `date` 字段的年份聚合（最近 5 年） */
+const projectsByYear = new Map<string, number>();
+personalProjects.forEach((p) => {
+	if (p.data.date) {
+		const year = p.data.date.split('-')[0];
+		if (year) projectsByYear.set(year, (projectsByYear.get(year) || 0) + 1);
+	}
+});
+const recentYears = [...projectsByYear.entries()].sort((a, b) => Number(b[0]) - Number(a[0])).slice(0, 5);
+
+const autoTimeline = recentYears.map(([year, count]) => ({
+	period: year,
+	title: `${count} 个项目`,
+	org: '本站作品集',
+	desc: `${year} 年发布的个人项目。`,
+}));
+
+// 时间线完整序列：现在 → 倒序年份
+const timeline = [NOW_ITEM, ...autoTimeline];
 ---
 
-<BaseLayout title="关于 | 你的名字" description="关于我：个人简介、技能与联系方式。">
+<BaseLayout
+	title="关于 | Kerwin Zhang"
+	description="Kerwin Zhang · 自动驾驶工程学生，FSAC 车队成员，研究方向 LiDAR 感知与自动驾驶算法。"
+>
 	<section class="hero-section">
 		<div class="hero-blobs" aria-hidden="true">
 			<div class="blob blob-1"></div>
@@ -76,11 +162,8 @@ const contactLinks: { label: string; href: string; icon: keyof typeof iconPaths 
 					<h2 class="section-title">
 						<span data-i18n="about.background.title">我是谁</span>
 					</h2>
-					<!-- TODO: 替换为你的个人简介 -->
-					<p>我是「你的名字」，一名对软件工程充满热情的开发者。这个网站收录了我的个人项目、课程实验与博客文章。</p>
-					<p>
-						我相信在实践中学习。这里的每个项目都代表了我解决过的真实问题、探索过的技术，或者曾经难以理解最终掌握的概念。
-					</p>
+					<p class="role-line">{ROLE}</p>
+					{ABOUT_PARAGRAPHS.map((p) => <p>{p}</p>)}
 				</div>
 				<div class="timeline">
 					{
@@ -127,6 +210,49 @@ const contactLinks: { label: string; href: string; icon: keyof typeof iconPaths 
 					))
 				}
 			</div>
+		</section>
+
+		<!-- 数据摘要（B 路线：项目数据自动聚合，零图表库） -->
+		<section class="section reveal">
+			<span class="section-eyebrow">数据</span>
+			<h2 class="section-title">
+				<span>项目</span>
+				<span class="gradient-text">概览</span>
+			</h2>
+			<p class="data-note">以下数据从 <code>src/content/projects/</code> 自动聚合，每加一个项目都会自动更新。</p>
+			<div class="data-grid">
+				<div class="data-card">
+					<span class="data-number">{personalProjects.length}</span>
+					<span class="data-label">个人项目</span>
+				</div>
+				<div class="data-card">
+					<span class="data-number">{allTechSorted.length}</span>
+					<span class="data-label">独立技术</span>
+				</div>
+				<div class="data-card">
+					<span class="data-number">{skills.reduce((s, g) => s + g.items.length, 0)}</span>
+					<span class="data-label">技术归类</span>
+				</div>
+				<div class="data-card">
+					<span class="data-number">{recentYears.length}</span>
+					<span class="data-label">活跃年份</span>
+				</div>
+			</div>
+			{
+				allTechSorted.length > 0 && (
+					<div class="top-tech">
+						<h3>最常使用的技术</h3>
+						<ol>
+							{allTechSorted.slice(0, 8).map(([tech, count]) => (
+								<li>
+									<span class="top-tech-name">{tech}</span>
+									<span class="top-tech-count">× {count}</span>
+								</li>
+							))}
+						</ol>
+					</div>
+				)
+			}
 		</section>
 
 		<!-- Contact -->
@@ -279,6 +405,104 @@ const contactLinks: { label: string; href: string; icon: keyof typeof iconPaths 
 			color: var(--gray-300);
 			line-height: 1.7;
 			margin: 0;
+		}
+
+		/* 身份标签（莫兰迪点缀） */
+		.role-line {
+			display: inline-block;
+			padding: 0.35rem 0.85rem;
+			border-radius: 999px;
+			background: var(--accent-overlay);
+			color: var(--accent-dark);
+			font-size: var(--text-sm);
+			font-weight: 500;
+			letter-spacing: 0.02em;
+			margin-bottom: 0.25rem;
+		}
+
+		/* ===== 数据摘要（B 路线） ===== */
+		.data-note {
+			color: var(--gray-400);
+			font-size: var(--text-sm);
+			margin: 0 0 1.25rem;
+		}
+		.data-note code {
+			font-family: var(--font-mono);
+			font-size: 0.85em;
+			padding: 0.1em 0.4em;
+			background: var(--gray-800);
+			border-radius: 4px;
+		}
+		.data-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+		@media (min-width: 50em) {
+			.data-grid {
+				grid-template-columns: repeat(4, 1fr);
+			}
+		}
+		.data-card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+			padding: 1.25rem 1rem;
+			border: 1px solid var(--gray-700);
+			border-radius: 12px;
+			background: var(--gray-900);
+			transition: border-color 0.2s;
+		}
+		.data-card:hover {
+			border-color: var(--accent-regular);
+		}
+		.data-number {
+			font-family: var(--font-brand);
+			font-size: var(--text-3xl);
+			font-weight: 700;
+			color: var(--accent-regular);
+		}
+		.data-label {
+			font-size: var(--text-sm);
+			color: var(--gray-400);
+		}
+		.top-tech h3 {
+			font-size: var(--text-lg);
+			margin: 0 0 0.75rem;
+			color: var(--gray-100);
+		}
+		.top-tech ol {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 0.5rem;
+		}
+		@media (min-width: 40em) {
+			.top-tech ol {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+		.top-tech li {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.6rem 0.9rem;
+			background: var(--gray-900);
+			border: 1px solid var(--gray-700);
+			border-radius: 8px;
+			font-size: var(--text-sm);
+		}
+		.top-tech-name {
+			color: var(--gray-100);
+			font-weight: 500;
+		}
+		.top-tech-count {
+			color: var(--accent-regular);
+			font-family: var(--font-mono);
+			font-size: 0.85em;
 		}
 
 		/* ===== Timeline ===== */

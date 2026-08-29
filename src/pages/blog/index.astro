@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
+import { withBase } from '../../utils/paths';
 
 const articles = await getCollection('blog');
 const sortedArticles = articles.sort((a, b) => {
@@ -45,11 +46,11 @@ const sortedArticles = articles.sort((a, b) => {
 							))}
 						</div>
 						<h2 class="article-title">
-							<a href={`/blog/${article.id}`}>{article.data.title}</a>
+							<a href={withBase(`/blog/${article.id}`)}>{article.data.title}</a>
 						</h2>
 						<p class="article-desc">{article.data.description}</p>
 						{article.data.relatedProject && (
-							<a href={`/projects/${article.data.relatedProject}`} class="related-link">
+							<a href={withBase(`/projects/${article.data.relatedProject}`)} class="related-link">
 								<Icon icon="arrow-right" size="0.9em" />
 								<span data-i18n="blog.relatedProject">查看相关作品</span>
 							</a>

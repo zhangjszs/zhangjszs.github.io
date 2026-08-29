@@ -5,7 +5,6 @@ import ProjectCard from '../../components/ProjectCard.astro';
 import TagFilter from '../../components/TagFilter.astro';
 import Grid from '../../components/Grid.astro';
 import Icon from '../../components/Icon.astro';
-
 const projects = await getCollection('projects');
 // 个人项目排在前面，课程实验（labwork）靠后
 const sortedProjects = projects.sort((a, b) => {

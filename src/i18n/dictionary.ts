@@ -84,10 +84,10 @@ export const dictionary = {
 		'about.background.eyebrow': '背景',
 		'about.background.title': '我是谁',
 		'about.background.titleAccent': '',
-		'about.background.p1':
-			'我是「你的名字」，一名对软件工程充满热情的开发者。这个网站收录了我的个人项目、课程实验与博客文章。',
-		'about.background.p2':
-			'我相信在实践中学习。这里的每个项目都代表了我解决过的真实问题、探索过的技术，或者曾经难以理解最终掌握的概念。',
+		// TODO: 关于页背景段落已改为 about.astro 里的 ABOUT_PARAGRAPHS 数组维护
+		// 下面两行仅供其它组件（如 RSS / SEO）兜底使用，可以保持不动
+		'about.background.p1': '关于页背景段落已迁移到 about.astro 的 ABOUT_PARAGRAPHS 数组，请在那里修改。',
+		'about.background.p2': '这里的中英字典项仅作兜底用，正文渲染直接读取 about.astro。',
 		'about.skills.eyebrow': '能力',
 		'about.skills.title': '技术',
 		'about.skills.titleAccent': '栈',
@@ -197,9 +197,8 @@ export const dictionary = {
 		'about.background.title': 'Who I',
 		'about.background.titleAccent': 'Am',
 		'about.background.p1':
-			"I'm [Your Name], a developer passionate about software engineering. This site collects my personal projects, lab work, and blog posts.",
-		'about.background.p2':
-			'I believe in learning by doing. Every project here represents a real problem I tackled, a technology I explored, or a concept I struggled to understand and eventually mastered.',
+			'About page background paragraphs are now maintained in src/pages/about.astro (ABOUT_PARAGRAPHS).',
+		'about.background.p2': 'This i18n key is kept for backwards compatibility but not used for rendering.',
 		'about.skills.eyebrow': 'Capabilities',
 		'about.skills.title': 'Tech',
 		'about.skills.titleAccent': 'Stack',

@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import { withBase } from '../utils/paths';
 
 const currentYear = new Date().getFullYear();
 
@@ -7,18 +8,21 @@ const footerLinks = [
 	{
 		title: 'Navigate',
 		links: [
-			{ label: 'Home', href: '/' },
-			{ label: 'Projects', href: '/projects/' },
-			{ label: 'Blog', href: '/blog/' },
-			{ label: 'About', href: '/about/' },
+			{ label: 'Home', href: withBase('/') },
+			{ label: 'Projects', href: withBase('/projects/') },
+			{ label: 'Blog', href: withBase('/blog/') },
+			{ label: 'About', href: withBase('/about/') },
+			{ label: 'RSS', href: withBase('/rss.xml') },
 		],
 	},
 	{
 		title: 'Connect',
-		// TODO: 替换为你自己的社交链接
+		// 与 Nav.astro 的 iconLinks 保持一致
 		links: [
-			{ label: 'GitHub', href: 'https://github.com/your-username' },
-			{ label: 'Email', href: 'mailto:your-email@example.com' },
+			{ label: 'GitHub', href: 'https://github.com/zhangjszs' },
+			{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com' },
+			{ label: 'CSDN', href: 'https://blog.csdn.net/zcw_jszs' },
+			{ label: 'CNBlogs', href: 'https://www.cnblogs.com/jszs0013/' },
 		],
 	},
 ];
@@ -28,12 +32,11 @@ const footerLinks = [
 	<div class="footer-wrapper">
 		<div class="footer-top">
 			<div class="footer-brand">
-				<a href="/" class="brand-link">
+				<a href={withBase('/')} class="brand-link">
 					<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
-					<span class="brand-name">你的名字</span>
+					<span class="brand-name">Kerwin Zhang</span>
 				</a>
-				<!-- TODO: 替换为你的站点简介 -->
-				<p class="brand-desc">个人主页：项目作品、博客文章与联系方式。</p>
+				<p class="brand-desc">自动驾驶工程学生 · 项目作品、技术笔记与联系方式。</p>
 			</div>
 			<div class="footer-links">
 				{
@@ -61,17 +64,25 @@ const footerLinks = [
 		</div>
 		<div class="footer-bottom">
 			<p class="copyright">
-				&copy; {currentYear} 你的名字. <span data-i18n="footer.builtWith">Built with</span>
+				&copy; {currentYear} Kerwin Zhang. <span data-i18n="footer.builtWith">Built with</span>
 				<a href="https://astro.build/">Astro</a>
 				<Icon icon="rocket-launch" size="1.2em" />
 			</p>
 			<div class="socials">
-				<!-- TODO: 替换为你自己的社交链接 -->
-				<a href="https://github.com/your-username" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+				<a href="https://github.com/zhangjszs" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
 					<Icon icon="github-logo" size="1.2em" />
 				</a>
-				<a href="mailto:your-email@example.com" aria-label="Email">
+				<a href="mailto:zhangjszs@foxmail.com" aria-label="Email">
 					<Icon icon="envelope" size="1.2em" />
+				</a>
+				<a href="https://blog.csdn.net/zcw_jszs" target="_blank" rel="noopener noreferrer" aria-label="CSDN">
+					<Icon icon="pencil-line" size="1.2em" />
+				</a>
+				<a href="https://www.cnblogs.com/jszs0013/" target="_blank" rel="noopener noreferrer" aria-label="CNBlogs">
+					<Icon icon="globe" size="1.2em" />
+				</a>
+				<a href={withBase('/rss.xml')} target="_blank" rel="noopener noreferrer" aria-label="RSS Feed">
+					<Icon icon="rss" size="1.2em" />
 				</a>
 			</div>
 		</div>

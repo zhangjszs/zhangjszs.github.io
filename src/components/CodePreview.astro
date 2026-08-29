@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/paths';
+
 interface Props {
 	src: string;
 	lang?: string;
@@ -6,11 +8,13 @@ interface Props {
 }
 
 const { src, lang = 'text', caption } = Astro.props;
+// 站内绝对路径自动带上部署子路径（base）
+const resolvedSrc = src.startsWith('/') ? withBase(src) : src;
 ---
 
 <figure class="code-preview">
 	{caption && <figcaption>{caption}</figcaption>}
-	<pre><code class={`language-${lang}`} data-src={src}><span class="loading">Loading code...</span></code></pre>
+	<pre><code class={`language-${lang}`} data-src={resolvedSrc}><span class="loading">Loading code...</span></code></pre>
 </figure>
 
 <script>

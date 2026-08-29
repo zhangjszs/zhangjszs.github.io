@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-username.github.io/sitemap-index.xml
+# GitHub Pages 项目页：站点路径 /huat-showcase/
+Sitemap: https://zhangjszs.github.io/huat-showcase/sitemap-index.xml

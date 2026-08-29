@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../utils/paths';
 
 interface Props {
 	project: CollectionEntry<'projects'>;
@@ -21,7 +22,7 @@ const gradientIndex = title.length % gradients.length;
 const gradient = gradients[gradientIndex];
 ---
 
-<a class={`card ${featured ? 'featured' : ''}`} href={`/projects/${project.id}`}>
+<a class={`card ${featured ? 'featured' : ''}`} href={withBase(`/projects/${project.id}`)}>
 	<div class="card-cover" style={`background: ${gradient}`}>
 		<div class="cover-overlay">
 			<span class="cover-icon">{title.charAt(0)}</span>

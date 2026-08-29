@@ -1,3 +1,13 @@
 name = "personal-showcase"
 compatibility_date = "2026-04-26"
 pages_build_output_dir = "dist"
+
+# ============================================================
+# Cloudflare Pages 部署（任选其一）：
+#   1. 在 Cloudflare 控制台导入本仓库，构建命令 `npm run build`，
+#      输出目录 `dist`，环境变量 `NODE_VERSION` = `22`。
+#   2. 用 Wrangler CLI：`npx wrangler pages deploy dist --project-name=<你的项目名>`
+#
+# 部署到自定义域名后，记得把 astro.config.mjs 的 site 改为你的域名，
+# 并删除 base 配置（改为根路径部署）。
+# ============================================================

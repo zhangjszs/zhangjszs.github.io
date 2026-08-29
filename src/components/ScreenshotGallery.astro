@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/paths';
+
 interface Props {
 	dir: string;
 	captions?: string[];
@@ -25,7 +27,7 @@ if (existsSync(screenshotsDir)) {
 			{images.map((img, i) => (
 				<figure>
 					<img
-						src={`/screenshots/${dir}/${img}`}
+						src={withBase(`/screenshots/${dir}/${img}`)}
 						alt={captions[i] || `${dir} screenshot ${i + 1}`}
 						loading="lazy"
 						decoding="async"

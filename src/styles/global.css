@@ -1,39 +1,43 @@
-/* Global variables */
+/* ============================================================
+   莫兰迪配色方案（低饱和、雾面、灰调）
+   主色：雾霾灰绿（旧绿）+ 旧玫瑰粉 + 暖灰背景
+   ============================================================ */
 :root {
-	/* Colors */
-	--gray-0: #090b11;
-	--gray-50: #141925;
-	--gray-100: #283044;
-	--gray-200: #3d4663;
-	--gray-300: #505d84;
-	--gray-400: #6474a2;
-	--gray-500: #8490b5;
-	--gray-600: #a3acc8;
-	--gray-700: #c3cadb;
-	--gray-800: #e3e6ee;
-	--gray-900: #f3f4f7;
-	--gray-999-basis: 0, 0%, 100%;
+	/* 文字/灰阶（亮色模式：深 → 浅） */
+	--gray-0: #2b2e2c; /* 最深：标题 */
+	--gray-50: #3a3d3b; /* 副标题 */
+	--gray-100: #4a4d4b; /* 正文 */
+	--gray-200: #6b6e6c; /* 弱化正文 */
+	--gray-300: #8a8d8b; /* 描边 */
+	--gray-400: #a8aba9; /* 占位 */
+	--gray-500: #c5c8c6; /* 分隔 */
+	--gray-600: #d8dbd9; /* 卡片边 */
+	--gray-700: #e6e2dc; /* 悬停背景 */
+	--gray-800: #efece6; /* 次级背景 */
+	--gray-900: #f5f1ec; /* 主背景 */
+	--gray-999-basis: 36, 18%, 95%;
 	--gray-999_40: hsla(var(--gray-999-basis), 0.4);
-	--gray-999: #ffffff;
+	--gray-999: #f5f1ec; /* 页面底色（米白） */
 
-	--accent-light: #7ab8ff;
-	--accent-regular: #2563eb;
-	--accent-secondary: #00e1ff;
-	--accent-dark: #172554;
-	--accent-overlay: hsla(217, 91%, 60%, 0.33);
+	/* 强调色（accent）—— 雾霾灰绿 + 旧玫瑰 */
+	--accent-light: #b5c4b6; /* 高亮/浅 */
+	--accent-regular: #8a9a8b; /* 主：雾霾绿 */
+	--accent-secondary: #c4a4a7; /* 辅：旧玫瑰 */
+	--accent-dark: #5e6e60; /* 深：森林阴影 */
+	--accent-overlay: hsla(125, 8%, 45%, 0.18);
 	--accent-subtle-overlay: var(--accent-overlay);
-	--accent-text-over: var(--gray-999);
+	--accent-text-over: #f5f1ec;
 
-	--link-color: var(--accent-regular);
+	--link-color: var(--accent-dark);
 
-	/* Gradients */
-	--gradient-stop-1: var(--accent-light);
-	--gradient-stop-2: var(--accent-regular);
-	--gradient-stop-3: var(--accent-dark);
-	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 150%);
+	/* 渐变 */
+	--gradient-stop-1: #b5c4b6;
+	--gradient-stop-2: #8a9a8b;
+	--gradient-stop-3: #5e6e60;
+	--gradient-subtle: linear-gradient(150deg, var(--gray-800) 19%, var(--gray-999) 150%);
 	--gradient-accent: linear-gradient(150deg, var(--gradient-stop-1), var(--gradient-stop-2), var(--gradient-stop-3));
-	--gradient-accent-orange: linear-gradient(150deg, #ca7879, var(--accent-regular), var(--accent-dark));
-	--gradient-stroke: linear-gradient(180deg, var(--gray-900), var(--gray-700));
+	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #5e6e60);
+	--gradient-stroke: linear-gradient(180deg, var(--gray-800), var(--gray-600));
 
 	/* Shadows */
 	--shadow-sm:
@@ -72,34 +76,35 @@
 }
 
 :root.theme-dark {
-	--gray-0: #ffffff;
-	--gray-50: #f3f4f7;
-	--gray-100: #e3e6ee;
-	--gray-200: #c3cadb;
-	--gray-300: #a3acc8;
-	--gray-400: #8490b5;
-	--gray-500: #6474a2;
-	--gray-600: #505d84;
-	--gray-700: #3d4663;
-	--gray-800: #283044;
-	--gray-900: #141925;
-	--gray-999-basis: 225, 31%, 5%;
-	--gray-999: #090b11;
+	/* 文字/灰阶（暗色模式：浅 → 深，与亮色互补） */
+	--gray-0: #e6e2dc; /* 最浅：标题 */
+	--gray-50: #d2cec7; /* 副标题 */
+	--gray-100: #b8b4ad; /* 正文 */
+	--gray-200: #95918a; /* 弱化正文 */
+	--gray-300: #75716a; /* 描边 */
+	--gray-400: #5a5751; /* 占位 */
+	--gray-500: #45433f; /* 分隔 */
+	--gray-600: #383633; /* 卡片边 */
+	--gray-700: #2f2d2a; /* 悬停背景 */
+	--gray-800: #2b2e2c; /* 次级背景 */
+	--gray-900: #252725; /* 主背景（深） */
+	--gray-999-basis: 120, 4%, 14%;
+	--gray-999: #1f2120; /* 页面底色（墨绿灰） */
 
-	--accent-light: #172554;
-	--accent-regular: #3b82f6;
-	--accent-secondary: #00e1ff;
-	--accent-dark: #7ab8ff;
-	--accent-overlay: hsla(217, 91%, 60%, 0.33);
-	--accent-subtle-overlay: hsla(221, 83%, 53%, 0.33);
-	--accent-text-over: var(--gray-0);
+	--accent-light: #5e6e60;
+	--accent-regular: #8a9a8b;
+	--accent-secondary: #c4a4a7;
+	--accent-dark: #b5c4b6;
+	--accent-overlay: hsla(125, 8%, 60%, 0.22);
+	--accent-subtle-overlay: hsla(125, 8%, 55%, 0.18);
+	--accent-text-over: #2b2e2c;
 
-	--link-color: var(--accent-dark);
+	--link-color: var(--accent-light);
 
-	--gradient-stop-1: #1d4ed8;
+	--gradient-stop-1: #5e6e60;
 	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 81%);
-	--gradient-accent-orange: linear-gradient(150deg, #ca7879, var(--accent-regular), var(--accent-light));
-	--gradient-stroke: linear-gradient(180deg, var(--gray-600), var(--gray-800));
+	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #b5c4b6);
+	--gradient-stroke: linear-gradient(180deg, var(--gray-500), var(--gray-700));
 
 	--shadow-sm:
 		0px 6px 3px rgba(255, 255, 255, 0.01), 0px 4px 2px rgba(255, 255, 255, 0.01), 0px 2px 2px rgba(255, 255, 255, 0.02),

@@ -5,6 +5,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import Icon from '../components/Icon.astro';
 import Grid from '../components/Grid.astro';
 import Typewriter from '../components/Typewriter.astro';
+import { withBase } from '../utils/paths';
 
 const allProjects = await getCollection('projects');
 // 个人项目排在前面，课程实验（labwork）靠后
@@ -57,7 +58,7 @@ allProjects.forEach((p) => {
 const languages = [...langSet];
 ---
 
-<BaseLayout title="你的名字 | 个人主页" description="个人主页：项目作品、博客文章与联系方式。">
+<BaseLayout title="Kerwin Zhang | 个人主页" description="自动驾驶工程学生 · 项目作品、技术笔记与联系方式。">
 	<!-- Hero Section -->
 	<section class="hero-section">
 		<div class="hero-blobs" aria-hidden="true">
@@ -68,13 +69,12 @@ const languages = [...langSet];
 		<div class="wrapper hero-content">
 			<div class="hero-text">
 				<h1 class="hero-title">
-					<!-- TODO: 替换为你的名字/个人品牌名 -->
-					<Typewriter text="你好，我是" class="gradient-text" speed={100} /> 你的名字
+					<Typewriter text="你好，我是" class="gradient-text" speed={100} /> Kerwin Zhang
 				</h1>
-				<p class="hero-tagline" data-i18n="hero.tagline">在这里记录我的项目实践、技术探索与学习心得。</p>
+				<p class="hero-tagline" data-i18n="hero.tagline">自动驾驶工程学生 · 关注 ROS 2、路径规划与 LiDAR 感知。</p>
 				<div class="hero-roles">
 					{languages.map((lang) => <span class="role-pill">{lang}</span>)}
-					{languages.length === 0 && ['Java', 'Python', 'C++'].map((lang) => <span class="role-pill">{lang}</span>)}
+					{languages.length === 0 && ['C++', 'Python', 'ROS 2'].map((lang) => <span class="role-pill">{lang}</span>)}
 				</div>
 			</div>
 			<div class="stats-grid">
@@ -161,7 +161,7 @@ const languages = [...langSet];
 				</Grid>
 			</div>
 			<div class="cta">
-				<a href="/projects" class="cta-button" data-i18n="section.cta.viewAll">
+				<a href={withBase('/projects')} class="cta-button" data-i18n="section.cta.viewAll">
 					查看全部作品
 					<Icon icon="arrow-right" size="1.2em" />
 				</a>
@@ -199,10 +199,10 @@ const languages = [...langSet];
 									))}
 								</div>
 								<h3 class="post-title">
-									<a href={`/blog/${post.id}`}>{post.data.title}</a>
+									<a href={withBase(`/blog/${post.id}`)}>{post.data.title}</a>
 								</h3>
 								<p class="post-desc">{post.data.description}</p>
-								<a href={`/blog/${post.id}`} class="post-link" data-i18n="blog.readMore">
+								<a href={withBase(`/blog/${post.id}`)} class="post-link" data-i18n="blog.readMore">
 									阅读全文
 									<Icon icon="arrow-right" size="0.9em" />
 								</a>
@@ -210,7 +210,7 @@ const languages = [...langSet];
 						))}
 					</div>
 					<div class="cta">
-						<a href="/blog" class="cta-button" data-i18n="section.cta.viewAllPosts">
+						<a href={withBase('/blog')} class="cta-button" data-i18n="section.cta.viewAllPosts">
 							查看全部文章
 							<Icon icon="arrow-right" size="1.2em" />
 						</a>
@@ -250,7 +250,7 @@ const languages = [...langSet];
 						const freq = tagFreq.get(tag) || 1;
 						const sizeClass = freq >= maxFreq ? 'tag-lg' : freq >= maxFreq / 2 ? 'tag-md' : 'tag-sm';
 						return (
-							<a href={`/projects?tag=${encodeURIComponent(tag)}`} class={`tag-link ${sizeClass}`}>
+							<a href={withBase(`/projects?tag=${encodeURIComponent(tag)}`)} class={`tag-link ${sizeClass}`}>
 								{tag}
 							</a>
 						);

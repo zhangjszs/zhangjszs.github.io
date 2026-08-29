@@ -6,6 +6,7 @@ import CodePreview from '../../components/CodePreview.astro';
 import MermaidDiagram from '../../components/MermaidDiagram.astro';
 import FileTree from '../../components/FileTree.astro';
 import Icon from '../../components/Icon.astro';
+import { withBase } from '../../utils/paths';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects');
@@ -51,9 +52,9 @@ const sourceUrl =
 			</div>
 			<div class="wrapper hero-content">
 				<div class="breadcrumbs">
-					<a href="/" data-i18n="project.breadcrumbs.home">Home</a>
+					<a href={withBase('/')} data-i18n="project.breadcrumbs.home">首页</a>
 					<span>/</span>
-					<a href="/projects" data-i18n="project.breadcrumbs.projects">Projects</a>
+					<a href={withBase('/projects')} data-i18n="project.breadcrumbs.projects">作品</a>
 					<span>/</span>
 					<span class="current">{title}</span>
 				</div>
@@ -203,7 +204,7 @@ const sourceUrl =
 		<!-- Project Navigation -->
 		<nav class="project-nav">
 			<div class="wrapper">
-				<a href="/projects" class="back-link">
+				<a href={withBase('/projects')} class="back-link">
 					<Icon icon="arrow-left" size="1.2em" />
 					<span data-i18n="project.back">Back to all projects</span>
 				</a>

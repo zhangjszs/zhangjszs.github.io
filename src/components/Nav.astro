@@ -3,21 +3,23 @@ import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
 import LangSwitcher from './LangSwitcher.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import { withBase } from '../utils/paths';
 
 /** Main menu items */
 // TODO: 如需调整导航（如新增独立"联系"页），在下方数组增删即可
 const textLinks: { label: string; href: string; i18n: string }[] = [
-	{ label: 'Home', href: '/', i18n: 'nav.home' },
-	{ label: 'Projects', href: '/projects/', i18n: 'nav.projects' },
-	{ label: 'Blog', href: '/blog/', i18n: 'nav.blog' },
-	{ label: 'About', href: '/about/', i18n: 'nav.about' },
+	{ label: 'Home', href: withBase('/'), i18n: 'nav.home' },
+	{ label: 'Projects', href: withBase('/projects/'), i18n: 'nav.projects' },
+	{ label: 'Blog', href: withBase('/blog/'), i18n: 'nav.blog' },
+	{ label: 'About', href: withBase('/about/'), i18n: 'nav.about' },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
-// TODO: 替换为你自己的社交链接
 const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[] = [
-	{ label: 'GitHub', href: 'https://github.com/your-username', icon: 'github-logo' },
-	{ label: 'Email', href: 'mailto:your-email@example.com', icon: 'envelope' },
+	{ label: 'GitHub', href: 'https://github.com/zhangjszs', icon: 'github-logo' },
+	{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com', icon: 'envelope' },
+	{ label: 'CSDN', href: 'https://blog.csdn.net/zcw_jszs', icon: 'pencil-line' },
+	{ label: 'CNBlogs', href: 'https://www.cnblogs.com/jszs0013/', icon: 'globe' },
 ];
 
 /** Test if a link is pointing to the current page. */
@@ -31,10 +33,9 @@ const isCurrentPage = (href: string) => {
 
 <nav id="main-nav">
 	<div class="menu-header">
-		<a href="/" class="site-title">
+		<a href={withBase('/')} class="site-title">
 			<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
-			<!-- TODO: 替换为你的站点名/个人品牌名 -->
-			你的名字
+			Kerwin Zhang
 		</a>
 		<menu-button>
 			<template>
