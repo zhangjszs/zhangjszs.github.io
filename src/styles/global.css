@@ -1,34 +1,47 @@
 /* ============================================================
-   莫兰迪配色方案（低饱和、雾面、灰调）
-   主色：雾霾灰绿（旧绿）+ 旧玫瑰粉 + 暖灰背景
+   莫兰迪配色 + astro-paper 风格的语义化设计 token
+   - 6 个语义变量：background / foreground / accent / muted / border / surface
+   - 兼容旧的 --gray-* / --accent-* 变量（已有组件依赖）
+   - 排版：48rem 全文宽度、虚线链接、li 标记、图片边框
    ============================================================ */
+
 :root {
-	/* 文字/灰阶（亮色模式：深 → 浅） */
-	--gray-0: #2b2e2c; /* 最深：标题 */
-	--gray-50: #3a3d3b; /* 副标题 */
-	--gray-100: #4a4d4b; /* 正文 */
-	--gray-200: #6b6e6c; /* 弱化正文 */
-	--gray-300: #8a8d8b; /* 描边 */
-	--gray-400: #a8aba9; /* 占位 */
-	--gray-500: #c5c8c6; /* 分隔 */
-	--gray-600: #d8dbd9; /* 卡片边 */
-	--gray-700: #e6e2dc; /* 悬停背景 */
-	--gray-800: #efece6; /* 次级背景 */
-	--gray-900: #f5f1ec; /* 主背景 */
+	/* ===== 语义化设计 token（astro-paper 风格，6 变量） ===== */
+	--background: #faf8f5; /* 页面底色：暖米白（比纯白柔，比米色亮） */
+	--foreground: #28272a; /* 主文字：莫兰迪深炭 */
+	--accent: #5e6e60; /* 强调：雾霾灰绿 */
+	--accent-foreground: #faf8f5; /* 强调色上的文字 */
+	--muted: #efece6; /* 弱化背景：卡片/次级区块 */
+	--muted-foreground: #6b6e6c; /* 弱化文字：副标题/说明 */
+	--border: #e6e2dc; /* 描边：浅雾 */
+	--surface: #ffffff; /* 卡片表面：纯白（让卡片"浮"在米白背景上） */
+
+	/* ===== 兼容层：旧的 --gray-* 变量（保留给 BaseLayout / 现有组件） ===== */
+	--gray-0: #28272a;
+	--gray-50: #3a3d3b;
+	--gray-100: #4a4d4b;
+	--gray-200: #6b6e6c;
+	--gray-300: #8a8d8b;
+	--gray-400: #a8aba9;
+	--gray-500: #c5c8c6;
+	--gray-600: #d8dbd9;
+	--gray-700: #e6e2dc;
+	--gray-800: #efece6;
+	--gray-900: #f5f1ec;
 	--gray-999-basis: 36, 18%, 95%;
 	--gray-999_40: hsla(var(--gray-999-basis), 0.4);
-	--gray-999: #f5f1ec; /* 页面底色（米白） */
+	--gray-999: #faf8f5;
 
-	/* 强调色（accent）—— 雾霾灰绿 + 旧玫瑰 */
-	--accent-light: #b5c4b6; /* 高亮/浅 */
-	--accent-regular: #8a9a8b; /* 主：雾霾绿 */
-	--accent-secondary: #c4a4a7; /* 辅：旧玫瑰 */
-	--accent-dark: #5e6e60; /* 深：森林阴影 */
+	/* ===== 兼容层：旧的 --accent-* 变量 ===== */
+	--accent-light: #b5c4b6;
+	--accent-regular: #8a9a8b;
+	--accent-secondary: #c4a4a7;
+	--accent-dark: #5e6e60;
 	--accent-overlay: hsla(125, 8%, 45%, 0.18);
 	--accent-subtle-overlay: var(--accent-overlay);
-	--accent-text-over: #f5f1ec;
+	--accent-text-over: #faf8f5;
 
-	--link-color: var(--accent-dark);
+	--link-color: var(--accent);
 
 	/* 渐变 */
 	--gradient-stop-1: #b5c4b6;
@@ -39,84 +52,101 @@
 	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #5e6e60);
 	--gradient-stroke: linear-gradient(180deg, var(--gray-800), var(--gray-600));
 
-	/* Shadows */
-	--shadow-sm:
-		0px 6px 3px rgba(9, 11, 17, 0.01), 0px 4px 2px rgba(9, 11, 17, 0.01), 0px 2px 2px rgba(9, 11, 17, 0.02),
-		0px 0px 1px rgba(9, 11, 17, 0.03);
-	--shadow-md:
-		0px 28px 11px rgba(9, 11, 17, 0.01), 0px 16px 10px rgba(9, 11, 17, 0.03), 0px 7px 7px rgba(9, 11, 17, 0.05),
-		0px 2px 4px rgba(9, 11, 17, 0.06);
-	--shadow-lg:
-		0px 62px 25px rgba(9, 11, 17, 0.01), 0px 35px 21px rgba(9, 11, 17, 0.05), 0px 16px 16px rgba(9, 11, 17, 0.1),
-		0px 4px 9px rgba(9, 11, 17, 0.12);
+	/* 阴影（更柔和、更"悬浮"） */
+	--shadow-sm: 0 1px 2px rgba(40, 39, 42, 0.04);
+	--shadow-md: 0 4px 12px rgba(40, 39, 42, 0.06), 0 2px 4px rgba(40, 39, 42, 0.04);
+	--shadow-lg: 0 12px 32px rgba(40, 39, 42, 0.08), 0 4px 12px rgba(40, 39, 42, 0.05);
+	--shadow-glow: 0 0 0 4px hsla(125, 8%, 45%, 0.15);
 
-	/* Text Sizes */
+	/* 字号梯度（更细，参考 Tailwind 默认） */
+	--text-xs: 0.75rem;
 	--text-sm: 0.875rem;
 	--text-base: 1rem;
 	--text-md: 1.125rem;
 	--text-lg: 1.25rem;
-	--text-xl: 1.625rem;
-	--text-2xl: 2.125rem;
-	--text-3xl: 2.625rem;
-	--text-4xl: 3.5rem;
-	--text-5xl: 4.5rem;
+	--text-xl: 1.5rem;
+	--text-2xl: 1.875rem;
+	--text-3xl: 2.25rem;
+	--text-4xl: 3rem;
+	--text-5xl: 3.75rem;
 
-	/* Fonts */
+	/* 行高（更舒展） */
+	--leading-tight: 1.25;
+	--leading-snug: 1.4;
+	--leading-normal: 1.6;
+	--leading-relaxed: 1.75;
+
+	/* 字体：Inter 正文 / Cal Sans 标题（借 astro-paper 路线） / Fira Code 代码 */
 	--font-system:
 		system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
 		'Helvetica Neue', sans-serif;
-	--font-body: 'Public Sans', var(--font-system);
-	--font-brand: Rubik, var(--font-system);
+	--font-body: 'Inter', var(--font-system);
+	--font-brand: 'Cal Sans', 'Inter', var(--font-system);
 	--font-mono:
 		'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
 		'DejaVu Sans Mono', monospace;
 
-	/* Transitions */
+	/* 容器 */
+	--max-width-prose: 48rem; /* astro-paper max-w-3xl：文章正文 */
+	--max-width-app: 80rem; /* 整个 app 容器 */
+
+	/* 圆角 */
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 16px;
+	--radius-full: 9999px;
+
+	/* 过渡 */
 	--theme-transition: 0.2s ease-in-out;
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root.theme-dark {
-	/* 文字/灰阶（暗色模式：浅 → 深，与亮色互补） */
-	--gray-0: #e6e2dc; /* 最浅：标题 */
-	--gray-50: #d2cec7; /* 副标题 */
-	--gray-100: #b8b4ad; /* 正文 */
-	--gray-200: #95918a; /* 弱化正文 */
-	--gray-300: #75716a; /* 描边 */
-	--gray-400: #5a5751; /* 占位 */
-	--gray-500: #45433f; /* 分隔 */
-	--gray-600: #383633; /* 卡片边 */
-	--gray-700: #2f2d2a; /* 悬停背景 */
-	--gray-800: #2b2e2c; /* 次级背景 */
-	--gray-900: #252725; /* 主背景（深） */
-	--gray-999-basis: 120, 4%, 14%;
-	--gray-999: #1f2120; /* 页面底色（墨绿灰） */
+	/* 暗色：astro-paper 风格深蓝灰 + 莫兰迪绿保留 */
+	--background: #1a1d23; /* 深蓝灰（比纯黑通透） */
+	--foreground: #eaedf3; /* 文字：雾白 */
+	--accent: #b5c4b6; /* 暗色下用浅绿作为强调（更亮） */
+	--accent-foreground: #1a1d23;
+	--muted: #212737; /* 卡片底色 */
+	--muted-foreground: #afb9ca;
+	--border: #2d3344;
+	--surface: #212737;
+
+	--gray-0: #eaedf3;
+	--gray-50: #d2cec7;
+	--gray-100: #b8b4ad;
+	--gray-200: #95918a;
+	--gray-300: #75716a;
+	--gray-400: #5a5751;
+	--gray-500: #45433f;
+	--gray-600: #383633;
+	--gray-700: #2f2d2a;
+	--gray-800: #212737;
+	--gray-900: #1a1d23;
+	--gray-999-basis: 220, 14%, 12%;
+	--gray-999: #1a1d23;
 
 	--accent-light: #5e6e60;
 	--accent-regular: #8a9a8b;
 	--accent-secondary: #c4a4a7;
 	--accent-dark: #b5c4b6;
-	--accent-overlay: hsla(125, 8%, 60%, 0.22);
-	--accent-subtle-overlay: hsla(125, 8%, 55%, 0.18);
-	--accent-text-over: #2b2e2c;
+	--accent-overlay: hsla(125, 8%, 60%, 0.18);
+	--accent-subtle-overlay: hsla(125, 8%, 55%, 0.14);
+	--accent-text-over: #1a1d23;
 
-	--link-color: var(--accent-light);
-
-	--gradient-stop-1: #5e6e60;
 	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 81%);
 	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #b5c4b6);
 	--gradient-stroke: linear-gradient(180deg, var(--gray-500), var(--gray-700));
 
-	--shadow-sm:
-		0px 6px 3px rgba(255, 255, 255, 0.01), 0px 4px 2px rgba(255, 255, 255, 0.01), 0px 2px 2px rgba(255, 255, 255, 0.02),
-		0px 0px 1px rgba(255, 255, 255, 0.03);
-	--shadow-md:
-		0px 28px 11px rgba(255, 255, 255, 0.01), 0px 16px 10px rgba(255, 255, 255, 0.03),
-		0px 7px 7px rgba(255, 255, 255, 0.05), 0px 2px 4px rgba(255, 255, 255, 0.06);
-	--shadow-lg:
-		0px 62px 25px rgba(255, 255, 255, 0.01), 0px 35px 21px rgba(255, 255, 255, 0.05),
-		0px 16px 16px rgba(255, 255, 255, 0.1), 0px 4px 9px rgba(255, 255, 255, 0.12);
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
+	--shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+	--shadow-glow: 0 0 0 4px hsla(125, 8%, 60%, 0.2);
 }
 
+/* ============================================================
+   全局基础样式
+   ============================================================ */
 html,
 body {
 	min-height: 100%;
@@ -124,11 +154,15 @@ body {
 }
 
 body {
-	background-color: var(--gray-999);
-	color: var(--gray-200);
+	background-color: var(--background);
+	color: var(--foreground);
 	font-family: var(--font-body);
+	font-size: var(--text-base);
+	line-height: var(--leading-normal);
 	-webkit-font-smoothing: antialiased;
-	line-height: 1.5;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: 'cv11', 'ss01', 'ss03';
+	letter-spacing: -0.005em;
 }
 
 *,
@@ -144,42 +178,173 @@ img {
 }
 
 a {
-	color: var(--link-color);
+	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-color: var(--border);
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1px;
+	transition:
+		color 0.15s var(--ease-out),
+		text-decoration-color 0.15s var(--ease-out);
+}
+a:hover {
+	color: var(--accent);
+	text-decoration-color: var(--accent);
 }
 
+/* 标题字体与色阶 */
 h1,
 h2,
 h3,
 h4,
 h5 {
-	line-height: 1.1;
+	line-height: var(--leading-tight);
 	font-family: var(--font-brand);
 	font-weight: 600;
-	color: var(--gray-100);
+	color: var(--foreground);
+	letter-spacing: -0.02em;
 }
 
 h1 {
 	font-size: var(--text-5xl);
+	font-weight: 700;
 }
-
 h2 {
 	font-size: var(--text-4xl);
 }
-
 h3 {
 	font-size: var(--text-3xl);
 }
-
 h4 {
 	font-size: var(--text-2xl);
 }
-
 h5 {
 	font-size: var(--text-xl);
 }
 
-/* Utilities */
+/* ============================================================
+   排版工具类（astro-paper 风格 .app-prose）
+   - 适用于文章正文（blog/[...slug].astro）
+   - 正文 48rem 宽，行高 1.75，更舒展
+   ============================================================ */
+.app-prose {
+	max-width: var(--max-width-prose);
+	margin-inline: auto;
+	font-size: var(--text-md);
+	line-height: var(--leading-relaxed);
+	color: var(--foreground);
+}
+.app-prose > * + * {
+	margin-top: 1.25em;
+}
+.app-prose h1,
+.app-prose h2,
+.app-prose h3,
+.app-prose h4 {
+	margin-top: 2em;
+	margin-bottom: 0.75em;
+	letter-spacing: -0.025em;
+}
+.app-prose h1 {
+	font-size: var(--text-4xl);
+}
+.app-prose h2 {
+	font-size: var(--text-3xl);
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid var(--border);
+}
+.app-prose h3 {
+	font-size: var(--text-2xl);
+	font-style: italic;
+	color: var(--muted-foreground);
+}
+.app-prose h4 {
+	font-size: var(--text-xl);
+}
+.app-prose p {
+	color: var(--foreground);
+}
+.app-prose strong {
+	font-weight: 600;
+	color: var(--foreground);
+}
+.app-prose a {
+	text-decoration-style: dashed;
+	text-decoration-color: var(--muted-foreground);
+}
+.app-prose a:hover {
+	text-decoration-color: var(--accent);
+	text-decoration-style: solid;
+}
+.app-prose ul,
+.app-prose ol {
+	padding-left: 1.5em;
+}
+.app-prose li {
+	margin-top: 0.4em;
+}
+.app-prose li::marker {
+	color: var(--accent);
+}
+.app-prose ul > li {
+	list-style: disc;
+}
+.app-prose ol > li {
+	list-style: decimal;
+}
+.app-prose blockquote {
+	margin-left: 0;
+	padding: 0.25em 1.25em;
+	border-left: 3px solid var(--accent);
+	color: var(--muted-foreground);
+	font-style: italic;
+	background: var(--muted);
+	border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.app-prose code:not(pre code) {
+	padding: 0.15em 0.4em;
+	background: var(--muted);
+	color: var(--accent-dark);
+	border-radius: 4px;
+	font-size: 0.9em;
+	font-family: var(--font-mono);
+}
+.app-prose pre {
+	margin: 1.5em 0;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	box-shadow: var(--shadow-sm);
+}
+.app-prose img {
+	display: block;
+	margin: 1.5em auto;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+}
+.app-prose hr {
+	border: 0;
+	border-top: 1px solid var(--border);
+	margin: 2.5em 0;
+}
+.app-prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--text-base);
+}
+.app-prose th,
+.app-prose td {
+	padding: 0.6em 0.9em;
+	border: 1px solid var(--border);
+	text-align: left;
+}
+.app-prose th {
+	background: var(--muted);
+	font-weight: 600;
+}
 
+/* ============================================================
+   工具类
+   ============================================================ */
 .sr-only {
 	position: absolute;
 	width: 1px;
@@ -194,7 +359,7 @@ h5 {
 
 .wrapper {
 	width: 100%;
-	max-width: 83rem;
+	max-width: var(--max-width-app);
 	margin-inline: auto;
 	padding-inline: 1.5rem;
 }
@@ -204,254 +369,55 @@ h5 {
 	flex-direction: column;
 }
 
-.gap-2 {
-	gap: 0.5rem;
-}
-.gap-4 {
-	gap: 1rem;
-}
-.gap-8 {
-	gap: 2rem;
-}
-.gap-10 {
-	gap: 2.5rem;
-}
-.gap-15 {
-	gap: 3.75rem;
-}
-.gap-20 {
-	gap: 5rem;
-}
-.gap-30 {
-	gap: 7.5rem;
-}
-.gap-48 {
-	gap: 12rem;
+/* ============================================================
+   视觉细节升级
+   ============================================================ */
+
+/* 选区颜色（用 accent） */
+::selection {
+	background: var(--accent);
+	color: var(--accent-foreground);
 }
 
-/* ===== Code Block Copy Button ===== */
-.copy-code-btn {
-	position: absolute;
-	top: 0.5rem;
-	right: 0.5rem;
-	padding: 0.4rem 0.5rem;
-	background: var(--gray-800);
-	color: var(--gray-400);
-	border: 1px solid var(--gray-700);
-	border-radius: 0.375rem;
-	cursor: pointer;
-	opacity: 0;
-	transition:
-		opacity 0.2s,
-		background 0.2s,
-		color 0.2s,
-		border-color 0.2s;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+/* 滚动条（仅 webkit） */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 999px;
+	border: 2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--muted-foreground);
 }
 
-pre:hover .copy-code-btn,
-.copy-code-btn:focus {
-	opacity: 1;
+/* 焦点环（统一） */
+:focus-visible {
+	outline: 2px dashed var(--accent);
+	outline-offset: 3px;
+	border-radius: 4px;
 }
 
-.copy-code-btn:hover {
-	background: var(--accent-regular);
-	color: var(--gray-999);
-	border-color: var(--accent-regular);
-}
-
-.copy-code-btn.copied {
-	background: #22c55e;
-	color: white;
-	border-color: #22c55e;
-	opacity: 1;
-}
-
-/* ===== Image Fade-in ===== */
-.img-fade {
-	opacity: 0;
-	transform: scale(0.98);
-	transition:
-		opacity 0.6s ease,
-		transform 0.6s ease;
-}
-
-.img-fade.loaded {
-	opacity: 1;
-	transform: scale(1);
-}
-
-/* ===== Reveal Stagger ===== */
-.reveal .grid > :nth-child(1),
-.reveal .gallery > :nth-child(1),
-.reveal .challenges-list > :nth-child(1),
-.reveal .lessons-list > :nth-child(1),
-.reveal .skills-grid > :nth-child(1),
-.reveal .timeline > :nth-child(1) {
-	transition-delay: 0ms;
-}
-
-.reveal .grid > :nth-child(2),
-.reveal .gallery > :nth-child(2),
-.reveal .challenges-list > :nth-child(2),
-.reveal .lessons-list > :nth-child(2),
-.reveal .skills-grid > :nth-child(2),
-.reveal .timeline > :nth-child(2) {
-	transition-delay: 80ms;
-}
-
-.reveal .grid > :nth-child(3),
-.reveal .gallery > :nth-child(3),
-.reveal .challenges-list > :nth-child(3),
-.reveal .lessons-list > :nth-child(3),
-.reveal .skills-grid > :nth-child(3),
-.reveal .timeline > :nth-child(3) {
-	transition-delay: 160ms;
-}
-
-.reveal .grid > :nth-child(4),
-.reveal .gallery > :nth-child(4),
-.reveal .challenges-list > :nth-child(4),
-.reveal .lessons-list > :nth-child(4),
-.reveal .skills-grid > :nth-child(4),
-.reveal .timeline > :nth-child(4) {
-	transition-delay: 240ms;
-}
-
-.reveal .grid > :nth-child(5),
-.reveal .gallery > :nth-child(5),
-.reveal .challenges-list > :nth-child(5),
-.reveal .lessons-list > :nth-child(5),
-.reveal .skills-grid > :nth-child(5),
-.reveal .timeline > :nth-child(5) {
-	transition-delay: 320ms;
-}
-
-.reveal .grid > :nth-child(6),
-.reveal .gallery > :nth-child(6),
-.reveal .challenges-list > :nth-child(6),
-.reveal .lessons-list > :nth-child(6),
-.reveal .skills-grid > :nth-child(6),
-.reveal .timeline > :nth-child(6) {
-	transition-delay: 400ms;
-}
-
-.reveal .grid > :nth-child(7),
-.reveal .gallery > :nth-child(7) {
-	transition-delay: 480ms;
-}
-.reveal .grid > :nth-child(8),
-.reveal .gallery > :nth-child(8) {
-	transition-delay: 560ms;
-}
-.reveal .grid > :nth-child(9),
-.reveal .gallery > :nth-child(9) {
-	transition-delay: 640ms;
-}
-.reveal .grid > :nth-child(10),
-.reveal .gallery > :nth-child(10) {
-	transition-delay: 720ms;
-}
-.reveal .grid > :nth-child(11),
-.reveal .gallery > :nth-child(11) {
-	transition-delay: 800ms;
-}
-.reveal .grid > :nth-child(12),
-.reveal .gallery > :nth-child(12) {
-	transition-delay: 880ms;
-}
-
-.reveal .grid > *,
-.reveal .gallery > *,
-.reveal .challenges-list > *,
-.reveal .lessons-list > *,
-.reveal .skills-grid > *,
-.reveal .timeline > * {
-	opacity: 0;
-	transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal.visible .grid > *,
-.reveal.visible .gallery > *,
-.reveal.visible .challenges-list > *,
-.reveal.visible .lessons-list > *,
-.reveal.visible .skills-grid > *,
-.reveal.visible .timeline > * {
-	opacity: 1;
-}
-
-/* ===== Smooth scroll ===== */
+/* 平滑滚动 */
 html {
 	scroll-behavior: smooth;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	html {
-		scroll-behavior: auto;
-	}
+/* 玻璃拟态工具类 */
+.glass {
+	background: color-mix(in srgb, var(--surface) 75%, transparent);
+	backdrop-filter: blur(12px) saturate(120%);
+	-webkit-backdrop-filter: blur(12px) saturate(120%);
+	border: 1px solid var(--border);
 }
 
-/* ===== Shared Animations ===== */
-@keyframes float {
-	0%,
-	100% {
-		transform: translate(0, 0) scale(1);
-	}
-	33% {
-		transform: translate(20px, -20px) scale(1.05);
-	}
-	66% {
-		transform: translate(-15px, 15px) scale(0.95);
-	}
-}
-
-/* ===== Gradient Text ===== */
-.gradient-text {
-	background: var(--gradient-accent);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-}
-
-/* ===== Reveal Animation ===== */
-.reveal {
-	opacity: 0;
-	transform: translateY(40px);
-	transition:
-		opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-		transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal.visible {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-@media (min-width: 50em) {
-	.lg\:gap-2 {
-		gap: 0.5rem;
-	}
-	.lg\:gap-4 {
-		gap: 1rem;
-	}
-	.lg\:gap-8 {
-		gap: 2rem;
-	}
-	.lg\:gap-10 {
-		gap: 2.5rem;
-	}
-	.lg\:gap-15 {
-		gap: 3.75rem;
-	}
-	.lg\:gap-20 {
-		gap: 5rem;
-	}
-	.lg\:gap-30 {
-		gap: 7.5rem;
-	}
-	.lg\:gap-48 {
-		gap: 12rem;
-	}
+/* 点状网格背景工具类 */
+.dot-grid {
+	background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+	background-size: 24px 24px;
 }

@@ -45,10 +45,18 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}/og-image.png`, Astro.site);
 <link rel="sitemap" type="application/xml" href={withBase('/sitemap-index.xml')} />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!--
+  字体三件套（视觉升级 2026-08）：
+  - Inter（正文，400/500/600/700 四个字重 + 斜体）：现代、可读性高
+  - Cal Sans（标题，600/700）：圆润有力，astro-paper 风格
+  - JetBrains Mono（代码，400/500）：开发者友好
+-->
 <link
-	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
 	rel="stylesheet"
 />
+<!-- Cal Sans：display 字体，每个页面下载一次，命中浏览器缓存后无感 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/cal-sans@1.0.0/index.min.css" />
 <script is:inline>
 	// This code is inlined in the head to make dark mode instant & blocking.
 	const getThemePreference = () => {

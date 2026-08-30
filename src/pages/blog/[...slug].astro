@@ -49,7 +49,9 @@ const { title, description, date, tags, relatedProject } = article.data;
 		</header>
 
 		<div class="wrapper content-wrapper">
-			<Content components={{ MermaidDiagram, ScreenshotGallery, CodePreview, FileTree }} />
+			<div class="app-prose">
+				<Content components={{ MermaidDiagram, ScreenshotGallery, CodePreview, FileTree }} />
+			</div>
 		</div>
 
 		<nav class="article-nav">
