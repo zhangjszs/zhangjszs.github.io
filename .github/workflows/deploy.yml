@@ -36,6 +36,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      # 首次部署到 GitHub Pages 之前，请在仓库 Settings → Pages →
+      # Build and deployment → Source 选择 "GitHub Actions"，否则
+      # actions/configure-pages 会因为 Pages 站点尚未创建而失败：
+      #   "Get Pages site failed. Not Found"
+      #   "Create Pages site failed. Resource not accessible by integration"
+      # 启用一次之后，后续部署不再需要额外操作。
       - name: Enable Pages
         uses: actions/configure-pages@v5
         with:
