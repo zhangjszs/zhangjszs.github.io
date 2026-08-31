@@ -1,17 +1,15 @@
 ---
 import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
-import LangSwitcher from './LangSwitcher.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import { withBase } from '../utils/paths';
 
 /** Main menu items */
 // TODO: 如需调整导航（如新增独立"联系"页），在下方数组增删即可
-const textLinks: { label: string; href: string; i18n: string }[] = [
-	{ label: 'Home', href: withBase('/'), i18n: 'nav.home' },
-	{ label: 'Projects', href: withBase('/projects/'), i18n: 'nav.projects' },
-	{ label: 'Blog', href: withBase('/blog/'), i18n: 'nav.blog' },
-	{ label: 'About', href: withBase('/about/'), i18n: 'nav.about' },
+const textLinks: { label: string; href: string }[] = [
+	{ label: '首页', href: withBase('/') },
+	{ label: '项目', href: withBase('/projects/') },
+	{ label: '博客', href: withBase('/blog/') },
+	{ label: '关于', href: withBase('/about/') },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
@@ -31,27 +29,33 @@ const isCurrentPage = (href: string) => {
 };
 ---
 
-<nav id="main-nav">
+<nav id="main-nav" data-pagefind-ignore>
 	<div class="menu-header">
 		<a href={withBase('/')} class="site-title">
 			<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
 			Kerwin Zhang
 		</a>
-		<menu-button>
-			<template>
-				<button class="menu-button" aria-expanded="false">
-					<span class="sr-only">Menu</span>
-					<Icon icon="list" />
-				</button>
-			</template>
-		</menu-button>
+		<div class="menu-header-actions">
+			<button class="search-trigger" type="button" aria-label="搜索" data-search-open>
+				<Icon icon="magnifying-glass" size="1.05em" />
+				<span class="search-kbd" aria-hidden="true">Ctrl K</span>
+			</button>
+			<menu-button>
+				<template>
+					<button class="menu-button" aria-expanded="false">
+						<span class="sr-only">Menu</span>
+						<Icon icon="list" />
+					</button>
+				</template>
+			</menu-button>
+		</div>
 	</div>
 	<noscript>
 		<ul class="nav-items">
 			{
-				textLinks.map(({ label, href, i18n }) => (
+				textLinks.map(({ label, href }) => (
 					<li>
-						<a aria-current={isCurrentPage(href) ? 'page' : null} class="link" href={href} data-i18n={i18n}>
+						<a aria-current={isCurrentPage(href) ? 'page' : null} class="link" href={href}>
 							{label}
 						</a>
 					</li>
@@ -76,9 +80,9 @@ const isCurrentPage = (href: string) => {
 	<div id="menu-content" hidden>
 		<ul class="nav-items">
 			{
-				textLinks.map(({ label, href, i18n }) => (
+				textLinks.map(({ label, href }) => (
 					<li>
-						<a aria-current={isCurrentPage(href) ? 'page' : null} class="link" href={href} data-i18n={i18n}>
+						<a aria-current={isCurrentPage(href) ? 'page' : null} class="link" href={href}>
 							{label}
 						</a>
 					</li>
@@ -95,13 +99,6 @@ const isCurrentPage = (href: string) => {
 						</a>
 					))
 				}
-			</div>
-
-			<div class="lang-toggle">
-				<LangSwitcher />
-			</div>
-			<div class="theme-toggle">
-				<ThemeToggle />
 			</div>
 		</div>
 	</div>
@@ -172,6 +169,41 @@ const isCurrentPage = (href: string) => {
 		justify-content: space-between;
 		gap: 0.5rem;
 		padding: 1.5rem;
+	}
+
+	.menu-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.search-trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		font-size: var(--text-sm);
+		color: var(--gray-300);
+		background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
+		border: 1px solid transparent;
+		border-radius: 999rem;
+		cursor: pointer;
+		box-shadow: var(--shadow-md);
+		transition:
+			color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.search-trigger:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+
+	.search-kbd {
+		display: none;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--gray-400);
 	}
 
 	.site-title {
@@ -276,37 +308,21 @@ const isCurrentPage = (href: string) => {
 		color: var(--accent-text-over);
 	}
 
-	.theme-toggle {
-		display: flex;
-		align-items: center;
-		height: calc(var(--icon-size) + 2 * var(--icon-padding));
-	}
-
-	.lang-toggle {
-		display: flex;
-		align-items: center;
-	}
-
 	/* Nav scroll effect - global for all viewports */
 	.nav-scrolled {
 		position: fixed !important;
 		top: 0;
 		left: 0;
 		right: 0;
-		background: rgba(255, 255, 255, 0.7) !important;
+		background: rgba(11, 13, 16, 0.75) !important;
 		backdrop-filter: blur(16px) saturate(180%) !important;
 		-webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-		box-shadow: 0 1px 20px rgba(0, 0, 0, 0.05) !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+		box-shadow: 0 1px 20px rgba(0, 0, 0, 0.35) !important;
 		margin-bottom: 0 !important;
 		padding: 0.75rem 1.5rem !important;
 		z-index: 9999;
 		animation: navSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	:root.theme-dark .nav-scrolled {
-		background: rgba(9, 11, 17, 0.75) !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 	}
 
 	@keyframes navSlideDown {
@@ -327,6 +343,10 @@ const isCurrentPage = (href: string) => {
 			align-items: center;
 			padding: 2.5rem 5rem;
 			gap: 1rem;
+		}
+
+		.search-kbd {
+			display: inline;
 		}
 
 		.menu-header {

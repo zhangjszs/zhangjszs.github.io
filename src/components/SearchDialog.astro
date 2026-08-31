@@ -1,0 +1,285 @@
+---
+// 全站搜索（Pagefind）：Ctrl/Cmd+K 或导航搜索按钮唤起。
+// 索引由 `npm run build` 里的 pagefind 生成；dev 模式无索引时静默降级提示。
+---
+
+<div class="search-overlay" id="search-overlay" hidden>
+	<div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索">
+		<div class="search-input-row">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="1em"
+				height="1em"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+				><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg
+			>
+			<input id="search-input" type="text" placeholder="搜索项目、文章…" autocomplete="off" />
+			<button class="search-close" type="button" aria-label="关闭" data-search-close>Esc</button>
+		</div>
+		<div class="search-status" id="search-status"></div>
+		<ul class="search-results" id="search-results"></ul>
+	</div>
+</div>
+
+<style>
+	.search-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 10001;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		padding: 12vh 1rem 1rem;
+		background: rgba(4, 6, 8, 0.72);
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+	}
+
+	.search-overlay[hidden] {
+		display: none;
+	}
+
+	.search-panel {
+		width: 100%;
+		max-width: 40rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-lg);
+		overflow: hidden;
+		animation: search-in 0.18s var(--ease-out);
+	}
+
+	@keyframes search-in {
+		from {
+			opacity: 0;
+			transform: translateY(-8px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	.search-input-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--muted-foreground);
+	}
+
+	#search-input {
+		flex: 1;
+		background: transparent;
+		border: 0;
+		outline: none;
+		color: var(--foreground);
+		font-size: var(--text-md);
+		font-family: var(--font-body);
+	}
+
+	#search-input::placeholder {
+		color: var(--muted-foreground);
+	}
+
+	.search-close {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--muted-foreground);
+		background: var(--muted);
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		padding: 0.15rem 0.45rem;
+		cursor: pointer;
+	}
+
+	.search-status {
+		padding: 0.9rem 1.25rem;
+		font-size: var(--text-sm);
+		color: var(--muted-foreground);
+	}
+
+	.search-status:empty {
+		display: none;
+	}
+
+	.search-results {
+		list-style: none;
+		margin: 0;
+		padding: 0.5rem;
+		max-height: 46vh;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.search-results:empty {
+		display: none;
+	}
+
+	.search-results li a {
+		display: block;
+		padding: 0.75rem 0.9rem;
+		border-radius: var(--radius-md);
+		text-decoration: none;
+		color: var(--foreground);
+		border: 1px solid transparent;
+	}
+
+	.search-results li a:hover,
+	.search-results li a.active {
+		background: var(--muted);
+		border-color: var(--border);
+	}
+
+	.search-results .result-title {
+		display: block;
+		font-weight: 600;
+		font-size: var(--text-sm);
+		margin-bottom: 0.2rem;
+	}
+
+	.search-results .result-excerpt {
+		display: block;
+		font-size: var(--text-xs);
+		color: var(--muted-foreground);
+		line-height: 1.6;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.search-results mark {
+		background: color-mix(in srgb, var(--accent) 22%, transparent);
+		color: var(--accent);
+		border-radius: 2px;
+		padding: 0 0.1em;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.search-panel {
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	// Pagefind 运行时类型（仅用到的字段）
+	interface PagefindResult {
+		data(): Promise<{ title: string; url: string; excerpt: string }>;
+	}
+	interface PagefindModule {
+		search(query: string): Promise<{ results: PagefindResult[] }>;
+	}
+
+	const overlay = document.getElementById('search-overlay')!;
+	const input = document.getElementById('search-input') as HTMLInputElement;
+	const statusEl = document.getElementById('search-status')!;
+	const resultsEl = document.getElementById('search-results')!;
+	const BASE = import.meta.env.BASE_URL;
+
+	let pagefind: PagefindModule | null = null;
+	let loading = false;
+	let activeIdx = -1;
+
+	const open = () => {
+		overlay.hidden = false;
+		input.value = '';
+		resultsEl.innerHTML = '';
+		statusEl.textContent = '';
+		document.body.style.overflow = 'hidden';
+		input.focus();
+	};
+
+	const close = () => {
+		overlay.hidden = true;
+		document.body.style.overflow = '';
+		activeIdx = -1;
+	};
+
+	async function ensurePagefind(): Promise<boolean> {
+		if (pagefind) return true;
+		if (loading) return false;
+		loading = true;
+		try {
+			pagefind = (await import(`${BASE}pagefind/pagefind.js`)) as unknown as PagefindModule;
+			return true;
+		} catch {
+			statusEl.textContent = '搜索索引不可用（仅在构建产物中生效）';
+			loading = false;
+			return false;
+		}
+	}
+
+	async function runSearch(query: string) {
+		resultsEl.innerHTML = '';
+		activeIdx = -1;
+		const q = query.trim();
+		if (!q) {
+			statusEl.textContent = '';
+			return;
+		}
+		if (!(await ensurePagefind())) return;
+		const { results } = await pagefind!.search(q);
+		statusEl.textContent = results.length ? `共 ${results.length} 条结果` : '没有相关结果';
+		const top = results.slice(0, 8);
+		for (const r of top) {
+			const data = await r.data();
+			const li = document.createElement('li');
+			const a = document.createElement('a');
+			const url = data.url.startsWith('/') ? data.url : BASE + data.url;
+			a.href = url;
+			const title = data.title && data.title !== 'undefined' ? data.title : url;
+			a.innerHTML = `<span class="result-title">${title}</span><span class="result-excerpt">${data.excerpt}</span>`;
+			li.appendChild(a);
+			resultsEl.appendChild(li);
+		}
+	}
+
+	const updateActive = () => {
+		const links = resultsEl.querySelectorAll('a');
+		links.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
+		links[activeIdx]?.scrollIntoView({ block: 'nearest' });
+	};
+
+	input.addEventListener('input', () => void runSearch(input.value));
+	input.addEventListener('keydown', (e) => {
+		const links = resultsEl.querySelectorAll('a');
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			activeIdx = Math.min(activeIdx + 1, links.length - 1);
+			updateActive();
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			activeIdx = Math.max(activeIdx - 1, 0);
+			updateActive();
+		} else if (e.key === 'Enter' && activeIdx >= 0 && links[activeIdx]) {
+			(links[activeIdx] as HTMLAnchorElement).click();
+		}
+	});
+
+	overlay.addEventListener('click', (e) => {
+		if (e.target === overlay) close();
+	});
+	document.querySelectorAll('[data-search-close]').forEach((b) => b.addEventListener('click', close));
+	document.querySelectorAll('[data-search-open]').forEach((b) => b.addEventListener('click', open));
+
+	window.addEventListener('keydown', (e) => {
+		if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+			e.preventDefault();
+			overlay.hidden ? open() : close();
+		} else if (e.key === 'Escape' && !overlay.hidden) {
+			close();
+		}
+	});
+</script>

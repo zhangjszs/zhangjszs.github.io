@@ -1,0 +1,385 @@
+---
+// 简历页：中英双版自包含切换 + 双语 PDF 下载。
+// PDF 存放约定：public/assets/resume/resume-zh.pdf、resume-en.pdf（用户提供）。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Bi from '../components/Bilingual.astro';
+import Icon from '../components/Icon.astro';
+import { RESUME } from '../data/resume';
+import { withBase } from '../utils/paths';
+
+const r = RESUME;
+---
+
+<BaseLayout title={`简历 | ${r.name}`} description="Kerwin Zhang 的简历（中英双语）。">
+	<div class="wrapper resume-page" data-lang="zh" data-pagefind-body>
+		<header class="resume-head" data-reveal>
+			<div class="resume-id">
+				<h1>{r.name}</h1>
+				<p class="resume-title"><Bi t={r.title} /></p>
+				<div class="resume-contact">
+					<a href={`mailto:${r.contact.email}`}>
+						<Icon icon="envelope" size="0.95em" />
+						{r.contact.email}
+					</a>
+					<a href={r.contact.github} target="_blank" rel="noopener noreferrer">
+						<Icon icon="github-logo" size="0.95em" />
+						GitHub
+					</a>
+					<a href={r.contact.website} target="_blank" rel="noopener noreferrer">
+						<Icon icon="globe" size="0.95em" />
+						zhangjszs.github.io
+					</a>
+				</div>
+			</div>
+			<div class="resume-actions">
+				<div class="lang-switch" role="tablist" aria-label="简历语言切换">
+					<button type="button" class="lang-btn" data-lang-btn="zh" aria-selected="true">中文</button>
+					<button type="button" class="lang-btn" data-lang-btn="en" aria-selected="false">EN</button>
+				</div>
+				<div class="pdf-links">
+					<a
+						href={withBase('/assets/resume/resume-zh.pdf')}
+						class="pdf-btn"
+						download
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<span class="pdf-glyph" aria-hidden="true">↓</span>
+						<span class="t-zh">PDF 中文版</span>
+						<span class="t-en">PDF (Chinese)</span>
+					</a>
+					<a
+						href={withBase('/assets/resume/resume-en.pdf')}
+						class="pdf-btn"
+						download
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<span class="pdf-glyph" aria-hidden="true">↓</span>
+						<span class="t-zh">PDF 英文版</span>
+						<span class="t-en">PDF (English)</span>
+					</a>
+				</div>
+			</div>
+		</header>
+
+		<section class="resume-section" data-reveal>
+			<h2 class="section-head"><span class="t-zh">简介</span><span class="t-en">Summary</span></h2>
+			<p class="summary"><Bi t={r.summary} /></p>
+		</section>
+
+		<section class="resume-section" data-reveal>
+			<h2 class="section-head"><span class="t-zh">教育背景</span><span class="t-en">Education</span></h2>
+			{
+				r.education.map((e) => (
+					<div class="entry">
+						<div class="entry-line">
+							<strong class="entry-title">
+								<Bi t={e.title} />
+							</strong>
+							<span class="entry-period">
+								<Bi t={e.period} />
+							</span>
+						</div>
+						<div class="entry-org">
+							<Bi t={e.org} />
+						</div>
+						{e.bullets.length > 0 && (
+							<ul>
+								{e.bullets.map((b) => (
+									<li>
+										<Bi t={b} />
+									</li>
+								))}
+							</ul>
+						)}
+					</div>
+				))
+			}
+		</section>
+
+		<section class="resume-section" data-reveal>
+			<h2 class="section-head"><span class="t-zh">车队经历</span><span class="t-en">Experience</span></h2>
+			{
+				r.experience.map((e) => (
+					<div class="entry">
+						<div class="entry-line">
+							<strong class="entry-title">
+								<Bi t={e.title} />
+							</strong>
+							<span class="entry-period">
+								<Bi t={e.period} />
+							</span>
+						</div>
+						<div class="entry-org">
+							<Bi t={e.org} />
+						</div>
+						<ul>
+							{e.bullets.map((b) => (
+								<li>
+									<Bi t={b} />
+								</li>
+							))}
+						</ul>
+					</div>
+				))
+			}
+		</section>
+
+		<section class="resume-section" data-reveal>
+			<h2 class="section-head"><span class="t-zh">技能</span><span class="t-en">Skills</span></h2>
+			<div class="skill-row">
+				{r.skills.zh.map((s) => <span class="skill-pill t-zh">{s}</span>)}
+				{r.skills.en.map((s) => <span class="skill-pill t-en">{s}</span>)}
+			</div>
+		</section>
+		<div class="page-end"></div>
+	</div>
+
+	<script>
+		const page = document.querySelector('.resume-page');
+		if (page) {
+			const saved = localStorage.getItem('resume-lang');
+			if (saved === 'en' || saved === 'zh') page.setAttribute('data-lang', saved);
+			const sync = () => {
+				const lang = page.getAttribute('data-lang');
+				page.querySelectorAll<HTMLButtonElement>('[data-lang-btn]').forEach((btn) => {
+					btn.setAttribute('aria-selected', btn.dataset.langBtn === lang ? 'true' : 'false');
+				});
+			};
+			page.querySelectorAll<HTMLButtonElement>('[data-lang-btn]').forEach((btn) => {
+				btn.addEventListener('click', () => {
+					page.setAttribute('data-lang', btn.dataset.langBtn!);
+					localStorage.setItem('resume-lang', btn.dataset.langBtn!);
+					sync();
+				});
+			});
+			sync();
+		}
+	</script>
+
+	<style>
+		/* 双语显隐：由容器 data-lang 驱动（.t-* 由 Bilingual 子组件渲染，需 :global 穿透作用域） */
+		.resume-page[data-lang='zh'] :global(.t-en) {
+			display: none;
+		}
+		.resume-page[data-lang='en'] :global(.t-zh) {
+			display: none;
+		}
+
+		.resume-page {
+			max-width: 52rem;
+		}
+
+		.resume-head {
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			padding: clamp(3.5rem, 8vw, 5.5rem) 0 2rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.resume-head h1 {
+			font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
+			letter-spacing: -0.03em;
+			margin: 0 0 0.5rem;
+		}
+
+		.resume-title {
+			color: var(--accent);
+			font-size: var(--text-md);
+			margin: 0 0 1rem;
+		}
+
+		.resume-contact {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem 1.5rem;
+		}
+
+		.resume-contact a {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			color: var(--muted-foreground);
+			text-decoration: none;
+		}
+
+		.resume-contact a:hover {
+			color: var(--accent);
+		}
+
+		.resume-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.lang-switch {
+			display: inline-flex;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-full);
+			overflow: hidden;
+		}
+
+		.lang-btn {
+			padding: 0.45rem 1.1rem;
+			background: transparent;
+			color: var(--muted-foreground);
+			border: 0;
+			font-weight: 600;
+			font-size: var(--text-sm);
+			cursor: pointer;
+			transition:
+				background-color 0.2s var(--ease-out),
+				color 0.2s var(--ease-out);
+		}
+
+		.lang-btn[aria-selected='true'] {
+			background: var(--accent);
+			color: var(--accent-foreground);
+		}
+
+		.pdf-links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+		}
+
+		.pdf-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.45rem;
+			padding: 0.45rem 1rem;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-full);
+			color: var(--foreground);
+			text-decoration: none;
+			font-size: var(--text-sm);
+			font-weight: 600;
+			transition:
+				border-color 0.2s var(--ease-out),
+				color 0.2s var(--ease-out);
+		}
+
+		.pdf-glyph {
+			font-family: var(--font-mono);
+			color: var(--accent);
+		}
+
+		.pdf-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.resume-section {
+			padding: 2.25rem 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.section-head {
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			font-weight: 500;
+			letter-spacing: 0.08em;
+			color: var(--accent);
+			margin: 0 0 1.5rem;
+			text-transform: uppercase;
+		}
+
+		.summary {
+			color: var(--foreground);
+			line-height: 1.9;
+			margin: 0;
+		}
+
+		.entry {
+			display: flex;
+			flex-direction: column;
+			gap: 0.4rem;
+			padding: 1rem 0;
+		}
+
+		.entry + .entry {
+			border-top: 1px dashed var(--border);
+		}
+
+		.entry-line {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 0.5rem;
+			align-items: baseline;
+		}
+
+		.entry-title {
+			font-size: var(--text-base);
+			color: var(--foreground);
+		}
+
+		.entry-period {
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--muted-foreground);
+		}
+
+		.entry-org {
+			font-size: var(--text-sm);
+			color: var(--accent);
+		}
+
+		.entry ul {
+			margin: 0.4rem 0 0;
+			padding-left: 1.25rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+		}
+
+		.entry li {
+			color: var(--muted-foreground);
+			line-height: 1.7;
+			font-size: var(--text-sm);
+		}
+
+		.entry li::marker {
+			color: var(--accent);
+		}
+
+		.skill-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+		}
+
+		.skill-pill {
+			padding: 0.4rem 0.9rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-full);
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			color: var(--foreground);
+		}
+
+		.page-end {
+			height: clamp(3rem, 8vw, 6rem);
+		}
+
+		@media (min-width: 50em) {
+			.resume-head {
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: flex-end;
+			}
+
+			.resume-actions {
+				flex-direction: column;
+				align-items: flex-end;
+			}
+		}
+	</style>
+</BaseLayout>

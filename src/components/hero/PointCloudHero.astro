@@ -1,0 +1,242 @@
+---
+// 签名交互：真实/合成激光雷达点云 3D 背景。
+// 数据管线：scripts/gen-synth-pointcloud.mjs（占位）或 scripts/convert-pointcloud.mjs（真实数据）
+// 降级：prefers-reduced-motion 时不初始化 3D，仅保留 CSS 辉光；no-JS 同理。
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+let meta: { count: number; synthetic?: boolean } = { count: 0, synthetic: true };
+try {
+	meta = JSON.parse(readFileSync(join(process.cwd(), 'public/assets/pointcloud/meta.json'), 'utf-8'));
+} catch {
+	// 数据未生成时静默降级（HUD 显示占位）
+}
+---
+
+<div class="pc-hero" aria-hidden="true">
+	<canvas id="pc-canvas"></canvas>
+	<div class="pc-hud">
+		<span class="hud-dot"></span>
+		{
+			meta.count > 0
+				? `${meta.count.toLocaleString('en-US')} points · ${meta.synthetic ? 'synthetic scan' : 'real scan'}`
+				: 'point cloud offline'
+		}
+	</div>
+</div>
+
+<style>
+	.pc-hero {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+		/* no-JS / reduced-motion 兜底：静态辉光 */
+		background:
+			radial-gradient(60% 50% at 70% 35%, hsla(158, 72%, 56%, 0.09), transparent 70%),
+			radial-gradient(50% 40% at 25% 70%, hsla(158, 60%, 45%, 0.06), transparent 70%);
+	}
+
+	#pc-canvas {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.pc-hud {
+		position: absolute;
+		left: 1.5rem;
+		bottom: 1.25rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.35rem 0.75rem;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--muted-foreground);
+		background: color-mix(in srgb, var(--surface) 55%, transparent);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+
+	.hud-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--accent);
+		box-shadow: 0 0 8px var(--accent);
+		animation: hud-pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes hud-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.35;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hud-dot {
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	import { withBase } from '../../utils/paths';
+
+	(async () => {
+		const canvas = document.getElementById('pc-canvas') as HTMLCanvasElement | null;
+		if (!canvas) return;
+		// 尊重系统减少动效偏好：静态辉光兜底，不加载 three
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		const [binRes, metaRes] = await Promise.all([
+			fetch(withBase('/assets/pointcloud/hero.bin')),
+			fetch(withBase('/assets/pointcloud/meta.json')),
+		]);
+		if (!binRes.ok || !metaRes.ok) return;
+		const bytes = new Uint8Array(await binRes.arrayBuffer());
+		const meta = (await metaRes.json()) as {
+			count: number;
+			bounds: { x: [number, number]; y: [number, number]; z: [number, number] };
+		};
+
+		const coarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 820;
+		const maxPoints = coarse ? 150000 : 250000;
+		const count = Math.min(meta.count, Math.floor(bytes.length / 7), maxPoints);
+
+		// 解码：Uint16 归一化坐标 → 以包围盒中心为原点、按真实比例缩放
+		const dv = new DataView(bytes.buffer);
+		const positions = new Float32Array(count * 3);
+		const intensities = new Float32Array(count);
+		const ranges = [
+			meta.bounds.x[1] - meta.bounds.x[0],
+			meta.bounds.y[1] - meta.bounds.y[0],
+			meta.bounds.z[1] - meta.bounds.z[0],
+		];
+		const centers = [
+			(meta.bounds.x[0] + meta.bounds.x[1]) / 2,
+			(meta.bounds.y[0] + meta.bounds.y[1]) / 2,
+			(meta.bounds.z[0] + meta.bounds.z[1]) / 2,
+		];
+		const SCALE = 3.4 / Math.max(...ranges);
+		for (let i = 0; i < count; i++) {
+			const o = i * 7;
+			positions[i * 3] = ((dv.getUint16(o, true) / 65535) * ranges[0] + meta.bounds.x[0] - centers[0]) * SCALE;
+			positions[i * 3 + 1] = ((dv.getUint16(o + 2, true) / 65535) * ranges[1] + meta.bounds.y[0] - centers[1]) * SCALE;
+			positions[i * 3 + 2] = ((dv.getUint16(o + 4, true) / 65535) * ranges[2] + meta.bounds.z[0] - centers[2]) * SCALE;
+			intensities[i] = dv.getUint8(o + 6) / 255;
+		}
+
+		const THREE = await import('three');
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(48, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+		camera.position.set(0, 0.9, 5.2);
+
+		const renderer = new THREE.WebGLRenderer({
+			canvas,
+			antialias: false,
+			alpha: true,
+			powerPreference: 'high-performance',
+		});
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+		renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		geometry.setAttribute('aIntensity', new THREE.BufferAttribute(intensities, 1));
+
+		const material = new THREE.ShaderMaterial({
+			transparent: true,
+			depthWrite: false,
+			blending: THREE.AdditiveBlending,
+			uniforms: { uSize: { value: coarse ? 1.6 : 2.0 } },
+			vertexShader: `
+				attribute float aIntensity;
+				varying float vIntensity;
+				uniform float uSize;
+				void main() {
+					vIntensity = aIntensity;
+					vec4 mv = modelViewMatrix * vec4(position, 1.0);
+					gl_PointSize = uSize * (160.0 / -mv.z) * (0.5 + aIntensity * 0.8);
+					gl_Position = projectionMatrix * mv;
+				}
+			`,
+			fragmentShader: `
+				varying float vIntensity;
+				void main() {
+					vec2 uv = gl_PointCoord - 0.5;
+					float d = length(uv);
+					if (d > 0.5) discard;
+					float alpha = smoothstep(0.5, 0.12, d) * (0.25 + vIntensity * 0.75);
+					vec3 dim = vec3(0.06, 0.35, 0.25);
+					vec3 hot = vec3(0.35, 0.95, 0.68);
+					vec3 color = mix(dim, hot, vIntensity);
+					gl_FragColor = vec4(color, alpha);
+				}
+			`,
+		});
+
+		const points = new THREE.Points(geometry, material);
+		points.rotation.x = -0.18;
+		const group = new THREE.Group();
+		group.add(points);
+		scene.add(group);
+
+		// 拖拽旋转 + 惯性 + 待机自转
+		let targetRotY = 0.35;
+		let rotY = 0.35;
+		let dragging = false;
+		let lastX = 0;
+		const onDown = (e: PointerEvent) => {
+			dragging = true;
+			lastX = e.clientX;
+			canvas.setPointerCapture(e.pointerId);
+		};
+		const onMove = (e: PointerEvent) => {
+			if (!dragging) return;
+			targetRotY += (e.clientX - lastX) * 0.005;
+			lastX = e.clientX;
+		};
+		const onUp = () => {
+			dragging = false;
+		};
+		canvas.addEventListener('pointerdown', onDown);
+		canvas.addEventListener('pointermove', onMove);
+		canvas.addEventListener('pointerup', onUp);
+		canvas.addEventListener('pointercancel', onUp);
+
+		// 离屏/后台暂停
+		let visible = true;
+		new IntersectionObserver(([entry]) => {
+			visible = entry.isIntersecting;
+		}).observe(canvas);
+
+		const resize = () => {
+			const w = canvas.clientWidth;
+			const h = canvas.clientHeight;
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
+			renderer.setSize(w, h, false);
+		};
+		new ResizeObserver(resize).observe(canvas);
+
+		const tick = () => {
+			requestAnimationFrame(tick);
+			if (!visible || document.hidden) return;
+			if (!dragging) targetRotY += 0.0006;
+			rotY += (targetRotY - rotY) * 0.06;
+			group.rotation.y = rotY;
+			renderer.render(scene, camera);
+		};
+		requestAnimationFrame(tick);
+	})();
+</script>

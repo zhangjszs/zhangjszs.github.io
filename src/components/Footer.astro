@@ -6,29 +6,30 @@ const currentYear = new Date().getFullYear();
 
 const footerLinks = [
 	{
-		title: 'Navigate',
+		title: '导航',
 		links: [
-			{ label: 'Home', href: withBase('/') },
-			{ label: 'Projects', href: withBase('/projects/') },
-			{ label: 'Blog', href: withBase('/blog/') },
-			{ label: 'About', href: withBase('/about/') },
+			{ label: '首页', href: withBase('/') },
+			{ label: '项目', href: withBase('/projects/') },
+			{ label: '博客', href: withBase('/blog/') },
+			{ label: '关于', href: withBase('/about/') },
+			{ label: '友链', href: withBase('/links/') },
 			{ label: 'RSS', href: withBase('/rss.xml') },
 		],
 	},
 	{
-		title: 'Connect',
+		title: '联系',
 		// 与 Nav.astro 的 iconLinks 保持一致
 		links: [
 			{ label: 'GitHub', href: 'https://github.com/zhangjszs' },
 			{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com' },
 			{ label: 'CSDN', href: 'https://blog.csdn.net/zcw_jszs' },
-			{ label: 'CNBlogs', href: 'https://www.cnblogs.com/jszs0013/' },
+			{ label: '博客园', href: 'https://www.cnblogs.com/jszs0013/' },
 		],
 	},
 ];
 ---
 
-<footer>
+<footer data-pagefind-ignore>
 	<div class="footer-wrapper">
 		<div class="footer-top">
 			<div class="footer-brand">
@@ -42,7 +43,7 @@ const footerLinks = [
 				{
 					footerLinks.map((group) => (
 						<div class="link-group">
-							<h4 data-i18n={group.title === 'Navigate' ? 'footer.navigate' : 'footer.connect'}>{group.title}</h4>
+							<h4>{group.title}</h4>
 							<ul>
 								{group.links.map((link) => (
 									<li>
@@ -50,7 +51,6 @@ const footerLinks = [
 											href={link.href}
 											target={link.href.startsWith('http') ? '_blank' : undefined}
 											rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-											data-i18n={`footer.${group.title.toLowerCase() === 'navigate' ? 'navigate' : 'connect'}.${link.label.toLowerCase().replace(/[^a-z]/g, '')}`}
 										>
 											{link.label}
 										</a>
@@ -64,7 +64,7 @@ const footerLinks = [
 		</div>
 		<div class="footer-bottom">
 			<p class="copyright">
-				&copy; {currentYear} Kerwin Zhang. <span data-i18n="footer.builtWith">Built with</span>
+				&copy; {currentYear} Kerwin Zhang. <span>Powered by</span>
 				<a href="https://astro.build/">Astro</a>
 				<Icon icon="rocket-launch" size="1.2em" />
 			</p>

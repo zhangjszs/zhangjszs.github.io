@@ -7,88 +7,8 @@ import Footer from '../components/Footer.astro';
 // Component Imports
 import MainHead from '../components/MainHead.astro';
 import Nav from '../components/Nav.astro';
-import RevealObserver from '../components/RevealObserver.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
-import { base } from '../utils/paths';
-
-// 背景系统样式：所有图片 URL 动态拼接 base 前缀，兼容子路径部署（GitHub Pages）
-const bg = (name: string) => `url('${base}/assets/backgrounds/${name}')`;
-const backgroundsCss = `
-:root {
-  --_placeholder-bg: linear-gradient(transparent, transparent);
-  --bg-image-main: ${bg('bg-main-light-800w.jpg')};
-  --bg-image-main-curves: ${bg('bg-main-light.svg')};
-  --bg-image-subtle-1: var(--_placeholder-bg);
-  --bg-image-subtle-2: var(--_placeholder-bg);
-  --bg-image-footer: var(--_placeholder-bg);
-  --bg-svg-blend-mode: overlay;
-  --bg-blend-mode: darken;
-  --bg-image-aspect-ratio: 2.25;
-  --bg-scale: 1.68;
-  --bg-aspect-ratio: calc(var(--bg-image-aspect-ratio) / var(--bg-scale));
-  --bg-gradient-size: calc(var(--bg-scale) * 100%);
-}
-:root.theme-dark {
-  --bg-image-main: ${bg('bg-main-dark-800w.jpg')};
-  --bg-image-main-curves: ${bg('bg-main-dark.svg')};
-  --bg-svg-blend-mode: darken;
-  --bg-blend-mode: lighten;
-}
-/* These backgrounds are displayed below the fold, so we lazy load them
-   once the 'loaded' class has been set. */
-:root.loaded {
-  --bg-image-subtle-1: ${bg('bg-subtle-1-light-800w.jpg')};
-  --bg-image-subtle-2: ${bg('bg-subtle-2-light-800w.jpg')};
-  --bg-image-footer: ${bg('bg-footer-light-800w.jpg')};
-}
-:root.loaded.theme-dark {
-  --bg-image-subtle-1: ${bg('bg-subtle-1-dark-800w.jpg')};
-  --bg-image-subtle-2: ${bg('bg-subtle-2-dark-800w.jpg')};
-  --bg-image-footer: ${bg('bg-footer-dark-800w.jpg')};
-}
-@media (min-width: 50em) {
-  :root {
-    --bg-scale: 1;
-    --bg-image-main: ${bg('bg-main-light-1440w.jpg')};
-  }
-  :root.theme-dark {
-    --bg-image-main: ${bg('bg-main-dark-1440w.jpg')};
-  }
-  :root.loaded {
-    --bg-image-subtle-1: ${bg('bg-subtle-1-light-1440w.jpg')};
-    --bg-image-subtle-2: ${bg('bg-subtle-2-light-1440w.jpg')};
-    --bg-image-footer: ${bg('bg-footer-light-1440w.jpg')};
-  }
-  :root.loaded.theme-dark {
-    --bg-image-subtle-1: ${bg('bg-subtle-1-dark-1440w.jpg')};
-    --bg-image-subtle-2: ${bg('bg-subtle-2-dark-1440w.jpg')};
-    --bg-image-footer: ${bg('bg-footer-dark-1440w.jpg')};
-  }
-}
-.backgrounds {
-  min-height: 100%;
-  isolation: isolate;
-  background:
-    /*noise*/ ${bg('noise.png')} top center/220px repeat,
-    /*footer*/ var(--bg-image-footer) bottom center/var(--bg-gradient-size) no-repeat,
-    /*header1*/ var(--bg-image-main-curves) top center/var(--bg-gradient-size) no-repeat,
-    /*header2*/ var(--bg-image-main) top center/var(--bg-gradient-size) no-repeat,
-    /*base*/ var(--gray-999);
-  background-blend-mode:
-    /*noise*/ overlay,
-    /*footer*/ var(--bg-blend-mode),
-    /*header1*/ var(--bg-svg-blend-mode),
-    /*header2*/ normal,
-    /*base*/ normal;
-}
-@media (forced-colors: active) {
-  /* Deactivate custom backgrounds for high contrast users. */
-  .backgrounds {
-    background: none;
-    background-blend-mode: none;
-    --bg-gradient-size: none;
-  }
-}`;
+import SearchDialog from '../components/SearchDialog.astro';
 
 interface Props {
 	title?: string | undefined;
@@ -98,24 +18,21 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<MainHead title={title} description={description} />
 	</head>
 	<body>
 		<ScrollProgress />
-		<div class="stack backgrounds">
+		<div class="stack">
 			<Nav />
 			<slot />
 			<Footer />
 		</div>
 		<BackToTop />
-		<RevealObserver />
+		<SearchDialog />
 
 		<script>
-			// Add "loaded" class once the document has completely loaded.
-			addEventListener('load', () => document.documentElement.classList.add('loaded'));
-
 			// Smooth scroll for anchor links
 			document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 				anchor.addEventListener('click', (e) => {
@@ -139,7 +56,7 @@ const { title, description } = Astro.props;
 
 					const btn = document.createElement('button');
 					btn.className = 'copy-code-btn';
-					btn.setAttribute('aria-label', 'Copy code');
+					btn.setAttribute('aria-label', '复制代码');
 					btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 
 					btn.addEventListener('click', async () => {
@@ -186,8 +103,5 @@ const { title, description } = Astro.props;
 			});
 			observer.observe(document.body, { childList: true, subtree: true });
 		</script>
-
-		<!-- 背景图 URL 需要带上部署子路径（base），因此整块样式以内联方式生成 -->
-		<style is:inline set:html={backgroundsCss}></style>
 	</body>
 </html>

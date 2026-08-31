@@ -1,5 +1,9 @@
 ---
 import '../styles/global.css';
+// 自托管字体（避免 Google Fonts / jsDelivr CDN 在中国大陆访问缓慢）
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/cal-sans/400.css';
 import { withBase } from '../utils/paths';
 
 // ============================================================
@@ -43,43 +47,9 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}/og-image.png`, Astro.site);
 <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} · RSS`} href={withBase('/rss.xml')} />
 <!-- sitemap 链接：搜索引擎爬虫可据此发现全部页面 -->
 <link rel="sitemap" type="application/xml" href={withBase('/sitemap-index.xml')} />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<!--
-  字体三件套（视觉升级 2026-08）：
-  - Inter（正文，400/500/600/700 四个字重 + 斜体）：现代、可读性高
-  - Cal Sans（标题，600/700）：圆润有力，astro-paper 风格
-  - JetBrains Mono（代码，400/500）：开发者友好
--->
-<link
-	href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
-	rel="stylesheet"
-/>
-<!-- Cal Sans：display 字体，每个页面下载一次，命中浏览器缓存后无感 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/cal-sans@1.0.0/index.min.css" />
-<script is:inline>
-	// This code is inlined in the head to make dark mode instant & blocking.
-	const getThemePreference = () => {
-		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-			return localStorage.getItem('theme');
-		}
-		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-	};
-	const isDark = getThemePreference() === 'dark';
-	document.documentElement.classList[isDark ? 'add' : 'remove']('theme-dark');
-
-	// Set html lang from localStorage (synced with LangSwitcher)
-	if (typeof localStorage !== 'undefined') {
-		const lang = localStorage.getItem('preferred-lang') || 'zh'; // 默认语言为中文
-		document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-	}
-
-	if (typeof localStorage !== 'undefined') {
-		// Watch the document element and persist user preference when it changes.
-		const observer = new MutationObserver(() => {
-			const isDark = document.documentElement.classList.contains('theme-dark');
-			localStorage.setItem('theme', isDark ? 'dark' : 'light');
-		});
-		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-	}
-</script>
+<link rel="canonical" href={Astro.url} />
+{
+	import.meta.env.PROD && (
+		<script is:inline data-goatcounter="https://zhangjszs.goatcounter.com/count" async src="//gc.zgo.at/count.js" />
+	)
+}

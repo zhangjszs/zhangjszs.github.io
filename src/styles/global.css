@@ -1,64 +1,70 @@
 /* ============================================================
-   莫兰迪配色 + astro-paper 风格的语义化设计 token
+   暗色技术风设计 token（graphite 深底 + 激光绿 accent）
    - 6 个语义变量：background / foreground / accent / muted / border / surface
-   - 兼容旧的 --gray-* / --accent-* 变量（已有组件依赖）
+   - 暗色单主题（无亮色模式；兼容层 --gray-* / --accent-* 保留给现有组件）
    - 排版：48rem 全文宽度、虚线链接、li 标记、图片边框
    ============================================================ */
 
 :root {
-	/* ===== 语义化设计 token（astro-paper 风格，6 变量） ===== */
-	--background: #faf8f5; /* 页面底色：暖米白（比纯白柔，比米色亮） */
-	--foreground: #28272a; /* 主文字：莫兰迪深炭 */
-	--accent: #5e6e60; /* 强调：雾霾灰绿 */
-	--accent-foreground: #faf8f5; /* 强调色上的文字 */
-	--muted: #efece6; /* 弱化背景：卡片/次级区块 */
-	--muted-foreground: #6b6e6c; /* 弱化文字：副标题/说明 */
-	--border: #e6e2dc; /* 描边：浅雾 */
-	--surface: #ffffff; /* 卡片表面：纯白（让卡片"浮"在米白背景上） */
+	color-scheme: dark;
 
-	/* ===== 兼容层：旧的 --gray-* 变量（保留给 BaseLayout / 现有组件） ===== */
-	--gray-0: #28272a;
-	--gray-50: #3a3d3b;
-	--gray-100: #4a4d4b;
-	--gray-200: #6b6e6c;
-	--gray-300: #8a8d8b;
-	--gray-400: #a8aba9;
-	--gray-500: #c5c8c6;
-	--gray-600: #d8dbd9;
-	--gray-700: #e6e2dc;
-	--gray-800: #efece6;
-	--gray-900: #f5f1ec;
-	--gray-999-basis: 36, 18%, 95%;
+	/* ===== 语义化设计 token ===== */
+	--background: #0b0d10; /* 页面底色：石墨黑 */
+	--foreground: #e6e9ef; /* 主文字：雾白 */
+	--accent: #3fe0a1; /* 强调：激光绿（LiDAR 扫描色） */
+	--accent-foreground: #07130d; /* 强调色上的文字 */
+	--muted: #14181d; /* 弱化背景：卡片/次级区块 */
+	--muted-foreground: #98a2b3; /* 弱化文字：副标题/说明 */
+	--border: #232a33; /* 描边：暗石墨线 */
+	--surface: #12161c; /* 卡片表面：比背景亮一档 */
+
+	/* 辅助色：强度图例琥珀（LiDAR intensity 配色传统） */
+	--accent-warm: #e8a04c;
+
+	/* ===== 兼容层：旧的 --gray-* 变量（组件依赖） ===== */
+	--gray-0: #e6e9ef;
+	--gray-50: #c9d1dc;
+	--gray-100: #aab4c2;
+	--gray-200: #98a2b3;
+	--gray-300: #7c8798;
+	--gray-400: #5c6675;
+	--gray-500: #3f4956;
+	--gray-600: #2c343e;
+	--gray-700: #232a33;
+	--gray-800: #14181d;
+	--gray-900: #0b0d10;
+	--gray-999-basis: 216, 16%, 5%;
 	--gray-999_40: hsla(var(--gray-999-basis), 0.4);
-	--gray-999: #faf8f5;
+	--gray-999: #0b0d10;
 
 	/* ===== 兼容层：旧的 --accent-* 变量 ===== */
-	--accent-light: #b5c4b6;
-	--accent-regular: #8a9a8b;
-	--accent-secondary: #c4a4a7;
-	--accent-dark: #5e6e60;
-	--accent-overlay: hsla(125, 8%, 45%, 0.18);
+	--accent-light: #0f2f22; /* 深色调底（用于 hover 背景） */
+	--accent-regular: #2b8f68;
+	--accent-secondary: var(--accent-warm);
+	--accent-dark: #8aecc4; /* 行内代码等高对比文字用浅绿 */
+	--accent-overlay: hsla(158, 72%, 56%, 0.16);
 	--accent-subtle-overlay: var(--accent-overlay);
-	--accent-text-over: #faf8f5;
+	--accent-text-over: var(--accent);
 
 	--link-color: var(--accent);
 
 	/* 渐变 */
-	--gradient-stop-1: #b5c4b6;
-	--gradient-stop-2: #8a9a8b;
-	--gradient-stop-3: #5e6e60;
-	--gradient-subtle: linear-gradient(150deg, var(--gray-800) 19%, var(--gray-999) 150%);
+	--gradient-stop-1: #8aecc4;
+	--gradient-stop-2: #3fe0a1;
+	--gradient-stop-3: #1d8f6a;
+	--gradient-subtle: linear-gradient(150deg, var(--gray-800) 19%, var(--gray-900) 150%);
 	--gradient-accent: linear-gradient(150deg, var(--gradient-stop-1), var(--gradient-stop-2), var(--gradient-stop-3));
-	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #5e6e60);
-	--gradient-stroke: linear-gradient(180deg, var(--gray-800), var(--gray-600));
+	--gradient-accent-orange: linear-gradient(150deg, #f0c08a, var(--accent-warm), #a86a26);
+	--gradient-stroke: linear-gradient(180deg, var(--gray-500), var(--gray-700));
 
-	/* 阴影（更柔和、更"悬浮"） */
-	--shadow-sm: 0 1px 2px rgba(40, 39, 42, 0.04);
-	--shadow-md: 0 4px 12px rgba(40, 39, 42, 0.06), 0 2px 4px rgba(40, 39, 42, 0.04);
-	--shadow-lg: 0 12px 32px rgba(40, 39, 42, 0.08), 0 4px 12px rgba(40, 39, 42, 0.05);
-	--shadow-glow: 0 0 0 4px hsla(125, 8%, 45%, 0.15);
+	/* 阴影与辉光 */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.3);
+	--shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+	--shadow-glow: 0 0 0 4px hsla(158, 72%, 56%, 0.16);
+	--glow-accent: 0 0 24px hsla(158, 72%, 56%, 0.14);
 
-	/* 字号梯度（更细，参考 Tailwind 默认） */
+	/* 字号梯度 */
 	--text-xs: 0.75rem;
 	--text-sm: 0.875rem;
 	--text-base: 1rem;
@@ -70,25 +76,25 @@
 	--text-4xl: 3rem;
 	--text-5xl: 3.75rem;
 
-	/* 行高（更舒展） */
+	/* 行高 */
 	--leading-tight: 1.25;
 	--leading-snug: 1.4;
 	--leading-normal: 1.6;
 	--leading-relaxed: 1.75;
 
-	/* 字体：Inter 正文 / Cal Sans 标题（借 astro-paper 路线） / Fira Code 代码 */
+	/* 字体：Inter 正文 / Cal Sans 标题 / JetBrains Mono 代码（@fontsource 自托管） */
 	--font-system:
 		system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
 		'Helvetica Neue', sans-serif;
-	--font-body: 'Inter', var(--font-system);
-	--font-brand: 'Cal Sans', 'Inter', var(--font-system);
+	--font-body: 'Inter Variable', var(--font-system);
+	--font-brand: 'Cal Sans', 'Inter Variable', var(--font-system);
 	--font-mono:
-		'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
+		'JetBrains Mono Variable', 'Fira Code', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
 		'DejaVu Sans Mono', monospace;
 
 	/* 容器 */
-	--max-width-prose: 48rem; /* astro-paper max-w-3xl：文章正文 */
-	--max-width-app: 80rem; /* 整个 app 容器 */
+	--max-width-prose: 48rem;
+	--max-width-app: 80rem;
 
 	/* 圆角 */
 	--radius-sm: 6px;
@@ -99,49 +105,6 @@
 	/* 过渡 */
 	--theme-transition: 0.2s ease-in-out;
 	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-:root.theme-dark {
-	/* 暗色：astro-paper 风格深蓝灰 + 莫兰迪绿保留 */
-	--background: #1a1d23; /* 深蓝灰（比纯黑通透） */
-	--foreground: #eaedf3; /* 文字：雾白 */
-	--accent: #b5c4b6; /* 暗色下用浅绿作为强调（更亮） */
-	--accent-foreground: #1a1d23;
-	--muted: #212737; /* 卡片底色 */
-	--muted-foreground: #afb9ca;
-	--border: #2d3344;
-	--surface: #212737;
-
-	--gray-0: #eaedf3;
-	--gray-50: #d2cec7;
-	--gray-100: #b8b4ad;
-	--gray-200: #95918a;
-	--gray-300: #75716a;
-	--gray-400: #5a5751;
-	--gray-500: #45433f;
-	--gray-600: #383633;
-	--gray-700: #2f2d2a;
-	--gray-800: #212737;
-	--gray-900: #1a1d23;
-	--gray-999-basis: 220, 14%, 12%;
-	--gray-999: #1a1d23;
-
-	--accent-light: #5e6e60;
-	--accent-regular: #8a9a8b;
-	--accent-secondary: #c4a4a7;
-	--accent-dark: #b5c4b6;
-	--accent-overlay: hsla(125, 8%, 60%, 0.18);
-	--accent-subtle-overlay: hsla(125, 8%, 55%, 0.14);
-	--accent-text-over: #1a1d23;
-
-	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 81%);
-	--gradient-accent-orange: linear-gradient(150deg, #c4a4a7, #8a9a8b, #b5c4b6);
-	--gradient-stroke: linear-gradient(180deg, var(--gray-500), var(--gray-700));
-
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
-	--shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
-	--shadow-glow: 0 0 0 4px hsla(125, 8%, 60%, 0.2);
 }
 
 /* ============================================================
@@ -223,9 +186,7 @@ h5 {
 }
 
 /* ============================================================
-   排版工具类（astro-paper 风格 .app-prose）
-   - 适用于文章正文（blog/[...slug].astro）
-   - 正文 48rem 宽，行高 1.75，更舒展
+   排版工具类（编辑排版内页）
    ============================================================ */
 .app-prose {
 	max-width: var(--max-width-prose);
@@ -370,7 +331,7 @@ h5 {
 }
 
 /* ============================================================
-   视觉细节升级
+   视觉细节
    ============================================================ */
 
 /* 选区颜色（用 accent） */
@@ -393,7 +354,7 @@ h5 {
 	border: 2px solid var(--background);
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: var(--muted-foreground);
+	background: var(--gray-400);
 }
 
 /* 焦点环（统一） */
@@ -403,14 +364,14 @@ h5 {
 	border-radius: 4px;
 }
 
-/* 平滑滚动 */
+/* 平滑滚动（Lenis 接管后由 JS 侧管理，此处保留 no-JS 兜底） */
 html {
 	scroll-behavior: smooth;
 }
 
 /* 玻璃拟态工具类 */
 .glass {
-	background: color-mix(in srgb, var(--surface) 75%, transparent);
+	background: color-mix(in srgb, var(--surface) 72%, transparent);
 	backdrop-filter: blur(12px) saturate(120%);
 	-webkit-backdrop-filter: blur(12px) saturate(120%);
 	border: 1px solid var(--border);
@@ -418,6 +379,6 @@ html {
 
 /* 点状网格背景工具类 */
 .dot-grid {
-	background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+	background-image: radial-gradient(circle at 1px 1px, var(--gray-600) 1px, transparent 0);
 	background-size: 24px 24px;
 }

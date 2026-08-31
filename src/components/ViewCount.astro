@@ -1,0 +1,40 @@
+---
+// 阅读计数展示：读取 GoatCounter 公开 API；未配置/请求失败时静默移除自身。
+// 前置条件：GoatCounter 站点开启"允许公开访问计数器"。
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname;
+---
+
+<span class="view-count" data-vc-path={path} hidden>
+	<Icon icon="magnifying-glass" size="0.9em" />
+	<span class="vc-num"></span>
+</span>
+
+<style>
+	.view-count {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--muted-foreground);
+	}
+</style>
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-vc-path]').forEach(async (el) => {
+		const path = el.getAttribute('data-vc-path') ?? '';
+		try {
+			const res = await fetch(`https://zhangjszs.goatcounter.com/counter/${encodeURIComponent(path)}.json`);
+			if (!res.ok) return;
+			const json = (await res.json()) as { count?: number };
+			if (typeof json.count === 'number' && json.count > 0) {
+				el.querySelector('.vc-num')!.textContent = `${json.count} 次阅读`;
+				el.hidden = false;
+			}
+		} catch {
+			// 服务不可用或未配置时保持隐藏
+		}
+	});
+</script>

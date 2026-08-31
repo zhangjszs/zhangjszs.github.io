@@ -1,0 +1,92 @@
+---
+// Giscus 评论（GitHub Discussions 驱动，零后端）。
+// 阶段 4 仓库改名到 zhangjszs.github.io 后：启用 Discussions、安装 giscus GitHub App、
+// 在 giscus.app 生成配置并把 REPO_ID / CATEGORY_ID 填入下方常量即可上线。
+import Icon from './Icon.astro';
+
+const REPO = 'zhangjszs/zhangjszs.github.io';
+const REPO_ID = 'TODO_REPO_ID';
+const CATEGORY = 'General';
+const CATEGORY_ID = 'TODO_CATEGORY_ID';
+
+const enabled = REPO_ID !== 'TODO_REPO_ID';
+---
+
+<section class="comments" data-pagefind-ignore>
+	<h2 class="comments-title">
+		<Icon icon="envelope" size="1em" />
+		评论
+	</h2>
+	{
+		enabled ? (
+			<div
+				class="giscus"
+				id="giscus-anchor"
+				data-repo={REPO}
+				data-repo-id={REPO_ID}
+				data-category={CATEGORY}
+				data-category-id={CATEGORY_ID}
+			/>
+		) : (
+			<p class="comments-note">评论系统将在仓库迁移完成后启用（Giscus · GitHub Discussions）。</p>
+		)
+	}
+</section>
+
+<style>
+	.comments {
+		padding: clamp(2.5rem, 6vw, 4rem) 0 0;
+	}
+
+	.comments-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: var(--text-xl);
+		margin: 0 0 1.5rem;
+	}
+
+	.comments-title :global(svg) {
+		color: var(--accent);
+	}
+
+	.comments-note {
+		color: var(--muted-foreground);
+		font-size: var(--text-sm);
+	}
+</style>
+
+<script>
+	// 配置从锚点 data-* 读取；进视口才懒加载 giscus 脚本
+	const anchor = document.getElementById('giscus-anchor');
+	if (anchor) {
+		const load = () => {
+			if (anchor.querySelector('iframe')) return;
+			const script = document.createElement('script');
+			script.src = 'https://giscus.app/client.js';
+			script.setAttribute('data-repo', anchor.dataset.repo ?? '');
+			script.setAttribute('data-repo-id', anchor.dataset.repoId ?? '');
+			script.setAttribute('data-category', anchor.dataset.category ?? '');
+			script.setAttribute('data-category-id', anchor.dataset.categoryId ?? '');
+			script.setAttribute('data-mapping', 'pathname');
+			script.setAttribute('data-strict', '0');
+			script.setAttribute('data-reactions-enabled', '1');
+			script.setAttribute('data-emit-metadata', '0');
+			script.setAttribute('data-input-position', 'top');
+			script.setAttribute('data-theme', 'transparent_dark');
+			script.setAttribute('data-lang', 'zh-CN');
+			script.crossOrigin = 'anonymous';
+			script.async = true;
+			anchor.appendChild(script);
+		};
+		new IntersectionObserver(
+			(entries, obs) => {
+				if (entries.some((e) => e.isIntersecting)) {
+					load();
+					obs.disconnect();
+				}
+			},
+			{ rootMargin: '400px' }
+		).observe(anchor);
+	}
+</script>

@@ -5,11 +5,11 @@
 
 ## 1. 当前现状
 
-| Workflow | 最近 5 次结论 | 当前状态 |
-| --- | --- | --- |
-| `CI`（`.github/workflows/ci.yml`） | ✅ ×5 | 🟢 green |
-| `Deploy to GitHub Pages`（`.github/workflows/deploy.yml`） | ❌❌❌✅✅ | 🟢 green（最近 2 次） |
-| `pages build and deployment`（系统内置） | ❌ | ⚪ 与本项目无关，已加 `.nojekyll` 抑制 |
+| Workflow                                                   | 最近 5 次结论 | 当前状态                               |
+| ---------------------------------------------------------- | ------------- | -------------------------------------- |
+| `CI`（`.github/workflows/ci.yml`）                         | ✅ ×5         | 🟢 green                               |
+| `Deploy to GitHub Pages`（`.github/workflows/deploy.yml`） | ❌❌❌✅✅    | 🟢 green（最近 2 次）                  |
+| `pages build and deployment`（系统内置）                   | ❌            | ⚪ 与本项目无关，已加 `.nojekyll` 抑制 |
 
 > 如果你看到旧失败通知，绝大多数来自 2026-08-28 ~ 08-29 那一段（见下）。
 
@@ -18,11 +18,13 @@
 ### 2.1 `CI`：`npm ci` 报 `EUSAGE`（`package.json` / `package-lock.json` 失同步）
 
 **触发条件**：
+
 - 修改了 `package.json`（例如 `astro`、`@astrojs/mdx` 升版本）
 - 但没有本地运行 `npm install` / `npm i` 来更新 `package-lock.json`
 - 直接 `git add package.json && git commit`，CI 严格模式下 `npm ci` 会拒绝
 
 **报错样例**：
+
 ```text
 npm error code EUSAGE
 npm error `npm ci` can only install packages when your package.json and
@@ -46,10 +48,12 @@ npm error Missing: astro@6.4.8 from lock file
 ### 2.2 `Deploy to GitHub Pages`：`actions/configure-pages` 报 `Not Found`
 
 **触发条件**：
+
 - 首次在该仓库启用 GitHub Pages，但 Settings → Pages → Source 仍是 `Deploy from a branch`
 - 或 GITHUB_TOKEN 的 `pages: write` 权限不够
 
 **报错样例**：
+
 ```text
 ##[warning]Get Pages site failed. Error: Not Found
 ##[error]Create Pages site failed.
@@ -58,6 +62,7 @@ npm error Missing: astro@6.4.8 from lock file
 ```
 
 **修复方法**：
+
 1. 进入仓库 Settings → Pages
 2. Build and deployment → Source 选择 **GitHub Actions**
 3. 重新 push 到 main（或在 Actions 页面手动重跑 Deploy 工作流）
@@ -67,12 +72,14 @@ npm error Missing: astro@6.4.8 from lock file
 ### 2.3 系统工作流 `pages build and deployment` 失败
 
 **说明**：
+
 - 这是 GitHub 在 Pages 启用 `Deploy from a branch` 模式时自动跑的 Jekyll 工作流
 - 我们的项目使用 Astro 独立构建，与 Jekyll 完全无关
 - 即使我们走 GitHub Actions 模式，这个工作流有时仍会因
   `gh-pages` 分支或仓库根出现 `_config.yml` 等触发
 
 **修复方法**：
+
 - 在 `public/.nojekyll`（已添加）放一个空文件
   Astro build 时会自动复制到 `dist/.nojekyll`
   GitHub Pages 看到这个标记后会**跳过 Jekyll 管线**

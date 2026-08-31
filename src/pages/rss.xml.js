@@ -6,8 +6,8 @@ import { withBase } from '../utils/paths';
 const SITE_TITLE = 'Kerwin Zhang';
 const SITE_DESC = '自动驾驶工程学生 · 项目作品、技术笔记与联系方式。';
 // 兜底 URL（与 astro.config.mjs 的 site 一致；context.site 优先）
-// 当前部署在 GitHub Pages 项目页，链接里自动拼 /huat-showcase 前缀
-const SITE_URL = 'https://zhangjszs.github.io/huat-showcase';
+// 当前部署在 GitHub Pages 用户页（根路径）
+const SITE_URL = 'https://zhangjszs.github.io';
 
 export async function GET(context) {
 	const site = context.site ?? new URL(SITE_URL);

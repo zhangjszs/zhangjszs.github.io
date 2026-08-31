@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import type { iconPaths } from '../components/IconPaths';
+import PageHeader from '../components/PageHeader.astro';
 import RadarChart from '../components/RadarChart.astro';
+import { UPDATES, UPDATE_TYPE_LABEL } from '../data/updates';
 
 // ============================================================
 // 静态个人信息（站名、身份、时间线"现在"段、联系方式）
@@ -33,11 +35,14 @@ const contactLinks: { label: string; href: string; icon: keyof typeof iconPaths 
 	{ label: 'GitHub', href: 'https://github.com/zhangjszs', icon: 'github-logo' },
 	{ label: 'Email', href: 'mailto:zhangjszs@foxmail.com', icon: 'envelope' },
 	{ label: 'CSDN', href: 'https://blog.csdn.net/zcw_jszs', icon: 'pencil-line' },
-	{ label: 'CNBlogs', href: 'https://www.cnblogs.com/jszs0013/', icon: 'globe' },
+	{ label: '博客园', href: 'https://www.cnblogs.com/jszs0013/', icon: 'globe' },
 ];
 
+/** GitHub 贡献热力图（ghchart 免费服务，失效时图片 onerror 自动隐藏整个区块） */
+const GITHUB_USERNAME = 'zhangjszs';
+
 // ============================================================
-// B 路线：项目数据自动聚合（不引外部图表库，纯前端聚合 + 现有 RadarChart）
+// 项目数据自动聚合（不引外部图表库，纯前端聚合 + 现有 RadarChart）
 // ============================================================
 
 const allProjects = await getCollection('projects');
@@ -98,7 +103,6 @@ const radarCategories = RADAR_CATEGORY_ORDER.map((cat) => {
 	const hits = allTechSorted.filter(([tech]) => kws.some((k) => tech.toLowerCase().includes(k)));
 	const skills = hits.slice(0, 3).map(([t]) => t);
 	const totalCount = hits.reduce((s, [, c]) => s + c, 0);
-	// level 归一化：每类至少要 1 个项目才显示数据；按"累计使用次数 / 项目数"映射到 0-100
 	const level =
 		personalProjects.length === 0 ? 0 : Math.min(100, Math.round((totalCount / personalProjects.length) * 60 + 20));
 	return { category: cat, skills, level };
@@ -136,33 +140,15 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 	title="关于 | Kerwin Zhang"
 	description="Kerwin Zhang · 自动驾驶工程学生，FSAC 车队成员，研究方向 LiDAR 感知与自动驾驶算法。"
 >
-	<section class="hero-section">
-		<div class="hero-blobs" aria-hidden="true">
-			<div class="blob blob-1"></div>
-			<div class="blob blob-2"></div>
-		</div>
-		<div class="wrapper hero-content">
-			<div class="hero-text">
-				<span class="eyebrow" data-i18n="about.eyebrow">你好</span>
-				<h1 class="hero-title">
-					<span data-i18n="about.title">关于</span>
-					<span class="gradient-text" data-i18n="about.titleAccent">我</span>
-				</h1>
-				<p class="hero-tagline" data-i18n="about.tagline">热爱动手实践的开发者，在这里记录成长轨迹。</p>
-			</div>
-		</div>
-	</section>
+	<div class="wrapper" data-pagefind-body>
+		<PageHeader eyebrow="03 · about" title="关于我" description={ROLE} />
 
-	<main class="wrapper stack gap-20">
-		<!-- Background -->
-		<section class="section reveal">
+		<!-- 01 背景 -->
+		<section class="section" data-reveal>
+			<span class="section-eyebrow">01 · 背景</span>
+			<h2 class="section-title">我是谁</h2>
 			<div class="about-grid">
 				<div class="about-text">
-					<span class="section-eyebrow" data-i18n="about.background.eyebrow">背景</span>
-					<h2 class="section-title">
-						<span data-i18n="about.background.title">我是谁</span>
-					</h2>
-					<p class="role-line">{ROLE}</p>
 					{ABOUT_PARAGRAPHS.map((p) => <p>{p}</p>)}
 				</div>
 				<div class="timeline">
@@ -186,13 +172,10 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 			</div>
 		</section>
 
-		<!-- Skills -->
-		<section class="section section-alt reveal">
-			<span class="section-eyebrow" data-i18n="about.skills.eyebrow">能力</span>
-			<h2 class="section-title">
-				<span data-i18n="about.skills.title">技术</span>
-				<span class="gradient-text" data-i18n="about.skills.titleAccent">栈</span>
-			</h2>
+		<!-- 02 技能 -->
+		<section class="section" data-reveal>
+			<span class="section-eyebrow">02 · 技能</span>
+			<h2 class="section-title">技术雷达</h2>
 			<div class="radar-wrapper">
 				<RadarChart categories={radarCategories} />
 			</div>
@@ -212,57 +195,70 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 			</div>
 		</section>
 
-		<!-- 数据摘要（B 路线：项目数据自动聚合，零图表库） -->
-		<section class="section reveal">
-			<span class="section-eyebrow">数据</span>
-			<h2 class="section-title">
-				<span>项目</span>
-				<span class="gradient-text">概览</span>
-			</h2>
-			<p class="data-note">以下数据从 <code>src/content/projects/</code> 自动聚合，每加一个项目都会自动更新。</p>
-			<div class="data-grid">
-				<div class="data-card">
-					<span class="data-number">{personalProjects.length}</span>
-					<span class="data-label">个人项目</span>
-				</div>
-				<div class="data-card">
-					<span class="data-number">{allTechSorted.length}</span>
-					<span class="data-label">独立技术</span>
-				</div>
-				<div class="data-card">
-					<span class="data-number">{skills.reduce((s, g) => s + g.items.length, 0)}</span>
-					<span class="data-label">技术归类</span>
-				</div>
-				<div class="data-card">
-					<span class="data-number">{recentYears.length}</span>
-					<span class="data-label">活跃年份</span>
-				</div>
+		<!-- 03 GitHub 贡献热力图 -->
+		<section class="section" data-reveal id="heatmap-section">
+			<span class="section-eyebrow">03 · 轨迹</span>
+			<h2 class="section-title">GitHub 贡献</h2>
+			<div class="heatmap-card">
+				<img
+					src={`https://ghchart.rshah.org/3fe0a1/${GITHUB_USERNAME}`}
+					alt={`${GITHUB_USERNAME} 的 GitHub 贡献热力图`}
+					loading="lazy"
+					onerror="document.getElementById('heatmap-section')?.remove()"
+				/>
 			</div>
-			{
-				allTechSorted.length > 0 && (
-					<div class="top-tech">
-						<h3>最常使用的技术</h3>
-						<ol>
-							{allTechSorted.slice(0, 8).map(([tech, count]) => (
-								<li>
-									<span class="top-tech-name">{tech}</span>
-									<span class="top-tech-count">× {count}</span>
-								</li>
-							))}
-						</ol>
-					</div>
-				)
-			}
 		</section>
 
-		<!-- Contact -->
-		<section class="section section-alt reveal">
-			<span class="section-eyebrow" data-i18n="about.contact.eyebrow">联系</span>
-			<h2 class="section-title">
-				<span data-i18n="about.contact.title">联系</span>
-				<span class="gradient-text" data-i18n="about.contact.titleAccent">方式</span>
-			</h2>
-			<p class="contact-desc" data-i18n="about.contact.desc">欢迎通过以下渠道与我交流，无论是技术讨论还是合作机会。</p>
+		<!-- 04 数据概览 -->
+		{
+			allTechSorted.length > 0 && (
+				<section class="section" data-reveal>
+					<span class="section-eyebrow">04 · 数据</span>
+					<h2 class="section-title">项目概览</h2>
+					<div class="data-grid">
+						<div class="data-card">
+							<span class="data-number">{personalProjects.length}</span>
+							<span class="data-label">个人项目</span>
+						</div>
+						<div class="data-card">
+							<span class="data-number">{allTechSorted.length}</span>
+							<span class="data-label">独立技术</span>
+						</div>
+						<div class="data-card">
+							<span class="data-number">{skills.reduce((s, g) => s + g.items.length, 0)}</span>
+							<span class="data-label">技术归类</span>
+						</div>
+						<div class="data-card">
+							<span class="data-number">{recentYears.length}</span>
+							<span class="data-label">活跃年份</span>
+						</div>
+					</div>
+				</section>
+			)
+		}
+
+		<!-- 05 站点更新日志 -->
+		<section class="section" data-reveal>
+			<span class="section-eyebrow">05 · 更新</span>
+			<h2 class="section-title">站点动态</h2>
+			<div class="updates">
+				{
+					UPDATES.map((u) => (
+						<div class="update-row">
+							<time datetime={u.date}>{u.date}</time>
+							<span class={`update-type update-type-${u.type}`}>{UPDATE_TYPE_LABEL[u.type]}</span>
+							<span class="update-title">{u.title}</span>
+						</div>
+					))
+				}
+			</div>
+		</section>
+
+		<!-- 06 联系 -->
+		<section class="section" data-reveal>
+			<span class="section-eyebrow">06 · 联系</span>
+			<h2 class="section-title">联系方式</h2>
+			<p class="contact-desc">欢迎通过以下渠道与我交流，无论是技术讨论还是合作机会。</p>
 			<div class="contact-grid">
 				{
 					contactLinks.map((link) => (
@@ -272,126 +268,50 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 							target={link.href.startsWith('http') ? '_blank' : undefined}
 							rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
 						>
-							<Icon icon={link.icon} size="1.5em" />
+							<Icon icon={link.icon} size="1.4em" />
 							<span class="contact-label">{link.label}</span>
 						</a>
 					))
 				}
 			</div>
 		</section>
-	</main>
+		<div class="page-end"></div>
+	</div>
+
+	<script>
+		import { initMotion } from '../scripts/motion/core';
+		initMotion();
+	</script>
 
 	<style>
-		/* ===== Hero ===== */
-		.hero-section {
-			position: relative;
-			padding: 6rem 0 5rem;
-			overflow: hidden;
-			margin-bottom: 3rem;
-		}
-
-		.hero-blobs {
-			position: absolute;
-			inset: 0;
-			z-index: 0;
-			pointer-events: none;
-		}
-
-		.blob {
-			position: absolute;
-			border-radius: 50%;
-			filter: blur(100px);
-			opacity: 0.3;
-		}
-
-		.blob-1 {
-			width: 450px;
-			height: 450px;
-			background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-			top: -20%;
-			left: 10%;
-			animation: float 12s ease-in-out infinite;
-		}
-
-		.blob-2 {
-			width: 350px;
-			height: 350px;
-			background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-			bottom: -10%;
-			right: 10%;
-			animation: float 14s ease-in-out infinite reverse;
-		}
-
-		.hero-content {
-			position: relative;
-			z-index: 1;
-			text-align: center;
-		}
-
-		.hero-text {
+		.section {
 			display: flex;
 			flex-direction: column;
-			gap: 0.75rem;
-			align-items: center;
+			gap: 1.25rem;
+			padding: clamp(2.5rem, 6vw, 4rem) 0;
+			border-top: 1px solid var(--border);
 		}
 
-		.eyebrow {
-			font-size: var(--text-sm);
-			font-weight: 600;
-			color: var(--accent-regular);
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
-		}
-
-		.hero-title {
-			font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
-			font-weight: 800;
-			color: var(--gray-0);
-			line-height: 1.1;
-			margin: 0;
-		}
-
-		.hero-tagline {
-			font-size: var(--text-lg);
-			color: var(--gray-300);
-			max-width: 55ch;
-			line-height: 1.6;
-			margin: 0;
-		}
-
-		/* ===== Sections ===== */
-		.section {
-			padding: 2rem 0;
-		}
-
-		.section-alt {
-			background: var(--gray-900);
-			border-top: 1px solid var(--gray-800);
-			border-bottom: 1px solid var(--gray-800);
-			padding: 4rem 1.5rem;
-			margin: 0 -1.5rem;
+		.section:first-of-type {
+			border-top: 0;
 		}
 
 		.section-eyebrow {
-			display: block;
+			font-family: var(--font-mono);
 			font-size: var(--text-sm);
-			font-weight: 600;
-			color: var(--accent-regular);
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
-			margin-bottom: 0.5rem;
+			color: var(--accent);
+			letter-spacing: 0.08em;
 		}
 
 		.section-title {
 			font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
-			margin-bottom: 2rem;
-			color: var(--gray-0);
+			margin: 0 0 1.25rem;
 		}
 
-		/* ===== About Grid ===== */
+		/* ===== 背景 ===== */
 		.about-grid {
 			display: grid;
-			gap: 3rem;
+			gap: 2.5rem;
 			grid-template-columns: 1fr;
 		}
 
@@ -402,114 +322,17 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 		}
 
 		.about-text p {
-			color: var(--gray-300);
-			line-height: 1.7;
+			color: var(--muted-foreground);
+			line-height: 1.9;
 			margin: 0;
+			font-size: var(--text-md);
 		}
 
-		/* 身份标签（莫兰迪点缀） */
-		.role-line {
-			display: inline-block;
-			padding: 0.35rem 0.85rem;
-			border-radius: 999px;
-			background: var(--accent-overlay);
-			color: var(--accent-dark);
-			font-size: var(--text-sm);
-			font-weight: 500;
-			letter-spacing: 0.02em;
-			margin-bottom: 0.25rem;
-		}
-
-		/* ===== 数据摘要（B 路线） ===== */
-		.data-note {
-			color: var(--gray-400);
-			font-size: var(--text-sm);
-			margin: 0 0 1.25rem;
-		}
-		.data-note code {
-			font-family: var(--font-mono);
-			font-size: 0.85em;
-			padding: 0.1em 0.4em;
-			background: var(--gray-800);
-			border-radius: 4px;
-		}
-		.data-grid {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			gap: 1rem;
-			margin-bottom: 2rem;
-		}
-		@media (min-width: 50em) {
-			.data-grid {
-				grid-template-columns: repeat(4, 1fr);
-			}
-		}
-		.data-card {
-			display: flex;
-			flex-direction: column;
-			gap: 0.25rem;
-			padding: 1.25rem 1rem;
-			border: 1px solid var(--gray-700);
-			border-radius: 12px;
-			background: var(--gray-900);
-			transition: border-color 0.2s;
-		}
-		.data-card:hover {
-			border-color: var(--accent-regular);
-		}
-		.data-number {
-			font-family: var(--font-brand);
-			font-size: var(--text-3xl);
-			font-weight: 700;
-			color: var(--accent-regular);
-		}
-		.data-label {
-			font-size: var(--text-sm);
-			color: var(--gray-400);
-		}
-		.top-tech h3 {
-			font-size: var(--text-lg);
-			margin: 0 0 0.75rem;
-			color: var(--gray-100);
-		}
-		.top-tech ol {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 0.5rem;
-		}
-		@media (min-width: 40em) {
-			.top-tech ol {
-				grid-template-columns: repeat(2, 1fr);
-			}
-		}
-		.top-tech li {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0.6rem 0.9rem;
-			background: var(--gray-900);
-			border: 1px solid var(--gray-700);
-			border-radius: 8px;
-			font-size: var(--text-sm);
-		}
-		.top-tech-name {
-			color: var(--gray-100);
-			font-weight: 500;
-		}
-		.top-tech-count {
-			color: var(--accent-regular);
-			font-family: var(--font-mono);
-			font-size: 0.85em;
-		}
-
-		/* ===== Timeline ===== */
+		/* ===== 时间线 ===== */
 		.timeline {
 			display: flex;
 			flex-direction: column;
-			gap: 1.5rem;
+			gap: 0;
 		}
 
 		.timeline-item {
@@ -525,17 +348,17 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 		}
 
 		.timeline-dot {
-			width: 12px;
-			height: 12px;
+			width: 10px;
+			height: 10px;
 			border-radius: 50%;
-			background: var(--accent-regular);
-			box-shadow: 0 0 0 4px var(--accent-subtle-overlay);
+			background: var(--accent);
+			box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 		}
 
 		.timeline-line {
-			width: 2px;
+			width: 1px;
 			flex: 1;
-			background: var(--gray-800);
+			background: var(--border);
 			margin-top: 0.5rem;
 		}
 
@@ -546,72 +369,63 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 		.timeline-content {
 			display: flex;
 			flex-direction: column;
-			gap: 0.25rem;
+			gap: 0.2rem;
 			padding-bottom: 1.5rem;
 		}
 
 		.timeline-period {
-			font-size: var(--text-sm);
-			font-weight: 600;
-			color: var(--accent-regular);
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--accent);
 		}
 
 		.timeline-content h3 {
-			font-size: var(--text-lg);
-			color: var(--gray-0);
+			font-size: var(--text-base);
 			margin: 0;
 		}
 
 		.timeline-org {
-			font-size: var(--text-sm);
-			color: var(--gray-400);
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--muted-foreground);
 			margin: 0;
+			overflow-wrap: anywhere;
 		}
 
-		.timeline-content p {
-			color: var(--gray-300);
-			line-height: 1.5;
+		.timeline-content p:last-child {
+			color: var(--muted-foreground);
+			line-height: 1.6;
 			margin: 0.25rem 0 0;
 			font-size: var(--text-sm);
 		}
 
-		/* ===== Radar Chart ===== */
+		/* ===== 技能 ===== */
 		.radar-wrapper {
 			display: flex;
 			justify-content: center;
-			margin-bottom: 2.5rem;
+			margin-bottom: 2rem;
 		}
 
-		/* ===== Skills Grid ===== */
 		.skills-grid {
 			display: grid;
-			gap: 1.5rem;
+			gap: 1.25rem;
 			grid-template-columns: 1fr;
 		}
 
 		.skill-card {
-			padding: 1.5rem;
-			background: var(--gray-999);
-			border: 1px solid var(--gray-800);
-			border-radius: 1rem;
-			transition:
-				transform 0.3s ease,
-				box-shadow 0.3s ease,
-				border-color 0.3s ease;
-		}
-
-		.skill-card:hover {
-			transform: translateY(-4px);
-			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-			border-color: var(--accent-regular);
+			padding: 1.25rem 1.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
 		}
 
 		.skill-card h3 {
+			font-family: var(--font-mono);
 			font-size: var(--text-sm);
-			text-transform: uppercase;
+			font-weight: 500;
+			color: var(--muted-foreground);
+			margin: 0 0 0.9rem;
 			letter-spacing: 0.05em;
-			color: var(--gray-400);
-			margin-bottom: 1rem;
 		}
 
 		.skill-items {
@@ -621,32 +435,141 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 		}
 
 		.skill-item {
-			padding: 0.35rem 0.8rem;
-			background: var(--gray-800);
-			color: var(--gray-200);
-			border-radius: 0.375rem;
+			padding: 0.3rem 0.75rem;
+			background: var(--muted);
+			color: var(--foreground);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-sm);
 			font-size: var(--text-sm);
-			border: 1px solid var(--gray-700);
-			transition: all 0.2s ease;
+			font-family: var(--font-mono);
+			transition:
+				color 0.2s var(--ease-out),
+				border-color 0.2s var(--ease-out);
 		}
 
 		.skill-item:hover {
-			background: var(--accent-regular);
-			color: var(--gray-999);
-			border-color: var(--accent-regular);
-			transform: translateY(-2px);
+			color: var(--accent);
+			border-color: var(--accent);
 		}
 
-		/* ===== Contact ===== */
-		.contact-desc {
-			color: var(--gray-300);
+		/* ===== 热力图 ===== */
+		.heatmap-card {
+			padding: 1.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
+			overflow-x: auto;
+		}
+
+		.heatmap-card img {
+			width: 100%;
+			min-width: 560px;
+			display: block;
+			border: 0;
+		}
+
+		/* ===== 数据 ===== */
+		.data-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1rem;
+		}
+
+		.data-card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+			padding: 1.25rem 1.25rem;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
+			background: var(--surface);
+			transition: border-color 0.2s var(--ease-out);
+		}
+
+		.data-card:hover {
+			border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+		}
+
+		.data-number {
+			font-family: var(--font-brand);
+			font-size: var(--text-3xl);
+			font-weight: 700;
+			color: var(--accent);
+			line-height: 1.1;
+		}
+
+		.data-label {
+			font-size: var(--text-sm);
+			color: var(--muted-foreground);
+		}
+
+		/* ===== 更新日志 ===== */
+		.updates {
+			display: flex;
+			flex-direction: column;
+			border-top: 1px solid var(--border);
+		}
+
+		.update-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem 1.25rem;
+			align-items: baseline;
+			padding: 1rem 0;
+			border-bottom: 1px solid var(--border);
+			font-size: var(--text-sm);
+		}
+
+		.update-row time {
+			font-family: var(--font-mono);
+			color: var(--muted-foreground);
+			flex-shrink: 0;
+		}
+
+		.update-type {
+			padding: 0.1rem 0.6rem;
+			border-radius: var(--radius-full);
+			font-size: var(--text-xs);
+			font-weight: 600;
+			flex-shrink: 0;
+		}
+
+		.update-type-design {
+			background: color-mix(in srgb, var(--accent) 14%, transparent);
+			color: var(--accent);
+		}
+
+		.update-type-feature {
+			background: color-mix(in srgb, var(--accent-warm) 16%, transparent);
+			color: var(--accent-warm);
+		}
+
+		.update-type-content {
+			background: var(--muted);
+			color: var(--foreground);
+		}
+
+		.update-type-fix {
+			background: var(--muted);
+			color: var(--muted-foreground);
+		}
+
+		.update-title {
+			color: var(--foreground);
 			line-height: 1.6;
-			margin: 0 0 2rem;
+		}
+
+		/* ===== 联系 ===== */
+		.contact-desc {
+			color: var(--muted-foreground);
+			line-height: 1.7;
+			margin: 0 0 1.5rem;
+			max-width: 56ch;
 		}
 
 		.contact-grid {
 			display: grid;
-			gap: 1.25rem;
+			gap: 1rem;
 			grid-template-columns: repeat(2, 1fr);
 			max-width: 40rem;
 		}
@@ -655,44 +578,38 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 			display: flex;
 			align-items: center;
 			gap: 0.9rem;
-			padding: 1.25rem 1.5rem;
-			background: var(--gray-999);
-			border: 1px solid var(--gray-800);
-			border-radius: 1rem;
-			color: var(--gray-200);
+			padding: 1.1rem 1.4rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
+			color: var(--foreground);
 			text-decoration: none;
 			transition:
-				transform 0.3s ease,
-				border-color 0.3s ease,
-				box-shadow 0.3s ease;
+				transform 0.25s var(--ease-out),
+				border-color 0.25s var(--ease-out),
+				box-shadow 0.25s var(--ease-out);
 		}
 
 		.contact-card:hover {
-			transform: translateY(-4px);
-			border-color: var(--accent-regular);
-			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+			transform: translateY(-3px);
+			border-color: var(--accent);
+			box-shadow: var(--glow-accent);
 		}
 
 		.contact-card :global(svg) {
-			color: var(--accent-regular);
+			color: var(--accent);
 		}
 
 		.contact-label {
 			font-weight: 600;
-			font-size: var(--text-md);
+			font-size: var(--text-sm);
 		}
 
-		@media (max-width: 40em) {
-			.contact-grid {
-				grid-template-columns: 1fr;
-			}
+		.page-end {
+			height: clamp(3rem, 8vw, 6rem);
 		}
 
 		@media (min-width: 50em) {
-			.hero-section {
-				padding: 8rem 0 6rem;
-			}
-
 			.about-grid {
 				grid-template-columns: 1fr 1fr;
 				gap: 4rem;
@@ -703,15 +620,20 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 				grid-template-columns: repeat(2, 1fr);
 			}
 
-			.section-alt {
-				padding: 4rem 2.5rem;
-				margin: 0 -2.5rem;
+			.data-grid {
+				grid-template-columns: repeat(4, 1fr);
 			}
 		}
 
 		@media (min-width: 70em) {
 			.skills-grid {
 				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+
+		@media (max-width: 40em) {
+			.contact-grid {
+				grid-template-columns: 1fr;
 			}
 		}
 	</style>

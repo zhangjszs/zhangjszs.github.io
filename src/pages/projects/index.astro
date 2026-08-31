@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Grid from '../../components/Grid.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import TagFilter from '../../components/TagFilter.astro';
-import Grid from '../../components/Grid.astro';
-import Icon from '../../components/Icon.astro';
+
 const projects = await getCollection('projects');
 // 个人项目排在前面，课程实验（labwork）靠后
 const sortedProjects = projects.sort((a, b) => {
@@ -14,61 +15,36 @@ const sortedProjects = projects.sort((a, b) => {
 const allTags = projects.flatMap((p) => p.data.tags);
 const uniqueTags = [...new Set(allTags)];
 const allTech = [...new Set(projects.flatMap((p) => p.data.techStack))];
-const featuredCount = projects.filter((p) => p.data.featured).length;
+const personalCount = projects.filter((p) => p.data.category === 'personal').length;
 
-// 分类筛选按钮（i18n key 见 src/i18n/dictionary.ts）
+// 分类筛选按钮
 const categories = [
-	{ value: 'personal', i18n: 'projects.category.personal', label: '个人项目' },
-	{ value: 'labwork', i18n: 'projects.category.labwork', label: '课程实验' },
+	{ value: 'personal', label: '个人项目' },
+	{ value: 'labwork', label: '课程实验' },
 ];
 ---
 
-<BaseLayout title="作品 | 你的名字" description="个人项目与课程实验作品集。">
-	<section class="hero-section">
-		<div class="hero-blobs" aria-hidden="true">
-			<div class="blob blob-1"></div>
-			<div class="blob blob-2"></div>
-		</div>
-		<div class="wrapper hero-content">
-			<div class="hero-text">
-				<span class="eyebrow" data-i18n="projects.eyebrow">作品集</span>
-				<h1 class="hero-title">
-					<span data-i18n="projects.title">全部</span>
-					<span class="gradient-text" data-i18n="projects.titleAccent">作品</span>
-				</h1>
-				<p class="hero-tagline" data-i18n="projects.tagline">
-					这里收录了我的个人项目与课程实验，涵盖 Web 开发、算法、机器学习等多个方向。
-				</p>
-			</div>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<Icon icon="code" size="1.5em" />
-					<span class="stat-number">{projects.length}</span>
-					<span class="stat-label" data-i18n="stats.projects">项目</span>
-				</div>
-				<div class="stat-card">
-					<Icon icon="terminal-window" size="1.5em" />
-					<span class="stat-number">{allTech.length}</span>
-					<span class="stat-label" data-i18n="stats.technologies">技术</span>
-				</div>
-				<div class="stat-card">
-					<Icon icon="list" size="1.5em" />
-					<span class="stat-number">{uniqueTags.length}</span>
-					<span class="stat-label" data-i18n="projects.stats.categories">类别</span>
-				</div>
-				<div class="stat-card">
-					<Icon icon="star" size="1.5em" />
-					<span class="stat-number">{featuredCount}</span>
-					<span class="stat-label" data-i18n="projects.stats.featured">精选</span>
-				</div>
-			</div>
-		</div>
-	</section>
+<BaseLayout title="项目 | Kerwin Zhang" description="个人项目与课程实验作品集。">
+	<div class="wrapper" data-pagefind-body>
+		<PageHeader
+			eyebrow="01 · projects"
+			title="项目"
+			description="个人项目与课程实验，每个条目都带完整的技术细节与复盘。"
+		>
+			<p class="stats-line">
+				<span><strong>{projects.length}</strong> 项目</span>
+				<span class="sep">/</span>
+				<span><strong>{personalCount}</strong> 个人</span>
+				<span class="sep">/</span>
+				<span><strong>{allTech.length}</strong> 技术</span>
+				<span class="sep">/</span>
+				<span><strong>{uniqueTags.length}</strong> 标签</span>
+			</p>
+		</PageHeader>
 
-	<main class="wrapper stack gap-20">
 		<TagFilter tags={allTags} categories={categories} />
 
-		<div class="projects-grid reveal">
+		<div class="projects-grid" data-reveal>
 			<Grid variant="offset">
 				{
 					sortedProjects.map((project) => (
@@ -79,155 +55,41 @@ const categories = [
 				}
 			</Grid>
 		</div>
-	</main>
+		<div class="page-end"></div>
+	</div>
+
+	<script>
+		import { initMotion } from '../../scripts/motion/core';
+		initMotion();
+	</script>
 
 	<style>
-		.hero-section {
-			position: relative;
-			padding: 6rem 0 5rem;
-			overflow: hidden;
-			margin-bottom: 3rem;
-		}
-
-		.hero-blobs {
-			position: absolute;
-			inset: 0;
-			z-index: 0;
-			pointer-events: none;
-		}
-
-		.blob {
-			position: absolute;
-			border-radius: 50%;
-			filter: blur(100px);
-			opacity: 0.3;
-		}
-
-		.blob-1 {
-			width: 450px;
-			height: 450px;
-			background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
-			top: -20%;
-			left: 10%;
-			animation: float 12s ease-in-out infinite;
-		}
-
-		.blob-2 {
-			width: 350px;
-			height: 350px;
-			background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-			bottom: -10%;
-			right: 10%;
-			animation: float 14s ease-in-out infinite reverse;
-		}
-
-		.hero-content {
-			position: relative;
-			z-index: 1;
+		.stats-line {
 			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 2.5rem;
-			text-align: center;
-		}
-
-		.hero-text {
-			display: flex;
-			flex-direction: column;
-			gap: 0.75rem;
-			align-items: center;
-		}
-
-		.eyebrow {
+			flex-wrap: wrap;
+			gap: 0.6rem;
+			align-items: baseline;
+			font-family: var(--font-mono);
 			font-size: var(--text-sm);
+			color: var(--muted-foreground);
+			margin: 0.5rem 0 0;
+		}
+
+		.stats-line strong {
+			color: var(--accent);
 			font-weight: 600;
-			color: var(--accent-regular);
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
 		}
 
-		.hero-title {
-			font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
-			font-weight: 800;
-			color: var(--gray-0);
-			line-height: 1.1;
-			margin: 0;
-		}
-
-		.hero-tagline {
-			font-size: var(--text-lg);
-			color: var(--gray-300);
-			max-width: 55ch;
-			line-height: 1.6;
-			margin: 0;
-		}
-
-		.stats-grid {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			gap: 1rem;
-			width: 100%;
-			max-width: 600px;
-		}
-
-		.stat-card {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 0.35rem;
-			padding: 1.25rem 1rem;
-			background: rgba(255, 255, 255, 0.03);
-			backdrop-filter: blur(12px);
-			border: 1px solid rgba(255, 255, 255, 0.06);
-			border-radius: 1rem;
-			color: var(--accent-regular);
-			transition:
-				transform 0.3s ease,
-				box-shadow 0.3s ease,
-				border-color 0.3s ease;
-		}
-
-		.stat-card:hover {
-			transform: translateY(-4px);
-			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-			border-color: var(--accent-regular);
-		}
-
-		.stat-card :global(svg) {
-			color: var(--accent-regular);
-		}
-
-		.stat-number {
-			font-size: var(--text-2xl);
-			font-weight: 800;
-			color: var(--gray-0);
-			line-height: 1;
-			font-family: var(--font-brand);
-		}
-
-		.stat-label {
-			font-size: var(--text-sm);
-			color: var(--gray-400);
-			font-weight: 500;
+		.stats-line .sep {
+			color: var(--border);
 		}
 
 		.projects-grid {
-			margin-top: 1rem;
+			margin-top: 2.5rem;
 		}
 
-		@media (min-width: 50em) {
-			.hero-section {
-				padding: 8rem 0 6rem;
-			}
-
-			.stats-grid {
-				grid-template-columns: repeat(4, 1fr);
-				gap: 1.25rem;
-			}
-
-			.stat-card {
-				padding: 1.5rem;
-			}
+		.page-end {
+			height: clamp(3rem, 8vw, 6rem);
 		}
 	</style>
 </BaseLayout>

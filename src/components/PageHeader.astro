@@ -1,0 +1,50 @@
+---
+// 内页统一页头（编辑排版风）：等宽序号眉题 + 大标题 + 说明
+interface Props {
+	eyebrow: string;
+	title: string;
+	description?: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+---
+
+<header class="page-header" data-reveal>
+	<span class="ph-eyebrow">{eyebrow}</span>
+	<h1 class="ph-title">{title}</h1>
+	{description && <p class="ph-desc">{description}</p>}
+	<slot />
+</header>
+
+<style>
+	.page-header {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: clamp(4rem, 10vw, 7rem) 0 clamp(2.5rem, 6vw, 4rem);
+		border-bottom: 1px solid var(--border);
+		margin-bottom: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.ph-eyebrow {
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+		color: var(--accent);
+		letter-spacing: 0.08em;
+	}
+
+	.ph-title {
+		font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
+		letter-spacing: -0.03em;
+		line-height: 1.1;
+		margin: 0;
+	}
+
+	.ph-desc {
+		font-size: var(--text-md);
+		color: var(--muted-foreground);
+		line-height: 1.8;
+		max-width: 62ch;
+		margin: 0;
+	}
+</style>

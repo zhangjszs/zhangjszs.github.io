@@ -1,0 +1,11 @@
+---
+// 双语文本对：中英各渲染一个 span，由祖先元素 data-lang 控制显隐
+interface Props {
+	t: { zh: string; en: string };
+}
+
+const { t } = Astro.props;
+---
+
+<span class="t-zh">{t.zh}</span>
+<span class="t-en">{t.en}</span>

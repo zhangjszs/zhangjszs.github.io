@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { LINKS } from '../data/links';
+import { withBase } from '../utils/paths';
+---
+
+<BaseLayout title="友链 | Kerwin Zhang" description="友情链接。">
+	<div class="wrapper" data-pagefind-body>
+		<PageHeader
+			eyebrow="04 · links"
+			title="友情链接"
+			description="一些值得常逛的站点。想交换友链？邮件里附上你的站点信息即可。"
+		>
+			<a href="mailto:zhangjszs@foxmail.com" class="apply-link">
+				<Icon icon="envelope" size="0.95em" />
+				申请友链
+			</a>
+		</PageHeader>
+
+		{
+			LINKS.length > 0 ? (
+				<div class="links-grid">
+					{LINKS.map((link, i) => (
+						<a
+							class="link-card"
+							href={link.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							data-reveal
+							data-reveal-delay={String(Math.min(i, 6) * 0.05)}
+						>
+							<span class="link-name">{link.name}</span>
+							{link.description && <span class="link-desc">{link.description}</span>}
+							<span class="link-url">{link.url.replace(/^https?:\/\//, '')}</span>
+						</a>
+					))}
+				</div>
+			) : (
+				<div class="empty" data-reveal>
+					<span class="empty-glyph">∅</span>
+					<p>友链位虚位以待——第一封申请邮件也许就是你的。</p>
+				</div>
+			)
+		}
+		<div class="page-end"></div>
+	</div>
+
+	<script>
+		import { initMotion } from '../scripts/motion/core';
+		initMotion();
+	</script>
+
+	<style>
+		.apply-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.45rem;
+			padding: 0.6rem 1.25rem;
+			margin-top: 0.5rem;
+			width: fit-content;
+			background: transparent;
+			color: var(--foreground);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-full);
+			text-decoration: none;
+			font-weight: 600;
+			font-size: var(--text-sm);
+			transition:
+				border-color 0.2s var(--ease-out),
+				color 0.2s var(--ease-out);
+		}
+
+		.apply-link:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.links-grid {
+			display: grid;
+			gap: 1.25rem;
+			grid-template-columns: 1fr;
+		}
+
+		.link-card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.4rem;
+			padding: 1.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
+			text-decoration: none;
+			transition:
+				transform 0.25s var(--ease-out),
+				border-color 0.25s var(--ease-out),
+				box-shadow 0.25s var(--ease-out);
+		}
+
+		.link-card:hover {
+			transform: translateY(-3px);
+			border-color: var(--accent);
+			box-shadow: var(--glow-accent);
+		}
+
+		.link-name {
+			font-weight: 700;
+			font-size: var(--text-lg);
+			color: var(--foreground);
+		}
+
+		.link-desc {
+			font-size: var(--text-sm);
+			color: var(--muted-foreground);
+			line-height: 1.6;
+		}
+
+		.link-url {
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--accent);
+			overflow-wrap: anywhere;
+		}
+
+		.empty {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1rem;
+			padding: clamp(3rem, 8vw, 5rem) 1rem;
+			text-align: center;
+		}
+
+		.empty-glyph {
+			font-family: var(--font-mono);
+			font-size: 3.5rem;
+			color: color-mix(in srgb, var(--accent) 60%, transparent);
+		}
+
+		.empty p {
+			color: var(--muted-foreground);
+			margin: 0;
+		}
+
+		.page-end {
+			height: clamp(3rem, 8vw, 6rem);
+		}
+
+		@media (min-width: 40em) {
+			.links-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		@media (min-width: 64em) {
+			.links-grid {
+				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+	</style>
+</BaseLayout>
