@@ -7,8 +7,6 @@ const REPO = 'zhangjszs/zhangjszs.github.io';
 const REPO_ID = 'R_kgDOUHOyDA';
 const CATEGORY = 'General';
 const CATEGORY_ID = 'DIC_kwDOUHOyDM4DEmPH';
-
-const enabled = REPO_ID !== 'TODO_REPO_ID';
 ---
 
 <section class="comments" data-pagefind-ignore>
@@ -16,20 +14,15 @@ const enabled = REPO_ID !== 'TODO_REPO_ID';
 		<Icon icon="envelope" size="1em" />
 		评论
 	</h2>
-	{
-		enabled ? (
-			<div
-				class="giscus"
-				id="giscus-anchor"
-				data-repo={REPO}
-				data-repo-id={REPO_ID}
-				data-category={CATEGORY}
-				data-category-id={CATEGORY_ID}
-			/>
-		) : (
-			<p class="comments-note">评论系统将在仓库迁移完成后启用（Giscus · GitHub Discussions）。</p>
-		)
-	}
+	<div
+		class="giscus"
+		id="giscus-anchor"
+		data-repo={REPO}
+		data-repo-id={REPO_ID}
+		data-category={CATEGORY}
+		data-category-id={CATEGORY_ID}
+	>
+	</div>
 </section>
 
 <style>
@@ -47,11 +40,6 @@ const enabled = REPO_ID !== 'TODO_REPO_ID';
 
 	.comments-title :global(svg) {
 		color: var(--accent);
-	}
-
-	.comments-note {
-		color: var(--muted-foreground);
-		font-size: var(--text-sm);
 	}
 </style>
 
