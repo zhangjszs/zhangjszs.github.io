@@ -98,6 +98,7 @@ try {
 		// 尊重系统减少动效偏好：静态辉光兜底，不加载 three
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+		// 先发起数据请求（不阻塞首屏绘制）
 		const [binRes, metaRes] = await Promise.all([
 			fetch(withBase('/assets/pointcloud/hero.bin')),
 			fetch(withBase('/assets/pointcloud/meta.json')),
@@ -113,130 +114,140 @@ try {
 		const maxPoints = coarse ? 150000 : 250000;
 		const count = Math.min(meta.count, Math.floor(bytes.length / 7), maxPoints);
 
-		// 解码：Uint16 归一化坐标 → 以包围盒中心为原点、按真实比例缩放
-		const dv = new DataView(bytes.buffer);
-		const positions = new Float32Array(count * 3);
-		const intensities = new Float32Array(count);
-		const ranges = [
-			meta.bounds.x[1] - meta.bounds.x[0],
-			meta.bounds.y[1] - meta.bounds.y[0],
-			meta.bounds.z[1] - meta.bounds.z[0],
-		];
-		const centers = [
-			(meta.bounds.x[0] + meta.bounds.x[1]) / 2,
-			(meta.bounds.y[0] + meta.bounds.y[1]) / 2,
-			(meta.bounds.z[0] + meta.bounds.z[1]) / 2,
-		];
-		const SCALE = 3.4 / Math.max(...ranges);
-		for (let i = 0; i < count; i++) {
-			const o = i * 7;
-			positions[i * 3] = ((dv.getUint16(o, true) / 65535) * ranges[0] + meta.bounds.x[0] - centers[0]) * SCALE;
-			positions[i * 3 + 1] = ((dv.getUint16(o + 2, true) / 65535) * ranges[1] + meta.bounds.y[0] - centers[1]) * SCALE;
-			positions[i * 3 + 2] = ((dv.getUint16(o + 4, true) / 65535) * ranges[2] + meta.bounds.z[0] - centers[2]) * SCALE;
-			intensities[i] = dv.getUint8(o + 6) / 255;
-		}
+		// 等首帧渲染后再初始化 three.js，避免阻塞 LCP
+		const initThree = async () => {
+			// 解码：Uint16 归一化坐标 → 以包围盒中心为原点、按真实比例缩放
+			const dv = new DataView(bytes.buffer);
+			const positions = new Float32Array(count * 3);
+			const intensities = new Float32Array(count);
+			const ranges = [
+				meta.bounds.x[1] - meta.bounds.x[0],
+				meta.bounds.y[1] - meta.bounds.y[0],
+				meta.bounds.z[1] - meta.bounds.z[0],
+			];
+			const centers = [
+				(meta.bounds.x[0] + meta.bounds.x[1]) / 2,
+				(meta.bounds.y[0] + meta.bounds.y[1]) / 2,
+				(meta.bounds.z[0] + meta.bounds.z[1]) / 2,
+			];
+			const SCALE = 3.4 / Math.max(...ranges);
+			for (let i = 0; i < count; i++) {
+				const o = i * 7;
+				positions[i * 3] = ((dv.getUint16(o, true) / 65535) * ranges[0] + meta.bounds.x[0] - centers[0]) * SCALE;
+				positions[i * 3 + 1] =
+					((dv.getUint16(o + 2, true) / 65535) * ranges[1] + meta.bounds.y[0] - centers[1]) * SCALE;
+				positions[i * 3 + 2] =
+					((dv.getUint16(o + 4, true) / 65535) * ranges[2] + meta.bounds.z[0] - centers[2]) * SCALE;
+				intensities[i] = dv.getUint8(o + 6) / 255;
+			}
 
-		const THREE = await import('three');
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(48, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-		camera.position.set(0, 0.9, 5.2);
+			const THREE = await import('three');
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera(48, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+			camera.position.set(0, 0.9, 5.2);
 
-		const renderer = new THREE.WebGLRenderer({
-			canvas,
-			antialias: false,
-			alpha: true,
-			powerPreference: 'high-performance',
-		});
-		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-		renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+			const renderer = new THREE.WebGLRenderer({
+				canvas,
+				antialias: false,
+				alpha: true,
+				powerPreference: 'high-performance',
+			});
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+			renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
-		const geometry = new THREE.BufferGeometry();
-		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-		geometry.setAttribute('aIntensity', new THREE.BufferAttribute(intensities, 1));
+			const geometry = new THREE.BufferGeometry();
+			geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+			geometry.setAttribute('aIntensity', new THREE.BufferAttribute(intensities, 1));
 
-		const material = new THREE.ShaderMaterial({
-			transparent: true,
-			depthWrite: false,
-			blending: THREE.AdditiveBlending,
-			uniforms: { uSize: { value: coarse ? 1.6 : 2.0 } },
-			vertexShader: `
-				attribute float aIntensity;
-				varying float vIntensity;
-				uniform float uSize;
-				void main() {
-					vIntensity = aIntensity;
-					vec4 mv = modelViewMatrix * vec4(position, 1.0);
-					gl_PointSize = uSize * (160.0 / -mv.z) * (0.5 + aIntensity * 0.8);
-					gl_Position = projectionMatrix * mv;
-				}
-			`,
-			fragmentShader: `
-				varying float vIntensity;
-				void main() {
-					vec2 uv = gl_PointCoord - 0.5;
-					float d = length(uv);
-					if (d > 0.5) discard;
-					float alpha = smoothstep(0.5, 0.12, d) * (0.25 + vIntensity * 0.75);
-					vec3 dim = vec3(0.06, 0.35, 0.25);
-					vec3 hot = vec3(0.35, 0.95, 0.68);
-					vec3 color = mix(dim, hot, vIntensity);
-					gl_FragColor = vec4(color, alpha);
-				}
-			`,
-		});
+			const material = new THREE.ShaderMaterial({
+				transparent: true,
+				depthWrite: false,
+				blending: THREE.AdditiveBlending,
+				uniforms: { uSize: { value: coarse ? 1.6 : 2.0 } },
+				vertexShader: `
+					attribute float aIntensity;
+					varying float vIntensity;
+					uniform float uSize;
+					void main() {
+						vIntensity = aIntensity;
+						vec4 mv = modelViewMatrix * vec4(position, 1.0);
+						gl_PointSize = uSize * (160.0 / -mv.z) * (0.5 + aIntensity * 0.8);
+						gl_Position = projectionMatrix * mv;
+					}
+				`,
+				fragmentShader: `
+					varying float vIntensity;
+					void main() {
+						vec2 uv = gl_PointCoord - 0.5;
+						float d = length(uv);
+						if (d > 0.5) discard;
+						float alpha = smoothstep(0.5, 0.12, d) * (0.25 + vIntensity * 0.75);
+						vec3 dim = vec3(0.06, 0.35, 0.25);
+						vec3 hot = vec3(0.35, 0.95, 0.68);
+						vec3 color = mix(dim, hot, vIntensity);
+						gl_FragColor = vec4(color, alpha);
+					}
+				`,
+			});
 
-		const points = new THREE.Points(geometry, material);
-		points.rotation.x = -0.18;
-		const group = new THREE.Group();
-		group.add(points);
-		scene.add(group);
+			const points = new THREE.Points(geometry, material);
+			points.rotation.x = -0.18;
+			const group = new THREE.Group();
+			group.add(points);
+			scene.add(group);
 
-		// 拖拽旋转 + 惯性 + 待机自转
-		let targetRotY = 0.35;
-		let rotY = 0.35;
-		let dragging = false;
-		let lastX = 0;
-		const onDown = (e: PointerEvent) => {
-			dragging = true;
-			lastX = e.clientX;
-			canvas.setPointerCapture(e.pointerId);
-		};
-		const onMove = (e: PointerEvent) => {
-			if (!dragging) return;
-			targetRotY += (e.clientX - lastX) * 0.005;
-			lastX = e.clientX;
-		};
-		const onUp = () => {
-			dragging = false;
-		};
-		canvas.addEventListener('pointerdown', onDown);
-		canvas.addEventListener('pointermove', onMove);
-		canvas.addEventListener('pointerup', onUp);
-		canvas.addEventListener('pointercancel', onUp);
+			// 拖拽旋转 + 惯性 + 待机自转
+			let targetRotY = 0.35;
+			let rotY = 0.35;
+			let dragging = false;
+			let lastX = 0;
+			const onDown = (e: PointerEvent) => {
+				dragging = true;
+				lastX = e.clientX;
+				canvas.setPointerCapture(e.pointerId);
+			};
+			const onMove = (e: PointerEvent) => {
+				if (!dragging) return;
+				targetRotY += (e.clientX - lastX) * 0.005;
+				lastX = e.clientX;
+			};
+			const onUp = () => {
+				dragging = false;
+			};
+			canvas.addEventListener('pointerdown', onDown);
+			canvas.addEventListener('pointermove', onMove);
+			canvas.addEventListener('pointerup', onUp);
+			canvas.addEventListener('pointercancel', onUp);
 
-		// 离屏/后台暂停
-		let visible = true;
-		new IntersectionObserver(([entry]) => {
-			visible = entry.isIntersecting;
-		}).observe(canvas);
+			// 离屏/后台暂停
+			let visible = true;
+			new IntersectionObserver(([entry]) => {
+				visible = entry.isIntersecting;
+			}).observe(canvas);
 
-		const resize = () => {
-			const w = canvas.clientWidth;
-			const h = canvas.clientHeight;
-			camera.aspect = w / h;
-			camera.updateProjectionMatrix();
-			renderer.setSize(w, h, false);
-		};
-		new ResizeObserver(resize).observe(canvas);
+			const resize = () => {
+				const w = canvas.clientWidth;
+				const h = canvas.clientHeight;
+				camera.aspect = w / h;
+				camera.updateProjectionMatrix();
+				renderer.setSize(w, h, false);
+			};
+			new ResizeObserver(resize).observe(canvas);
 
-		const tick = () => {
+			const tick = () => {
+				requestAnimationFrame(tick);
+				if (!visible || document.hidden) return;
+				if (!dragging) targetRotY += 0.0006;
+				rotY += (targetRotY - rotY) * 0.06;
+				group.rotation.y = rotY;
+				renderer.render(scene, camera);
+			};
 			requestAnimationFrame(tick);
-			if (!visible || document.hidden) return;
-			if (!dragging) targetRotY += 0.0006;
-			rotY += (targetRotY - rotY) * 0.06;
-			group.rotation.y = rotY;
-			renderer.render(scene, camera);
 		};
-		requestAnimationFrame(tick);
+
+		// 等首帧渲染后再初始化 three.js，避免阻塞 LCP
+		requestAnimationFrame(() => {
+			requestAnimationFrame(initThree);
+		});
 	})();
 </script>

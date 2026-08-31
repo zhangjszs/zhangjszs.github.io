@@ -16,15 +16,13 @@ const id = 'mermaid-' + Math.random().toString(36).slice(2, 9);
 </figure>
 
 <script>
-	import mermaid from 'mermaid';
-
-	mermaid.initialize({
-		startOnLoad: false,
-		theme: 'dark',
-		securityLevel: 'strict',
-	});
-
 	async function renderMermaid() {
+		const { default: mermaid } = await import('mermaid');
+		mermaid.initialize({
+			startOnLoad: false,
+			theme: 'dark',
+			securityLevel: 'strict',
+		});
 		const elements = document.querySelectorAll('.mermaid[data-chart]');
 		for (const el of elements) {
 			const chart = el.getAttribute('data-chart');
