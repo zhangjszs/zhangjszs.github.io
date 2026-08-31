@@ -50,12 +50,10 @@ mise x -- node scripts/convert-pointcloud.mjs 你的文件.pcd
 
 ### ② Giscus（评论区）
 
-仓库改名后需要一次性授权：
+仓库 ID 与讨论分类已自动配置完成，只差一步授权：
 
 1. 打开 [giscus.app](https://giscus.app/zh-CN)，仓库选 `zhangjszs/zhangjszs.github.io`
-2. 评论映射选"页面路径"，特性按需，主题选"透明暗色"
-3. 按页面提示安装 giscus GitHub App 到该仓库
-4. 页面底部生成的 `data-repo-id` 与 `data-category-id` 两个值，填入 `src/components/Giscus.astro` 顶部常量（替换两处 `TODO_`），推送后评论自动启用
+2. 按页面提示把 giscus GitHub App 安装到该仓库（评论区"读取"已可用，"发表"依赖此步）
 
 ## 3. 可选优化
 
