@@ -170,12 +170,12 @@ const GITHUB = 'https://github.com/zhangjszs';
 		initMotion();
 
 		// Hero 入场时间线（不走滚动触发）
+		// 注意：.hero-title 作为 LCP 关键元素，保持默认可见，不做初始隐藏
 		if (!prefersReducedMotion()) {
 			const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 			tl.from('.hero-status', { opacity: 0, y: 16, duration: 0.6 }, 0.1)
-				.from('.hero-title', { opacity: 0, y: 24, duration: 0.8 }, 0.25)
-				.from('.hero-tagline', { opacity: 0, y: 18, duration: 0.7 }, 0.45)
-				.from('.hero-actions', { opacity: 0, y: 14, duration: 0.6 }, 0.65);
+				.from('.hero-tagline', { opacity: 0, y: 18, duration: 0.7 }, 0.35)
+				.from('.hero-actions', { opacity: 0, y: 14, duration: 0.6 }, 0.55);
 
 			// 桌面端：滚出 hero 时内容视差上移 + 淡出（移动端禁用保性能）
 			if (!isMobileTier()) {
