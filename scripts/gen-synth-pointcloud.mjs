@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = join(ROOT, 'public', 'assets', 'pointcloud');
 
-const COUNT = 118000;
+const COUNT = 60000;
 // 场景包络（米），bounds 同时供运行时居中/缩放使用
 const BOUNDS = { x: [-13, 13], y: [-3, 6.5], z: [4, 48] };
 
