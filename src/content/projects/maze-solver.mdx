@@ -1,0 +1,34 @@
+---
+title: 'MazeProject — 交互式迷宫求解与算法可视化'
+description: '基于 C++17/Qt 6 的迷宫求解与路径查找算法可视化工具,实现 A*、BFS、DFS、Dijkstra、JPS 五种算法,支持算法对比、逐步动画、地图编辑与导入导出。'
+category: labwork
+repoUrl: 'https://github.com/zhangjszs/HUAT-kerwin-labwork'
+repoPath: 'data-structures-course-design'
+tags: ['数据结构', '路径查找', '算法可视化', 'Qt']
+techStack: ['C++17', 'Qt 6', 'CMake']
+featured: true
+date: '2024'
+difficulty: '深度'
+status: Completed
+---
+
+## 项目背景
+
+数据结构课程设计,要求实现一个交互式的算法可视化工具。本项目选择"迷宫求解"作为载体,将抽象的路径查找算法(Greedy Best-First、BFS、DFS、Dijkstra、A\*、JPS)以动画形式呈现,同时提供算法性能对比功能,帮助理解不同算法在相同地图上的行为差异。
+
+## 技术方案
+
+- **算法层**:五种路径查找算法统一接口,通过 Qt 信号槽机制(`stepExecuted`、`pathFound`、`searchFinished`)将每一步搜索状态通知 UI
+- **A\* 启发函数**:支持 Manhattan、Euclidean、Chebyshev、Octile 四种启发函数,可切换 4 方向/8 方向移动模式
+- **迷宫生成**:三种生成策略(随机、保证可达、DFS 回溯生成),尺寸 5×5 至 100×100 可调
+- **可视化**:`MazeWidget` 自定义绘制,`QTimer` 驱动逐步动画,速度可调(默认 50ms/步);支持鼠标点击/拖拽绘制墙壁、设置起点终点
+- **算法对比**:`MazeSolver` 批量运行五种算法,输出访问节点数、路径长度、耗时三项指标
+- **持久化**:地图文件导入/导出,截图保存为图片
+- **架构**:CMake 构建(C++17,Qt6 优先/Qt5 回退),模型层(`MazeGrid` 智能指针网格)、服务层(`FileService` 文件 I/O)、算法层(`algorithms.cpp`)分离
+
+## 成果与数据
+
+- 完整实现 5 种路径查找算法 + 4 种启发函数 + 3 种迷宫生成器
+- 支持算法并排对比,可直接观察 DFS 探索范围大 vs A\* 目标导向性强等典型差异
+- 对角移动代价使用 √2(1.414),8 方向模式下路径更贴近真实最优
+- 附带 Python 版本对照实现

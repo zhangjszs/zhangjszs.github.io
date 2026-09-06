@@ -1,0 +1,32 @@
+---
+title: 'Java Swing 游戏合集 — 4 款桌面小游戏'
+description: '基于 Java Swing 开发的 4 款经典桌面游戏(大鱼吃小鱼、贪食蛇、吞食鱼、超级玛丽),综合运用事件驱动编程、Swing Timer 游戏循环、Graphics2D 自定义绘制、碰撞检测等 GUI 核心技术。'
+category: labwork
+repoUrl: 'https://github.com/zhangjszs/HUAT-kerwin-labwork'
+repoPath: 'java-course-design'
+tags: ['Java', 'Swing', '游戏开发', 'GUI']
+techStack: ['Java 8', 'Swing', 'Graphics2D']
+featured: false
+date: '2023'
+difficulty: '入门'
+status: Completed
+---
+
+## 项目背景
+
+Java 课程设计,要求独立开发一个综合性的 GUI 应用程序。选择"游戏"作为主题,因为它几乎涉及 GUI 编程的所有核心技术 — 事件处理、定时器、自定义绘图、键盘输入、碰撞检测、状态管理。每款游戏独立编译运行(`javac *.java && java Main`)。
+
+## 技术方案
+
+- **游戏循环**:Swing Timer 驱动定时刷新,替代传统 `while` 循环,避免阻塞事件调度线程
+- **渲染**:继承 `JPanel` 重写 `paintComponent`,使用 `Graphics2D` 绘制游戏元素
+- **输入**:键盘 `KeyListener` 监听方向键/WASD,控制角色移动
+- **碰撞检测**:基于矩形包围盒(AABB)的碰撞判定,处理吃食物/碰边界/碰自身等逻辑
+- **游戏状态**:计分、游戏结束判定、重新开始流程
+
+## 成果与数据
+
+- 4 款完整可运行游戏:大鱼吃小鱼、贪食蛇、吞食鱼、超级玛丽
+- 每款游戏独立工程,编译运行命令统一
+- 综合运用事件驱动、多线程(Timer)、面向对象设计等核心 Java 技术
+- 项目来自湖北汽车工业学院 Java 课程设计

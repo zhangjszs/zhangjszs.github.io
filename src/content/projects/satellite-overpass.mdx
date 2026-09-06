@@ -1,0 +1,32 @@
+---
+title: 'SatelliteOverpass — 卫星过境预报与可见性计算工具'
+description: '基于 C++20 的卫星过境预报系统,读取 NORAD 两行轨道根数(TLE),使用 SGP4/SDP4 模型计算卫星星历,输出指定地面站的卫星可见时间、仰角与方位角。'
+category: personal
+repoUrl: 'https://github.com/zhangjszs/SatelliteOverpass'
+tags: ['航天', 'C++20', 'SGP4', '轨道力学', '科学计算']
+techStack: ['C++20', 'CMake', 'Google Test']
+featured: true
+date: '2026-02'
+difficulty: '深度'
+status: Completed
+---
+
+## 项目背景
+
+学习卫星轨道力学与 C++20 现代特性的练手项目。核心问题是:给定地面站坐标和某颗卫星的 TLE 轨道根数,计算未来一段时间内卫星从该站过境的具体时间窗口、最大仰角与方位角轨迹。这在天文学观测和地面站通信调度中有实际用途。
+
+## 技术方案
+
+- **语言**:C++20,使用 `std::numbers`、`constexpr` 编译期求值、`std::format`、`[[nodiscard]]` 等现代特性
+- **轨道传播**:读取 NORAD 两行轨道根数(TLE),应用 SGP4/SDP4 模型计算卫星星历
+- **坐标转换**:高精度坐标变换链路 — 地心惯性系 ↔ 地固站 ↔ 站地平坐标系(仰角/方位角),含可验证的往返精度
+- **时间系统**:UTC、儒略日(JD)、修正儒略日(MJD)互转,计算格林尼治恒星时
+- **模块化设计**:`Core`、`Math`、`Time`、`Orbit` 四个命名空间;提供现代 API(`SatelliteOverpassModern.cpp`)与旧版兼容接口
+- **错误处理**:`Result<T>` 类型 + RAII,`noexcept` 标注,强类型安全
+- **测试**:Google Test 全覆盖 — 常数验证、坐标转换、异常场景
+
+## 成果与数据
+
+- 输出每次可见过境的时间窗口(UTC)、持续时长、最大仰角、方位角变化表
+- 可配置预测参数:时间范围、时间步长、最小仰角掩蔽角
+- MIT 开源许可,完整 CMake 跨平台构建(MSVC 2019+ / GCC 10+ / Clang 12+)

@@ -1,0 +1,33 @@
+---
+title: 'ForestBlog — 基于 SSM 的轻量博客系统'
+description: '基于 Spring + Spring MVC + MyBatis (SSM) 全栈框架的博客系统,实现文章发布、分类标签、评论、用户认证与后台管理,采用经典三层分层架构与 RESTful 设计。'
+category: labwork
+repoUrl: 'https://github.com/zhangjszs/HUAT-kerwin-labwork'
+repoPath: 'javaweb-course-design'
+tags: ['Java Web', 'SSM', '全栈', '博客系统']
+techStack: ['Java 8', 'Spring MVC', 'MyBatis', 'MySQL 8', 'Maven']
+featured: true
+date: '2024'
+difficulty: '进阶'
+status: Completed
+---
+
+## 项目背景
+
+JavaWeb 课程设计。基于开源项目 ForestBlog 进行二次开发,目标是理解 SSM(Spring + Spring MVC + MyBatis)分层架构在真实项目中的组织方式,掌握从数据库设计到前端渲染的全链路开发。系统面向个人站长,提供完整的内容发布与管理能力。
+
+## 技术方案
+
+- **后端架构**:经典 SSSM 分层 — Controller 层(10 个后台控制器 + 8 个前端控制器)、Service 层(10 个接口 + 实现)、Mapper 层(11 个 MyBatis XML 映射)
+- **数据层**:MySQL 8 数据库`forest_blog`,9 个实体类对应核心业务(文章、分类、标签、评论、用户、友链等);使用 Druid 连接池 + PageHelper 分页
+- **安全**:3 个拦截器(AdminInterceptor、LoginInterceptor、HomeResourceInterceptor)控制后台访问权限
+- **视图**:JSP 模板 + JSTL 渲染,JSON API 通过 Fastjson/Jackson 双序列化支持
+- **依赖**:Maven 管理,Spring 4.3.19 + MyBatis 3.4.0 + Guava 26.0 + Hutool 4.1.13;使用 Lombok 简化实体类
+- **部署**:WAR 包部署至 Tomcat,上传文件通过外部目录映射与源码分离
+
+## 成果与数据
+
+- 完整实现文章 CRUD、多级分类与标签、评论系统、用户注册登录、后台管理面板
+- 10 个后台控制器覆盖全部管理操作(文章、分类、评论、友链、菜单、公告、页面、标签、用户、上传)
+- 包含完整 SQL 建库脚本(`forest_blog.sql`),开箱即用
+- 基于原版 ForestBlog 二次开发,新增用户认证等功能模块

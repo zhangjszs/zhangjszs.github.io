@@ -1,0 +1,33 @@
+---
+title: 'Company — 企业移动办公 App'
+description: '基于 Kotlin + MVVM + Hilt + Room 的企业移动办公应用,实现考勤签到(含地理围栏)、请假与申诉管理、新闻推送、后台管理等功能,采用仓库模式与协程异步架构。'
+category: labwork
+repoUrl: 'https://github.com/zhangjszs/HUAT-kerwin-labwork'
+repoPath: 'android-mobile-development'
+tags: ['Android', 'Kotlin', 'MVVM', '移动开发']
+techStack: ['Kotlin', 'Android SDK 35', 'Room', 'Hilt', 'Coroutines']
+featured: false
+date: '2024'
+difficulty: '深度'
+status: Completed
+---
+
+## 项目背景
+
+Android 移动开发课程设计。模拟企业移动办公场景,实现员工端的考勤、请假、申诉、新闻浏览,以及管理员端的后台管理。项目采用当前 Android 官方推荐的 MVVM + Repository + DI 技术栈,而非过时的 MVC 模式。
+
+## 技术方案
+
+- **架构**:MVVM 分层 — Activity(视图) + ViewModel(状态/逻辑) + Repository(数据协调) + Room DAO(数据库访问);Hilt 依赖注入管理 DatabaseModule、ViewModel、Repository 全链路
+- **数据库**:Room 持久化库,6 个实体(User、AdminUser、News、AttendanceRecord、Appeal、LeaveRequest) + 6 个 DAO + 6 个 Repository,内置 17 个测试用户与管理员账号
+- **考勤签到**:基于 Play Services Location 获取 GPS,与设定中心点(半径 200m)做距离校验,判定签到是否在有效区域内
+- **业务模块**:登录注册、考勤签到、请假申请/审批、申诉提交/处理、考勤记录查询、公司新闻、个人资料、管理员后台(用户搜索、管理面板)
+- **异步**:Kotlin Coroutines 处理全部数据库操作,避免主线程阻塞
+- **构建**:Gradle 8.7,compileSdk 35 / minSdk 24,Java 17
+
+## 成果与数据
+
+- 40+ Kotlin/Java 源码文件,覆盖 14 个 UI 页面与完整业务逻辑
+- 14 个 ViewModel 实现响应式 UI 更新
+- 地理围栏签到功能集成真实 GPS 定位 SDK
+- 内置完整的测试数据集(17 用户 + 管理员 + 2 条新闻),开箱即可演示

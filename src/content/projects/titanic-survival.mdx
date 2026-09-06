@@ -1,0 +1,37 @@
+---
+title: 'Titanic 生存预测 — 完整数据科学工作流'
+description: '基于 Jupyter Notebook 的 Titanic 生存预测分析,完整覆盖探索性数据分析、特征工程、多模型对比(逻辑回归/随机森林/XGBoost)、交叉验证与模型解释,重点关注性别、舱等等级、票价对生存率的影响。'
+category: labwork
+repoUrl: 'https://github.com/zhangjszs/HUAT-kerwin-labwork'
+repoPath: 'ml-practice'
+tags: ['机器学习', '数据科学', '分类', 'Jupyter']
+techStack: ['Python', 'pandas', 'scikit-learn', 'XGBoost', 'seaborn', 'matplotlib']
+featured: false
+date: '2025'
+difficulty: '进阶'
+status: Completed
+---
+
+## 项目背景
+
+机器学习实践课程的期末项目。以 Kaggle 经典 Titanic 数据集为载体,目标是走通一次完整的机器学习项目流程 — 从数据清洗到模型解释,而非仅追求准确率。项目强调对数据的洞察与对模型行为的理解。
+
+## 技术方案
+
+- **数据集**:seaborn 内置 Titanic(891 行),约 62% 遇难 / 38% 幸存
+- **缺失值处理**:年龄(缺失 ~20%)用中位数填充(分布右偏),embarked(仅 2 条缺失)用众数,deck(缺失 ~77%)直接丢弃
+- **特征工程**:构造 `family_size = sibsp + parch + 1`、`is_alone` 两个组合特征;对 sex、embarked 做编码;最终使用 9 个特征
+- **模型对比**:3 个模型 + 5 折交叉验证,主指标 F1,辅指标 AUC-ROC 与混淆矩阵
+  - Logistic Regression(基线,max_iter=1000)
+  - Random Forest(n_estimators=100)
+  - XGBoost(n_estimators=100)
+- **模型解释**:Random Forest 特征重要性排序,识别关键预测因子
+- **可视化**:生存率分布、特征相关性热力图、模型对比柱状图、特征重要性图、混淆矩阵图
+
+## 成果与数据
+
+- XGBoost 5 折交叉验证 F1 ≈ 0.76,AUC ≈ 0.86
+- 女性生存率 ~74% vs 男性 ~19%;一等舱 ~63% vs 三等舱 ~24%
+- 特征重要性 top-3:`sex_encoded`、`fare`、`age`;`family_size` 进入 top-5
+- 80/20 分层划分(random_state=42),保证实验可复现
+- 输出 5 张分析图表,完整记录在 Notebook 中

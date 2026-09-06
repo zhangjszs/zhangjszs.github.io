@@ -1,0 +1,30 @@
+---
+title: 'ROS1-LTS-Final — 自动驾驶感知、规划、控制模块化框架'
+description: '基于 ROS1 的自动驾驶全栈框架(LIDAR_YE 迁移后的终版),采用 C++/Python 实现感知、规划、控制三大模块的解耦设计,使用 Shell 脚本编排 CMake 构建与系统启动。'
+category: personal
+repoUrl: 'https://github.com/zhangjszs/ROS1-LTS-Final'
+tags: ['自动驾驶', 'ROS', '感知', '路径规划', 'C++']
+techStack: ['C++', 'Python', 'Shell', 'CMake', 'ROS1']
+featured: true
+date: '2024'
+difficulty: '深度'
+status: Completed
+---
+
+## 项目背景
+
+源自 FSAC(Formula Student Autonomous China)车队的感知模块开发,后逐步扩展为涵盖感知(Perception)、规划(Planning)、控制(Control)的完整自动驾驶框架。原 LIDAR_YE 仓库的内容已迁移至此并持续迭代,作为车队的技术积累沉淀。
+
+## 技术方案
+
+- **感知**:C++ 实现激光雷达点云处理,ROS 话题订阅/发布与传感器融合
+- **规划**:路径规划算法模块,解耦于感知层,接收环境模型输出轨迹
+- **控制**:执行层将规划轨迹转化为车辆控制指令
+- **构建**:CMake 编译 C++ 节点,Shell 脚本编排多节点启动与配置
+- **跨语言**:C++ 负责计算密集模块(Python 用于工具脚本与可视化),通过 ROS 消息中间件通信
+
+## 成果与数据
+
+- 三大模块(感知/规划/控制)解耦,可独立开发与测试
+- 源码规模:C++ 占主体(约 1.5 MB),Python 工具链辅助,CMake 构建
+- 继承自 FSAC 车队实车项目,非纯仿真Demo
