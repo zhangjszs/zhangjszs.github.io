@@ -29,3 +29,8 @@ pnpm-debug.log*
 # lighthouse reports
 lh-report*.json
 lighthouse-report.json
+
+# AI tool state
+.mimosa/
+.claude/
+.trae/
