@@ -10,17 +10,29 @@ import Nav from '../components/Nav.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 
+// 透传给 MainHead 的 SEO 字段（保持单一事实源：见 src/data/site.ts 与 MainHead.astro 的 Props）
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
+	ogType?: 'website' | 'article' | undefined;
+	publishedTime?: string | undefined;
+	author?: string | undefined;
+	ogDescription?: string | undefined;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogType, publishedTime, author, ogDescription } = Astro.props;
 ---
 
 <html lang="zh-CN">
 	<head>
-		<MainHead title={title} description={description} />
+		<MainHead
+			title={title}
+			description={description}
+			ogType={ogType}
+			publishedTime={publishedTime}
+			author={author}
+			ogDescription={ogDescription}
+		/>
 	</head>
 	<body>
 		<ScrollProgress />

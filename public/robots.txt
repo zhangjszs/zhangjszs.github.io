@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+# 资源目录无独立页面价值，避免爬点云/字体/PDF 浪费配额
+Disallow: /assets/
 
 # GitHub Pages 用户页：站点根路径
 Sitemap: https://zhangjszs.github.io/sitemap-index.xml

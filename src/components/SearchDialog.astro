@@ -191,8 +191,16 @@
 	let pagefind: PagefindModule | null = null;
 	let loading = false;
 	let activeIdx = -1;
+	// 记录打开搜索的触发元素，关闭时把焦点还回去（屏幕阅读器/键盘用户体验）
+	let lastTrigger: HTMLElement | null = null;
 
-	const open = () => {
+	const open = (e?: Event) => {
+		if (e && e.currentTarget instanceof HTMLElement) {
+			lastTrigger = e.currentTarget as HTMLElement;
+		} else {
+			// 由 Ctrl/⌘+K 唤起：把当前焦点元素作为兜底
+			lastTrigger = (document.activeElement as HTMLElement | null) ?? null;
+		}
 		overlay.hidden = false;
 		input.value = '';
 		resultsEl.innerHTML = '';
@@ -205,6 +213,11 @@
 		overlay.hidden = true;
 		document.body.style.overflow = '';
 		activeIdx = -1;
+		// 焦点归还触发按钮（仅当它仍在文档中时）
+		if (lastTrigger && document.body.contains(lastTrigger)) {
+			lastTrigger.focus();
+		}
+		lastTrigger = null;
 	};
 
 	async function ensurePagefind(): Promise<boolean> {
@@ -272,7 +285,7 @@
 		if (e.target === overlay) close();
 	});
 	document.querySelectorAll('[data-search-close]').forEach((b) => b.addEventListener('click', close));
-	document.querySelectorAll('[data-search-open]').forEach((b) => b.addEventListener('click', open));
+	document.querySelectorAll('[data-search-open]').forEach((b) => b.addEventListener('click', (e) => open(e)));
 
 	window.addEventListener('keydown', (e) => {
 		if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {

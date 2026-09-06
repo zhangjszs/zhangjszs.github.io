@@ -9,6 +9,7 @@ import MermaidDiagram from '../../components/MermaidDiagram.astro';
 import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
 import ViewCount from '../../components/ViewCount.astro';
 import { withBase } from '../../utils/paths';
+import { SITE_NAME } from '../../data/site';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects');
@@ -38,6 +39,9 @@ const {
 	lessons,
 } = project.data;
 
+// article 形式 OG：publishedTime 取 frontmatter 的 date；缺失时退到今天
+const publishedTime = date ? new Date(date).toISOString() : new Date().toISOString();
+
 // 源码链接：个人项目直接使用 repoUrl；课程实验回退到 HUAT-kerwin-labwork 仓库子目录
 // TODO: 如课程实验仓库地址有变，请修改下面的回退地址
 const sourceUrl =
@@ -50,7 +54,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 ---
 
-<BaseLayout title={`${title} | 项目`} description={description}>
+<BaseLayout title={`${title} · ${SITE_NAME}`} description={description} ogType="article" publishedTime={publishedTime}>
 	<article class="project-article" data-pagefind-body>
 		<header class="detail-hero">
 			<div class="wrapper">

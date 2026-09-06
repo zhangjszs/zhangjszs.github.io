@@ -9,6 +9,7 @@ import MermaidDiagram from '../../components/MermaidDiagram.astro';
 import ScreenshotGallery from '../../components/ScreenshotGallery.astro';
 import ViewCount from '../../components/ViewCount.astro';
 import { withBase } from '../../utils/paths';
+import { SITE_NAME } from '../../data/site';
 
 export async function getStaticPaths() {
 	const articles = await getCollection('blog');
@@ -21,9 +22,11 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const { Content } = await render(article);
 const { title, description, date, tags, relatedProject } = article.data;
+
+const publishedTime = date ? new Date(date).toISOString() : new Date().toISOString();
 ---
 
-<BaseLayout title={`${title} | 博客`} description={description}>
+<BaseLayout title={`${title} · ${SITE_NAME}`} description={description} ogType="article" publishedTime={publishedTime}>
 	<article class="article-page" data-pagefind-body>
 		<header class="article-hero">
 			<div class="wrapper">

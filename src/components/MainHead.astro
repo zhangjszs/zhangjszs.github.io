@@ -5,22 +5,39 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/cal-sans/400.css';
 import { withBase } from '../utils/paths';
+import { SITE_NAME, SITE_DESCRIPTION, SITE_AUTHOR, SITE_LOCALE } from '../data/site';
 
 // ============================================================
-// TODO: 站点基础信息占位符 —— 全局搜索 TODO: 即可定位
+// 站点级元数据：站名 / 描述。改 src/data/site.ts 即同步全站。
 // ============================================================
-const SITE_NAME = 'Kerwin Zhang'; // 站点名（Nav/Footer/index/about 共用，改这里即可）
-const SITE_DESCRIPTION = '自动驾驶工程学生 · 项目作品、技术笔记与联系方式。'; // 站点描述（SEO / 社交分享）
 
 interface Props {
+	/** 完整标题（已含站点后缀也可），不传则使用站名 */
 	title?: string | undefined;
+	/** 描述，不传则使用站点默认描述 */
 	description?: string | undefined;
+	/** og:type，默认 website；详情页传 'article' */
+	ogType?: 'website' | 'article' | undefined;
+	/** og:article:published_time（ISO 字符串），仅 ogType=article 时使用 */
+	publishedTime?: string | undefined;
+	/** og:article:author 覆盖，不传则用 SITE_AUTHOR */
+	author?: string | undefined;
+	/** 避免 description 与 og:description 重复：若未传则与 description 同值 */
+	ogDescription?: string | undefined;
 }
 
-const { title = SITE_NAME, description = SITE_DESCRIPTION } = Astro.props;
+const {
+	title = SITE_NAME,
+	description = SITE_DESCRIPTION,
+	ogType = 'website',
+	publishedTime,
+	author = SITE_AUTHOR,
+	ogDescription,
+} = Astro.props;
 
 // 社交分享图的完整地址由 astro.config.mjs 的 site + base 派生
 const ogImage = new URL(`${import.meta.env.BASE_URL}/og-image.png`, Astro.site);
+const finalOgDescription = ogDescription ?? description;
 ---
 
 <meta charset="UTF-8" />
@@ -29,17 +46,28 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}/og-image.png`, Astro.site);
 <title>{title}</title>
 
 <meta name="description" content={description} />
+<meta name="author" content={author} />
 <meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
-<meta property="og:type" content="website" />
+<meta property="og:description" content={finalOgDescription} />
+<meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content={SITE_LOCALE} />
+<meta property="og:locale:alternate" content="en_US" />
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+{
+	ogType === 'article' && publishedTime && (
+		<>
+			<meta property="article:published_time" content={publishedTime} />
+			<meta property="article:author" content={author} />
+		</>
+	)
+}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content={ogImage} />
 <meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={finalOgDescription} />
 
 <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 <link rel="icon" href={withBase('/favicon.ico')} />
