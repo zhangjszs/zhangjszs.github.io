@@ -13,6 +13,10 @@ const sections = [
 	{ id: 'contact', label: '联系' },
 ];
 
+// 用字符串常量而不是模板内换行：中文段落里的换行会被折叠成一个空格，渲染出多余间隙
+const DECK =
+	'我在 FSAC 车队负责感知与规划方向的开发：点云地面分割与锥桶检测、基于代价地图的路径规划，以及从仿真到实车的闭环验证。课堂之外，把这些能力落在 C++、Qt、Java 与机器学习的一个个可运行工程上。';
+
 const allProjects = await getCollection('projects');
 // 个人项目排在前面，课程实验（labwork）靠后
 const orderedProjects = [...allProjects].sort((a, b) => {
@@ -94,10 +98,7 @@ const sourceOf = (project: (typeof works)[number]['project']) =>
 					<span class="mast-line">把激光雷达点云</span>
 					<span class="mast-line">变成能跑通的路径</span>
 				</h1>
-				<p class="mast-deck">
-					我在 FSAC 车队负责感知与规划方向的开发：点云地面分割与锥桶检测、基于代价地图的路径规划，
-					以及从仿真到实车的闭环验证。课堂之外，把这些能力落在 C++、Qt、Java 与机器学习的一个个可运行工程上。
-				</p>
+				<p class="mast-deck">{DECK}</p>
 				<p class="mast-fields">
 					<span>ROS 2</span><span>LiDAR 感知</span><span>路径规划</span><span>C++ / Python</span>
 				</p>

@@ -193,8 +193,14 @@ const channels = CONTACT.filter((channel) => channel.href);
 			});
 		};
 
-		// 视口上沿往下 25% 处判定当前区块；无 IntersectionObserver 时退回 scroll 监听
+		// 判定线取视口上沿往下 25%。桌面端左栏作品与右栏区块并排，
+		// 同一条判定线会同时穿过两个区块，无法唯一判定当前区块，因此只在单栏堆叠时高亮。
+		const stacked = window.matchMedia('(max-width: 67.99em)');
 		const evaluate = () => {
+			if (!stacked.matches) {
+				mark('');
+				return;
+			}
 			const probe = window.scrollY + window.innerHeight * 0.25;
 			let current = sections[0];
 			for (const section of sections) {
@@ -202,6 +208,8 @@ const channels = CONTACT.filter((channel) => channel.href);
 			}
 			mark(current.id);
 		};
+
+		stacked.addEventListener('change', evaluate);
 
 		evaluate();
 		window.addEventListener('scroll', evaluate, { passive: true });
