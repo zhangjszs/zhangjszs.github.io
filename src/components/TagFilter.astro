@@ -98,35 +98,43 @@ const uniqueTags = [...new Set(tags)].sort();
 	}
 
 	.label {
-		font-size: var(--text-sm);
-		color: var(--gray-300);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted-foreground);
 		font-weight: 500;
 	}
 
 	.tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem;
+		gap: 0.45rem;
 	}
 
 	.tag-btn {
-		font-size: var(--text-sm);
-		padding: 0.4rem 0.9rem;
-		background: var(--gray-800);
-		color: var(--gray-300);
-		border: 1px solid var(--gray-700);
-		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		padding: 0.35rem 0.7rem;
+		background: var(--surface);
+		color: var(--muted-foreground);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition:
+			color 0.2s var(--ease-out),
+			border-color 0.2s var(--ease-out),
+			background-color 0.2s var(--ease-out);
 	}
 
 	.tag-btn:hover {
-		background: var(--gray-700);
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 
 	.tag-btn.active {
-		background: var(--accent-regular);
+		background: var(--foreground);
 		color: var(--gray-999);
-		border-color: var(--accent-regular);
+		border-color: var(--foreground);
 	}
 </style>

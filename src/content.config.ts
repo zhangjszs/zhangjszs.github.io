@@ -16,6 +16,8 @@ export const collections = {
 			tags: z.array(z.string()),
 			keywords: z.array(z.string()).optional(),
 			techStack: z.array(z.string()),
+			/** 本人在该项目中的职责（首页展开面板的「职责」条目）；缺省时页面显示「待补充」 */
+			role: z.string().optional(),
 			screenshotsDir: z.string().optional(),
 			codeSnippets: z.array(z.string()).optional(),
 			demoUrl: z.string().optional(),

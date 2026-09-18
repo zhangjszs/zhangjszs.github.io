@@ -18,9 +18,11 @@ interface Props {
 	publishedTime?: string | undefined;
 	author?: string | undefined;
 	ogDescription?: string | undefined;
+	/** 首页传入本页区块，顶栏渲染为区块导航 */
+	sections?: { id: string; label: string }[];
 }
 
-const { title, description, ogType, publishedTime, author, ogDescription } = Astro.props;
+const { title, description, ogType, publishedTime, author, ogDescription, sections = [] } = Astro.props;
 ---
 
 <html lang="zh-CN">
@@ -36,28 +38,19 @@ const { title, description, ogType, publishedTime, author, ogDescription } = Ast
 	</head>
 	<body>
 		<ScrollProgress />
+		<a class="skip-link" href="#main">跳到主要内容</a>
 		<div class="stack">
-			<Nav />
-			<slot />
+			<Nav sections={sections} />
+			<main id="main">
+				<slot />
+			</main>
 			<Footer />
 		</div>
 		<BackToTop />
 		<SearchDialog />
 
 		<script>
-			// Smooth scroll for anchor links
-			document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-				anchor.addEventListener('click', (e) => {
-					const href = anchor.getAttribute('href');
-					if (href && href !== '#') {
-						const target = document.querySelector(href);
-						if (target) {
-							e.preventDefault();
-							target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-						}
-					}
-				});
-			});
+			// 锚点滚动与焦点转移统一由 src/scripts/motion/core.ts 的 initAnchorScroll 处理
 
 			// Code block copy buttons
 			const addCopyButtons = () => {

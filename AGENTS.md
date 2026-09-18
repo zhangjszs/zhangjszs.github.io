@@ -19,19 +19,19 @@ Astro 6 static personal showcase (`personal-showcase`)，Node ≥ 22.12.0，中�
 
 - `src/pages/` — 路由：`/`、`/projects/`、`/blog/`、`/about/`、`/links/`、`/resume/`、`/rss.xml`、`/404`。
 - `src/content/{projects,blog}/` — MDX 内容集合；schema 在 `src/content.config.ts`（Zod）。
-- `src/components/hero/PointCloudHero.astro` — 首页 Three.js 点云签名交互。
+- `src/components/hero/PointCloudHero.astro` — Three.js 点云签名交互；当前首页改版后**未挂载**（组件与 `public/assets/pointcloud/` 数据保留，等真实点云再接入）。
 - `src/scripts/motion/core.ts` — GSAP / Lenis 动效客户端入口。
 - `src/layouts/BaseLayout.astro` — 全局壳（Nav/Footer/滚动进度/搜索/code-copy 等增强脚本）。
 - `src/data/{site,resume,updates,links}.ts` — 站点元信息与内容数据。
 - `src/utils/paths.ts` — `withBase()`：所有站内绝对路径**必须**用它拼 base，否则切子路径部署会 404。
 - `src/i18n/` — 中英文字典（`data-i18n` 模式，默认中文）。
-- `src/styles/global.css` — 莫兰迪配色变量在此修改。
+- `src/styles/global.css` — 暖纸编辑风设计 token（纸底 `#f4f1ec` / 墨黑 `#1a1a18` / 生褐强调 + 衬线标题栈）在此修改；`--gray-*` 是「0 = 墨黑 → 999 = 纸白」的兼容梯度，改值前先确认组件用法。
 - `scripts/` — 一次性运维脚本（见下）。
 - `public/.nojekyll` — **必须保留**，否则 GitHub Pages 会跑 Jekyll 管线破坏输出。
 
 ## Adding content
 
-- **新作品**：在 `src/content/projects/` 新建 `.mdx`。`category: 'personal'` 排前面、`'labwork'`（默认）靠后；`featured: true` 进首页精选（其余聚合数据：技能雷达 / 标签云 / 时间线 / 数据概览**只看 `category: 'personal'`**，会自动更新，不要手维护）。
+- **新作品**：在 `src/content/projects/` 新建 `.mdx`。正文用 `## 项目背景 / ## 技术方案 / ## 成果与数据` 三节（首页展开面板直接复用正文，改标题请同步 `src/pages/index.astro`）；`role:` 写本人职责，缺省时卡片与面板显示「待补充」。`category: 'personal'` 排前面、`'labwork'`（默认）靠后；`featured: true` 进首页精选（最多渲染 4 张，其余聚合数据：技能雷达 / 标签云 / 时间线 / 数据概览**只看 `category: 'personal'`**，会自动更新，不要手维护）。
 - **新博客**：`src/content/blog/` 新建 `.mdx`，必填 `title/description/date/tags`；RSS feed 自动同步（按日期倒序，仅含 `date` 已设置的文章）。
 
 ## Deployment

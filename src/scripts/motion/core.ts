@@ -27,6 +27,8 @@ export interface MotionOptions {
 export function initMotion(opts: MotionOptions = {}) {
 	const html = document.documentElement;
 
+	initAnchorScroll();
+
 	if (prefersReducedMotion()) {
 		html.dataset.motion = 'reduced';
 		return { lenis: null };
@@ -60,5 +62,51 @@ export function initMotion(opts: MotionOptions = {}) {
 		);
 	});
 
+	anchorLenis = lenis;
+
+	// 跨页跳转来的 #锚点 由浏览器原生完成，Lenis 会把位置拉回去，这里立即对齐一次
+	if (location.hash) {
+		const pending = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+		if (pending) lenis?.scrollTo(pending, { immediate: true, offset: anchorOffset() });
+	}
+
 	return { lenis };
+}
+
+/** 顶栏是 sticky 的，锚点落点要让开它的高度 */
+let anchorLenis: Lenis | null = null;
+
+function anchorOffset() {
+	const nav = document.getElementById('main-nav');
+	return -(nav?.getBoundingClientRect().height ?? 0) - 16;
+}
+
+export function initAnchorScroll() {
+	if (document.documentElement.dataset.anchorScroll) return;
+	document.documentElement.dataset.anchorScroll = 'true';
+
+	document.addEventListener('click', (event) => {
+		const anchor = (event.target as Element | null)?.closest?.('a[href^="#"]') as HTMLAnchorElement | null;
+		const href = anchor?.getAttribute('href');
+		if (!href || href === '#') return;
+
+		const id = decodeURIComponent(href.slice(1));
+		const target = document.getElementById(id);
+		if (!target) return;
+
+		event.preventDefault();
+
+		const offset = anchorOffset();
+
+		if (anchorLenis && !prefersReducedMotion()) {
+			anchorLenis.scrollTo(target, { offset });
+		} else {
+			target.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+		}
+
+		// 把焦点交给目标区块：键盘与读屏用户跳转后从那里继续，而不是停在页头
+		if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+		(target as HTMLElement).focus({ preventScroll: true });
+		history.replaceState(null, '', href);
+	});
 }

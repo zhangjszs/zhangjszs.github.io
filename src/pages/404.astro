@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Icon from '../components/Icon.astro';
 import { withBase } from '../utils/paths';
 ---
 
@@ -9,131 +8,82 @@ import { withBase } from '../utils/paths';
 	description="你访问的页面不存在或已被移动。返回 Kerwin Zhang 的个人主页继续浏览项目与文章。"
 >
 	<section class="error-section">
-		<div class="wrapper">
-			<div class="error-content">
-				<p class="error-log">
-					<span class="log-prompt">~/site $</span> cd {Astro.url.pathname}<br />
-					cd: no such file or directory
-				</p>
-				<span class="error-code" aria-label="404">404</span>
-				<h1>页面不存在</h1>
-				<p class="error-desc">你正在寻找的页面不存在或已被移动。</p>
-				<a href={withBase('/')} class="home-link">
-					<Icon icon="arrow-left" size="1.1em" />
-					返回首页
-				</a>
-			</div>
+		<p class="error-path">
+			<span>GET</span>
+			<code>{Astro.url.pathname}</code>
+			<span class="error-status">404</span>
+		</p>
+		<span class="error-code" aria-hidden="true">404</span>
+		<h1>这一页不在这里</h1>
+		<p class="error-desc">你访问的地址不存在，或者内容已经换了位置。从首页或作品列表继续。</p>
+		<div class="error-actions">
+			<a href={withBase('/')} class="btn btn-primary"> 返回首页 </a>
+			<a href={withBase('/projects/')} class="btn">全部作品</a>
 		</div>
 	</section>
 
 	<style>
 		.error-section {
 			display: flex;
-			align-items: center;
-			justify-content: center;
-			min-height: 80vh;
-			text-align: center;
-		}
-
-		.error-content {
-			display: flex;
 			flex-direction: column;
-			align-items: center;
 			gap: 1rem;
+			align-items: flex-start;
+			max-width: 46rem;
+			padding-block: clamp(4rem, 12vw, 9rem);
 		}
 
-		.error-log {
+		.error-path {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+			align-items: baseline;
+			margin: 0;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid var(--border);
 			font-family: var(--font-mono);
 			font-size: var(--text-sm);
+			letter-spacing: 0.04em;
 			color: var(--muted-foreground);
-			background: var(--surface);
-			border: 1px solid var(--border);
-			border-radius: var(--radius-md);
-			padding: 0.9rem 1.4rem;
-			text-align: left;
-			line-height: 1.8;
-			margin: 0;
+			width: 100%;
 		}
 
-		.log-prompt {
+		.error-path code {
+			overflow-wrap: anywhere;
+			color: var(--foreground);
+		}
+
+		.error-status {
+			margin-left: auto;
 			color: var(--accent);
 		}
 
 		.error-code {
-			font-size: clamp(6rem, 15vw, 10rem);
-			font-weight: 800;
-			font-family: var(--font-brand);
-			color: var(--accent);
-			text-shadow: 0 0 40px hsla(158, 72%, 56%, 0.3);
-			line-height: 1;
-			animation: glitch 3s ease-in-out infinite;
+			font-family: var(--font-serif);
+			font-size: clamp(5rem, 18vw, 11rem);
+			font-weight: 500;
+			line-height: 0.9;
+			letter-spacing: -0.03em;
+			color: var(--foreground);
+			opacity: 0.14;
 		}
 
-		@keyframes glitch {
-			0%,
-			90%,
-			100% {
-				text-shadow: 0 0 40px hsla(158, 72%, 56%, 0.3);
-				transform: translate(0);
-			}
-			92% {
-				text-shadow:
-					2px 0 var(--accent-warm),
-					-2px 0 var(--accent);
-				transform: translate(-2px, 1px);
-			}
-			94% {
-				text-shadow:
-					-2px 0 var(--accent-warm),
-					2px 0 var(--accent);
-				transform: translate(2px, -1px);
-			}
-			96% {
-				text-shadow:
-					2px 0 var(--accent),
-					-2px 0 var(--accent-warm);
-				transform: translate(-1px, 2px);
-			}
-		}
-
-		h1 {
-			font-size: var(--text-2xl);
+		.error-section h1 {
 			margin: 0;
+			font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
 		}
 
 		.error-desc {
-			color: var(--muted-foreground);
-			max-width: 40ch;
 			margin: 0;
+			max-width: 46ch;
+			color: var(--muted-foreground);
+			line-height: 1.8;
 		}
 
-		.home-link {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.5rem;
+		.error-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
 			margin-top: 1rem;
-			padding: 0.75rem 1.5rem;
-			background: var(--accent);
-			color: var(--accent-foreground);
-			border-radius: var(--radius-full);
-			text-decoration: none;
-			font-weight: 600;
-			font-size: var(--text-sm);
-			box-shadow: var(--glow-accent);
-			transition:
-				transform 0.2s var(--ease-out),
-				box-shadow 0.2s var(--ease-out);
-		}
-
-		.home-link:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 0 32px hsla(158, 72%, 56%, 0.35);
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			.error-code {
-				animation: none;
-			}
 		}
 	</style>
 </BaseLayout>

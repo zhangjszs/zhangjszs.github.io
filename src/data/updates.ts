@@ -6,6 +6,11 @@ export interface UpdateEntry {
 }
 
 export const UPDATES: UpdateEntry[] = [
+	{
+		date: '2026-09-18',
+		title: '全站改为暖纸编辑风：衬线标题、区块导航、作品卡片可展开详情',
+		type: 'design',
+	},
 	{ date: '2026-08-31', title: '全站重设计：暗色技术风、真实点云首页、滚动叙事', type: 'design' },
 	{ date: '2026-08-31', title: '字体自托管（Inter / Cal Sans / JetBrains Mono），国内访问提速', type: 'fix' },
 ];

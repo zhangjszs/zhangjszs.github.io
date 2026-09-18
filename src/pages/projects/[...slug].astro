@@ -100,7 +100,7 @@ const STATUS_LABEL: Record<string, string> = {
 					}
 					{
 						demoUrl && (
-							<a class="btn btn-ghost" href={demoUrl} target="_blank" rel="noopener noreferrer">
+							<a class="btn" href={demoUrl} target="_blank" rel="noopener noreferrer">
 								<Icon icon="rocket-launch" size="1.1em" />
 								在线演示
 							</a>
@@ -108,7 +108,7 @@ const STATUS_LABEL: Record<string, string> = {
 					}
 					{
 						externalDeployUrl && (
-							<a class="btn btn-ghost" href={externalDeployUrl} target="_blank" rel="noopener noreferrer">
+							<a class="btn" href={externalDeployUrl} target="_blank" rel="noopener noreferrer">
 								<Icon icon="globe" size="1.1em" />
 								部署地址
 							</a>
@@ -331,45 +331,6 @@ const STATUS_LABEL: Record<string, string> = {
 			display: flex;
 			flex-wrap: wrap;
 			gap: 0.75rem;
-		}
-
-		.btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.5rem;
-			padding: 0.75rem 1.5rem;
-			border-radius: var(--radius-full);
-			text-decoration: none;
-			font-weight: 600;
-			font-size: var(--text-sm);
-			transition:
-				transform 0.2s var(--ease-out),
-				box-shadow 0.2s var(--ease-out),
-				border-color 0.2s var(--ease-out);
-		}
-
-		.btn-primary {
-			background: var(--accent);
-			color: var(--accent-foreground);
-			border: 1px solid var(--accent);
-			box-shadow: var(--glow-accent);
-		}
-
-		.btn-primary:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 0 32px hsla(158, 72%, 56%, 0.3);
-		}
-
-		.btn-ghost {
-			background: transparent;
-			color: var(--foreground);
-			border: 1px solid var(--border);
-		}
-
-		.btn-ghost:hover {
-			border-color: var(--accent);
-			color: var(--accent);
-			transform: translateY(-2px);
 		}
 
 		/* ===== Sections ===== */

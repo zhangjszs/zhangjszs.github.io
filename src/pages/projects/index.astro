@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Grid from '../../components/Grid.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import TagFilter from '../../components/TagFilter.astro';
@@ -44,17 +43,19 @@ const categories = [
 
 		<TagFilter tags={allTags} categories={categories} />
 
-		<div class="projects-grid" data-reveal>
-			<Grid variant="offset">
-				{
-					sortedProjects.map((project) => (
-						<li data-project-tags={JSON.stringify(project.data.tags)} data-project-category={project.data.category}>
-							<ProjectCard project={project} />
-						</li>
-					))
-				}
-			</Grid>
-		</div>
+		<ul class="work-grid" data-reveal>
+			{
+				sortedProjects.map((project, i) => (
+					<li
+						class="work-cell"
+						data-project-tags={JSON.stringify(project.data.tags)}
+						data-project-category={project.data.category}
+					>
+						<ProjectCard project={project} index={i + 1} />
+					</li>
+				))
+			}
+		</ul>
 		<div class="page-end"></div>
 	</div>
 
@@ -81,11 +82,37 @@ const categories = [
 		}
 
 		.stats-line .sep {
-			color: var(--border);
+			color: var(--border-strong);
 		}
 
-		.projects-grid {
-			margin-top: 2.5rem;
+		.work-grid {
+			display: grid;
+			gap: 1.5rem;
+			grid-template-columns: minmax(0, 1fr);
+			align-items: start;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+
+		.work-cell {
+			display: flex;
+		}
+
+		.work-cell :global(.work) {
+			flex: 1;
+		}
+
+		@media (min-width: 44em) {
+			.work-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media (min-width: 68em) {
+			.work-grid {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+			}
 		}
 
 		.page-end {

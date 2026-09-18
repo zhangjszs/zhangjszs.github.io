@@ -207,15 +207,15 @@ const publishedTime = date ? new Date(date).toISOString() : new Date().toISOStri
 		}
 
 		.related-link {
-			background: var(--accent);
-			color: var(--accent-foreground);
-			border: 1px solid var(--accent);
+			background: var(--foreground);
+			color: var(--gray-999);
+			border: 1px solid var(--foreground);
 			box-shadow: var(--glow-accent);
 		}
 
 		.related-link:hover {
 			transform: translateX(4px);
-			box-shadow: 0 0 32px hsla(158, 72%, 56%, 0.3);
+			box-shadow: var(--shadow-md);
 		}
 	</style>
 </BaseLayout>
