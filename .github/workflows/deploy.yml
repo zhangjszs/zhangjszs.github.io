@@ -33,6 +33,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 类型/模板检查前置：astro check 失败则直接阻断后续 Build 与发布，
+      # 与 AGENTS.md「format:check && check && build」的验证顺序对齐
+      - name: Check
+        run: npm run check
+
       - name: Build
         run: npm run build
 

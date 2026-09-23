@@ -29,11 +29,12 @@ src/
 │   ├── projects/      # 作品：personal-* 为个人项目；其余 category 字段详见 schema
 │   └── blog/          # 博客文章（MDX）
 ├── content.config.ts  # 内容集合 schema（Zod 校验）
-├── i18n/              # 中英文字典（data-i18n 模式，默认中文）
 ├── layouts/           # BaseLayout（背景、主题、滚动进度等全局能力）
 ├── pages/             # 路由：/ /projects/ /blog/ /about/ /rss.xml /404
-└── styles/            # global.css（莫兰迪配色变量在此修改）
+└── styles/            # global.css（暖纸编辑风配色变量在此修改）
 ```
+
+双语说明：中英文本以 `{zh, en}` 文本对经 `src/components/Bilingual.astro` 渲染，由祖先容器 `data-lang` 控制显隐（默认中文），无独立字典目录。
 
 ## 如何添加内容
 
@@ -53,11 +54,11 @@ src/
 | ------------------------------- | ------------------------------------------------------------- |
 | `astro.config.mjs`              | `site` 域名 + `base` 路径（已配为 GitHub Pages 用户页根路径） |
 | `public/robots.txt`             | sitemap 地址（部署到其他域名时记得改）                        |
-| `src/components/MainHead.astro` | `SITE_NAME` / `SITE_DESCRIPTION`                              |
+| `src/data/site.ts`              | `SITE_NAME` / `SITE_DESCRIPTION`（站名与默认描述单一事实源）  |
 | `src/components/Nav.astro`      | 顶部导航 + 社交链接数组                                       |
 | `src/components/Footer.astro`   | 页脚链接 + 版权 + 社交图标                                    |
 | `src/pages/about.astro`         | `ROLE` / `ABOUT_PARAGRAPHS` / `NOW_ITEM` / `contactLinks`     |
-| `scripts/generate-og-image.mjs` | 重新生成 `public/og-image.png`（莫兰迪 1200×630 分享卡）      |
+| `scripts/generate-og-image.mjs` | 重新生成 `public/og-image.png`（暖纸配色 1200×630 分享卡）    |
 
 > **关于"技能雷达 / 标签 / 时间线 / 数据概览"**：均从 `src/content/projects/` 自动聚合（仅统计 `category: 'personal'` 的项目），**不需要手动维护**——每加一个项目，这些数据自动更新。
 
@@ -71,4 +72,4 @@ src/
 
 ## 致谢
 
-站点基于 [Astro Portfolio 模板](https://github.com/withastro/astro/tree/main/examples/portfolio) 深度定制；莫兰迪配色与背景图沿用模板资源。
+站点基于 [Astro Portfolio 模板](https://github.com/withastro/astro/tree/main/examples/portfolio) 深度定制；配色与背景图源自模板资源，现已改为暖纸编辑风 token（见 `src/styles/global.css`）。

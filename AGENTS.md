@@ -24,7 +24,7 @@ Astro 6 static personal showcase (`personal-showcase`)，Node ≥ 22.12.0，中�
 - `src/layouts/BaseLayout.astro` — 全局壳（Nav/Footer/滚动进度/搜索/code-copy 等增强脚本）。
 - `src/data/{site,resume,updates,links}.ts` — 站点元信息与内容数据。
 - `src/utils/paths.ts` — `withBase()`：所有站内绝对路径**必须**用它拼 base，否则切子路径部署会 404。
-- `src/i18n/` — 中英文字典（`data-i18n` 模式，默认中文）。
+- 双语机制：`src/components/Bilingual.astro` 接收 `{zh, en}` 文本对，渲染 `.t-zh`/`.t-en` 两个 span，由祖先容器（如 `/resume` 的 `data-lang`）控制显隐；`src/styles/global.css` 与页面样式驱动切换，默认中文。
 - `src/styles/global.css` — 暖纸编辑风设计 token（纸底 `#f4f1ec` / 墨黑 `#1a1a18` / 生褐强调 + 衬线标题栈）在此修改；`--gray-*` 是「0 = 墨黑 → 999 = 纸白」的兼容梯度，改值前先确认组件用法。
 - `scripts/` — 一次性运维脚本（见下）。
 - `public/.nojekyll` — **必须保留**，否则 GitHub Pages 会跑 Jekyll 管线破坏输出。
