@@ -1,9 +1,15 @@
 ---
 import '../styles/global.css';
-// 自托管字体（避免 Google Fonts / jsDelivr CDN 在中国大陆访问缓慢）
+// 自托管字体（避免 Google Fonts / jsDelivr CDN 在中国大陆访问缓慢）。
+// 三个 latin 可变字体额外走 preload：生产 LCP 元素（首屏文字）含拉丁字符，
+// font-display: swap 下其重绘时间受字体到达时间约束；经 ?url 拿到 Vite 哈希地址，
+// 在 head 解析阶段即发起字体请求，避免等 render-blocking 资源解析完才发现 @font-face。
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/source-serif-4/wght.css';
+import interLatinWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import jetbrainsMonoLatinWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import sourceSerifLatinWoff2 from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
 import { withBase } from '../utils/paths';
 import { SITE_NAME, SITE_DESCRIPTION, SITE_AUTHOR, SITE_LOCALE } from '../data/site';
 
@@ -72,6 +78,10 @@ const finalOgDescription = ogDescription ?? description;
 
 <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 <link rel="icon" href={withBase('/favicon.ico')} />
+<!-- 首屏关键字体预热（fonts 天然 anonymous，同源也必须带 crossorigin） -->
+<link rel="preload" as="font" type="font/woff2" href={interLatinWoff2} crossorigin />
+<link rel="preload" as="font" type="font/woff2" href={jetbrainsMonoLatinWoff2} crossorigin />
+<link rel="preload" as="font" type="font/woff2" href={sourceSerifLatinWoff2} crossorigin />
 <!-- RSS 自动发现：浏览器/Reader 会在地址栏给出 RSS 订阅按钮 -->
 <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} · RSS`} href={withBase('/rss.xml')} />
 <!-- sitemap 链接：搜索引擎爬虫可据此发现全部页面 -->

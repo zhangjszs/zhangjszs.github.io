@@ -14,6 +14,12 @@ export default defineConfig({
 	//   - 若切到 Cloudflare Pages / 自有域名：仅改 site
 	// ============================================================
 	site: 'https://zhangjszs.github.io',
+	// 全站样式内联进 HTML：静态站无 SPA 路由复用缓存，内联后消除两个 render-blocking
+	// CSS 请求（GitHub Pages TTFB 高，首屏每个 RTT 都直接计入 LCP），@font-face 也随
+	// HTML 立即可见，webfont 请求得以更早发起
+	build: {
+		inlineStylesheets: 'always',
+	},
 	integrations: [mdx(), sitemap()],
 	markdown: {
 		shikiConfig: {
