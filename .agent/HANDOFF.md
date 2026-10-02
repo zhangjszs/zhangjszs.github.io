@@ -52,3 +52,17 @@
 **剩余差距与证据**（本地 LCP 2.3s 的构成）：LCP 元素为首屏文字（非图片），render delay ~200–230ms 即 webfont swap 重绘的下限——字体现已从 t≈0 开始请求，无更早手段；server-response-time 线上 ~300ms 为 GitHub Pages 固有，客户端无解（唯一 >50ms 的线上 opportunity，与规划者结论一致）。unused-javascript（gsap 包 34KB 未用部分，weight 0）不动，避免动 motion 网关。
 
 **给规划者**：推送后对线上三页复测 Lighthouse（a11y 应全 100、perf 预期 ≥90）；确认后可关 #5。临时产物 `lh-a11y-*.json`/`lh-perf-*.json`/`_iss5full.json` 已清理，`lh-report-*.json` 仍在 .gitignore 内。
+
+## 2026-10-02 · 执行 Agent（第三轮：#5 追加——data-reveal 首屏遮蔽 LCP）
+
+**背景**：第二轮提交推送后规划者线上复测——/ 98、/resume/ 92 已达标，但 /projects/ 仍 83、LCP 3.9s（render delay 2.1s），LCP 元素为页头描述文字（`PageHeader` 的 `p.ph-desc`，带 `data-reveal`）。
+
+**根因**：`core.ts` 的 reveal 用 `gsap.fromTo({opacity:0, y:28}, …)` + ScrollTrigger，fromTo 的初始隐藏状态在模块加载、tween 创建时立即生效——时序为「内容首绘可见 → GSAP 加载完把首屏藏起 → 滚动触发淡入」，这次重绘把 LCP 拖到动画结束。与首页历史上 9218a8e 修过的问题同类（首页/简历首屏现已不带 data-reveal，故两页已恢复；projects/about/blog/links 的页头仍带）。
+
+**修法**（`27822ab`）：`initMotion` 对每个 `[data-reveal]` 先测 `getBoundingClientRect().top`，位于首屏视口内（top < innerHeight）的不创建动画、保持立即可见；折叠线以下照旧 reveal。判断在创建 fromTo **之前**（fromTo 初始状态创建即生效，先藏再放会闪烁）；reduced-motion 网关提前返回路径不受影响；无 JS 路径 CSS 本就不藏 `[data-reveal]`。
+
+**本地指标**（移动端节流）：/projects/ **98**（目标 ≥93 达成；FCP 1.3s / LCP 2.3s / CLS 0.005，render delay 201→184ms——本地 GSAP 加载快，收益主要体现线上）；/ **98**、/resume/ **99** 无回退。
+
+**视觉回归**（Playwright 实测本地构建）：首屏 page-header opacity 恒为 1、无闪烁；折叠线以下 work-grid 初始 opacity 0，滚动入视口后 0.9s 淡入上移至 1，reveal 完整保留。
+
+**给规划者**：推送后复测线上 /projects/（预期 ≥93）与 /（≥98）、/resume/（≥99），确认后可关 #5。本轮唯一改动文件 `src/scripts/motion/core.ts`。
