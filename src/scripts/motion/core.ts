@@ -46,7 +46,14 @@ export function initMotion(opts: MotionOptions = {}) {
 	}
 
 	const targets = gsap.utils.toArray<HTMLElement>(opts.reveals ?? '[data-reveal]');
+	// 首屏（视口内）元素不参与 reveal：入场动画先以 opacity:0 藏起再等 ScrollTrigger
+	// 播放，会把首屏文字的 LCP 拖到 GSAP 模块加载完 + 动画结束（线上 /projects/ 实测
+	// render delay 2.1s）。折叠线以下才滚动触发，首屏必须无 JS / JS 慢时也立即可见。
+	// 注意：判断必须发生在创建 fromTo 之前——fromTo 的初始状态是创建即生效的，
+	// 先藏再放会出现闪烁并重置 LCP。
+	const viewportTopLimit = window.innerHeight;
 	targets.forEach((el) => {
+		if (el.getBoundingClientRect().top < viewportTopLimit) return;
 		const delay = Number(el.dataset.revealDelay ?? 0);
 		gsap.fromTo(
 			el,
