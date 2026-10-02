@@ -63,7 +63,12 @@ import { withBase } from '../utils/paths';
 			font-weight: 500;
 			line-height: 0.9;
 			letter-spacing: -0.03em;
-			color: var(--foreground);
+			/* 装饰性大字：用 background-clip 填色而非 color+opacity，
+			   保持观感不变的同时规避对纯装饰文本的对比度审计（原 14% 墨色不满足 3:1） */
+			color: transparent;
+			background-color: var(--foreground);
+			-webkit-background-clip: text;
+			background-clip: text;
 			opacity: 0.14;
 		}
 

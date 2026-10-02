@@ -48,7 +48,7 @@ const glyph = /[一-龥]/.test(title[0]) ? title[0] : title[0].toUpperCase();
 			}
 			{difficulty && <span>{difficulty}</span>}
 		</p>
-		<h3 class="work-title" id={titleId}>
+		<h2 class="work-title" id={titleId}>
 			<a
 				class="work-hit"
 				href={detailHref}
@@ -58,7 +58,7 @@ const glyph = /[一-龥]/.test(title[0]) ? title[0] : title[0].toUpperCase();
 			>
 				{title}
 			</a>
-		</h3>
+		</h2>
 		<p class="work-desc">{description}</p>
 		<p class="work-role">
 			<span class="work-role-k">职责</span>

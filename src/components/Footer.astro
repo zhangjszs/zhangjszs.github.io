@@ -32,7 +32,7 @@ const channels = CONTACT.filter((channel) => channel.href);
 				{
 					footerLinks.map((group) => (
 						<div class="link-group">
-							<h4>{group.title}</h4>
+							<h2>{group.title}</h2>
 							<ul>
 								{group.links.map((link) => (
 									<li>
@@ -44,7 +44,7 @@ const channels = CONTACT.filter((channel) => channel.href);
 					))
 				}
 				<div class="link-group">
-					<h4>联系</h4>
+					<h2>联系</h2>
 					<ul>
 						{
 							channels.map((channel) => (
@@ -133,7 +133,7 @@ const channels = CONTACT.filter((channel) => channel.href);
 		gap: 2rem;
 	}
 
-	.link-group h4 {
+	.link-group h2 {
 		margin: 0 0 0.9rem;
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);

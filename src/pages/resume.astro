@@ -41,8 +41,8 @@ const hasEnPdf = existsSync(resolve(process.cwd(), 'public/assets/resume/resume-
 			</div>
 			<div class="resume-actions">
 				<div class="lang-switch" role="tablist" aria-label="简历语言切换">
-					<button type="button" class="lang-btn" data-lang-btn="zh" aria-selected="true">中文</button>
-					<button type="button" class="lang-btn" data-lang-btn="en" aria-selected="false">EN</button>
+					<button type="button" class="lang-btn" role="tab" data-lang-btn="zh" aria-selected="true">中文</button>
+					<button type="button" class="lang-btn" role="tab" data-lang-btn="en" aria-selected="false">EN</button>
 				</div>
 				{
 					(hasZhPdf || hasEnPdf) && (
