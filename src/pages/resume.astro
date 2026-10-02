@@ -1,6 +1,8 @@
 ---
 // 简历页：中英双版自包含切换 + 双语 PDF 下载。
 // PDF 存放约定：public/assets/resume/resume-zh.pdf、resume-en.pdf（用户提供）。
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Bi from '../components/Bilingual.astro';
 import Icon from '../components/Icon.astro';
@@ -8,6 +10,12 @@ import { RESUME } from '../data/resume';
 import { withBase } from '../utils/paths';
 
 const r = RESUME;
+
+// 构建期检查 PDF 是否已提供：Astro frontmatter 在构建/SSR 时执行，
+// dev 与 build 均以项目根为工作目录，故从 process.cwd() 解析 public/ 路径。
+// 注意：此文件里 import.meta.url 指向构建产物 chunk 而非源码，不可用于定位源文件。
+const hasZhPdf = existsSync(resolve(process.cwd(), 'public/assets/resume/resume-zh.pdf'));
+const hasEnPdf = existsSync(resolve(process.cwd(), 'public/assets/resume/resume-en.pdf'));
 ---
 
 <BaseLayout title={`简历 | ${r.name}`} description="Kerwin Zhang 的简历（中英双语）。">
@@ -36,30 +44,42 @@ const r = RESUME;
 					<button type="button" class="lang-btn" data-lang-btn="zh" aria-selected="true">中文</button>
 					<button type="button" class="lang-btn" data-lang-btn="en" aria-selected="false">EN</button>
 				</div>
-				<div class="pdf-links">
-					<a
-						href={withBase('/assets/resume/resume-zh.pdf')}
-						class="pdf-btn"
-						download
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<span class="pdf-glyph" aria-hidden="true">↓</span>
-						<span class="t-zh">PDF 中文版</span>
-						<span class="t-en">PDF (Chinese)</span>
-					</a>
-					<a
-						href={withBase('/assets/resume/resume-en.pdf')}
-						class="pdf-btn"
-						download
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<span class="pdf-glyph" aria-hidden="true">↓</span>
-						<span class="t-zh">PDF 英文版</span>
-						<span class="t-en">PDF (English)</span>
-					</a>
-				</div>
+				{
+					(hasZhPdf || hasEnPdf) && (
+						<div class="pdf-links">
+							{hasZhPdf && (
+								<a
+									href={withBase('/assets/resume/resume-zh.pdf')}
+									class="pdf-btn"
+									download
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<span class="pdf-glyph" aria-hidden="true">
+										↓
+									</span>
+									<span class="t-zh">PDF 中文版</span>
+									<span class="t-en">PDF (Chinese)</span>
+								</a>
+							)}
+							{hasEnPdf && (
+								<a
+									href={withBase('/assets/resume/resume-en.pdf')}
+									class="pdf-btn"
+									download
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<span class="pdf-glyph" aria-hidden="true">
+										↓
+									</span>
+									<span class="t-zh">PDF 英文版</span>
+									<span class="t-en">PDF (English)</span>
+								</a>
+							)}
+						</div>
+					)
+				}
 			</div>
 		</header>
 
