@@ -496,6 +496,19 @@ html {
 	scroll-behavior: smooth;
 }
 
+/* 无障碍兜底：偏好减少动效时，全站 CSS 动画/过渡瞬时化（含上面的平滑滚动）。
+   JS 侧动效由 motion/core.ts 网关在 prefers-reduced-motion 下不初始化，二者配合收口。 */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
 /* 锚点落点让开 sticky 顶栏 */
 section[id],
 article[id],
