@@ -23,3 +23,32 @@
 - #10 / #11：GoatCounter 注册与 Giscus App 安装（纯账号操作，步骤见 `docs/SETUP-GOATCOUNTER-GISCUS.md`）
 
 **给规划者**：#5 的 Lighthouse（首页 / 项目详情 / 简历）与移动端体检待执行；#12 的 Astro 6→7 major 升级是清零 critical 的唯一路径，建议单独立项。最终验收 `npm run ci` 全绿。
+
+## 2026-10-02 · 执行 Agent（第二轮：#5 遗留项 a11y + LCP + 审计脚本）
+
+**做了什么**（均只本地 commit，未 push、未关 issue；#5 下已留言）：
+
+- `d5daa81` fix: 无障碍修复（aria 角色与标题层级）(#5)
+  - `/resume` 语言切换：`tablist` 下的按钮补 `role="tab"` → 修 `aria-allowed-attr`（`aria-selected` 不允许在 button role 上）与 `aria-required-children`（tablist 需要 tab 子元素），功能与样式不变
+  - 全站标题层级：页脚栏目标题 `h4`→`h2`（`.link-group` 作用域选择器同步改名，样式零变化；选 h2 而非 h3 是因为 /links、/404 只有 h1，h1→h3 仍跳级）；项目卡片标题 `h3`→`h2`（修 /projects/ 的 h1→h3 跳级，`.work-title` 类样式不变）
+  - `/404` 装饰大字 `color+opacity` → `background-clip:text` 填色：修 `color-contrast`（1.32:1，纯装饰文本无法满足 3:1），渲染结果像素级不变
+- `bd33fb3` perf: 首屏 LCP 优化（样式内联 + 关键字体 preload）(#5)
+  - `astro.config.mjs`：`build.inlineStylesheets: 'always'`——两个 render-blocking CSS（8KB+2KB）内联进 HTML，线上各省一个高 TTFB RTT
+  - `MainHead.astro`：三个 latin 可变字体经 Vite `?url` 拿哈希地址输出 preload（crossorigin）；线上字体请求从 CSS 解析完（888ms）提前到 head 解析（~0ms）
+- `c41d453` chore(scripts): 死链审计覆盖 og/twitter meta 图片 (#5)
+  - `audit-links.mjs` 校验 og:image / twitter:image content（`/` 开头路径 + 本站域名绝对 URL 剥 origin），负向注入验证：34 处全抓到 exit 1，还原后 0 死链
+
+**Lighthouse 指标对比**（本地 Lighthouse 移动端节流；线上「before」为规划者体检值，「after」待推送后复测）：
+
+| 页面       | a11y before(线上)    | a11y after(本地)                       | perf before(线上) | perf after(本地)                          | 备注                                        |
+| ---------- | -------------------- | -------------------------------------- | ----------------- | ----------------------------------------- | ------------------------------------------- |
+| /          | 98（heading-order）  | **100**                                | 83（LCP 3.6s）    | **98**（FCP 1.3s / LCP 2.3s / CLS 0.017） | 本地基线 96：FCP 2.0s→1.3s、CLS 0.067→0.017 |
+| /projects/ | 98（heading-order）  | **100**                                | 85（LCP 3.5s）    | **98**（FCP 1.3s / LCP 2.3s / CLS 0.005） | 本地基线 96：CLS 0.054→0.005                |
+| /resume/   | 87（aria×2+heading） | **100**                                | 91（LCP 3.0s）    | **99**（FCP 1.0s / LCP 2.0s / CLS 0）     |                                             |
+| 其余路由   | 未测                 | **100**（/blog/ /about/ /links/ /404） | 未测              | —                                         | 页脚改动影响全站，故全量复测                |
+
+本地 perf 未达 ≥90 的情况：无（/ 与 /projects/ 均 98）。线上预期收益：省 2 个 CSS RTT（Lighthouse 线上 render-blocking 估算 ~560ms）+ 字体起点提前 ~440ms，线上 LCP 预计 3.6s→约 2.6–2.8s，**需规划者推送后线上复测确认 ≥90**。
+
+**剩余差距与证据**（本地 LCP 2.3s 的构成）：LCP 元素为首屏文字（非图片），render delay ~200–230ms 即 webfont swap 重绘的下限——字体现已从 t≈0 开始请求，无更早手段；server-response-time 线上 ~300ms 为 GitHub Pages 固有，客户端无解（唯一 >50ms 的线上 opportunity，与规划者结论一致）。unused-javascript（gsap 包 34KB 未用部分，weight 0）不动，避免动 motion 网关。
+
+**给规划者**：推送后对线上三页复测 Lighthouse（a11y 应全 100、perf 预期 ≥90）；确认后可关 #5。临时产物 `lh-a11y-*.json`/`lh-perf-*.json`/`_iss5full.json` 已清理，`lh-report-*.json` 仍在 .gitignore 内。
