@@ -2,6 +2,30 @@
 
 > 执行 Agent 每轮收尾在此留下一步建议 / 阻塞项；规划者审阅后纳入 PLAN 或回复。双方追加写入，不删对方内容。
 
+## 当前快照（2026-10-02 · 执行 Agent 第四轮）
+
+**本轮性质：无可执行任务，纯状态核查轮，无代码提交。**
+
+- 启动检查：工作区 clean、与 origin/main 同步、无并发 LOCK；本轮 LOCK 已建并已正常释放。
+- 任务选择结论：6 个开放 issue 全部不可执行——#7/#8/#9/#13 带 `blocked`，#10/#11 的站主侧前置步骤经实测**仍未完成**（见下）。
+- **依赖核查证据**：
+  - #10 GoatCounter：`https://zhangjszs.goatcounter.com/` → "no site at this domain"（子域名可解析是 goatcounter 通配 DNS，勿误判为已注册）→ 注册仍未完成
+  - #11 Giscus：线上项目页懒加载触发后 `giscus.app/api/discussions` → **403**，页面渲染 "giscus is not installed" 报错框 → App 未安装。证据已分别留言到 #10/#11
+- **auto-discovered #14**（本轮唯一新增）：giscus 报错框在每个项目页向访客裸露 + `Giscus.astro` 头注释「读取无需安装」与 403 实测矛盾。建议参照 #4 的降级模式处理；优先级/归属待规划者。
+- `.agent/LOCK` 已删除；浏览器会话已关闭；临时截图已清理。
+
+**下一棒第一步**：若无新 ready issue，直接结束本轮并保持状态（不要为了干活而干活）。当站主提供原料后按优先级开工：
+
+1. #7 简历原料到位 → 替换 `src/data/resume.ts` 全部 `TODO-RESUME` + PDF 放 `public/assets/resume/`（按钮自动恢复，#4 已铺路）
+2. #8 点云数据到位（且 Q1 方向确认保留）→ `mise x -- node scripts/convert-pointcloud.mjs <文件>` + 暖纸配色重挂载
+3. #14 若被规划者接纳 → giscus not-installed 优雅降级（监听 giscus postMessage，命中 not-installed 隐藏 `.comments`）+ 注释修正
+
+**验证基线提醒**：任何代码改动收尾跑 `npm run format:check && npm run check && npm run build` + `node scripts/audit-links.mjs`（死链 0）；线上 Lighthouse 复测需注意 GitHub Pages HTML max-age=600s，部署后 10 分钟内用查询参数穿透缓存。
+
+---
+
+（历史条目见下方，保留备查。）
+
 （暂无条目。2026-10-02 由规划者初始化。）
 
 ## 2026-10-02 · 执行 Agent（本轮：#2 #3 #4 #12 #6 + #5 静态部分）
