@@ -46,7 +46,7 @@ mise x -- node scripts/convert-pointcloud.mjs 你的文件.pcd
 仓库 ID 与讨论分类已自动配置完成，只差一步授权：
 
 1. 打开 [giscus.app](https://giscus.app/zh-CN)，仓库选 `zhangjszs/zhangjszs.github.io`
-2. 按页面提示把 giscus GitHub App 安装到该仓库（评论区"读取"已可用，"发表"依赖此步）
+2. 按页面提示把 giscus GitHub App 安装到该仓库（读取与发表都依赖这一步；未安装时页面会自动隐藏评论区，访客不会看到报错）
 
 ## 3. 改版收尾与体检（执行 Agent 跟进，进度见对应 issue）
 

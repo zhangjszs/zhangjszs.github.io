@@ -1,6 +1,7 @@
 ---
 // Giscus 评论（GitHub Discussions 驱动，零后端）。
-// 用户需在 giscus.app 安装 giscus GitHub App 到本仓库后才能发表评论；读取无需安装。
+// 用户需在 giscus.app 安装 giscus GitHub App 到本仓库；未安装时读取与发表均不可用
+// （giscus.app/api/discussions 直接 403），此时下方脚本会隐藏整个评论区，避免访客看到报错框。
 import Icon from './Icon.astro';
 
 const REPO = 'zhangjszs/zhangjszs.github.io';
@@ -41,6 +42,11 @@ const CATEGORY_ID = 'DIC_kwDOUHOyDM4DEmPH';
 	.comments-title :global(svg) {
 		color: var(--accent);
 	}
+
+	/* 降级兜底：giscus App 未安装时由脚本打上 hidden，显式确保不渲染 */
+	.comments[hidden] {
+		display: none;
+	}
 </style>
 
 <script>
@@ -75,5 +81,17 @@ const CATEGORY_ID = 'DIC_kwDOUHOyDM4DEmPH';
 			},
 			{ rootMargin: '400px' }
 		).observe(anchor);
+
+		// giscus GitHub App 未安装时，其 iframe 会向父页面投递
+		// {giscus:{error:"giscus is not installed on this repository"}}（origin 为 giscus.app）。
+		// 命中即整体隐藏评论区，避免访客看到裸露报错框；App 安装后该信号不再出现，评论区正常渲染。
+		const hideOnNotInstalled = (event: MessageEvent) => {
+			if (event.origin !== 'https://giscus.app') return;
+			const error = (event.data as { giscus?: { error?: string } } | null)?.giscus?.error;
+			if (typeof error !== 'string' || !/not installed/i.test(error)) return;
+			anchor.closest('.comments')?.setAttribute('hidden', '');
+			window.removeEventListener('message', hideOnNotInstalled);
+		};
+		window.addEventListener('message', hideOnNotInstalled);
 	}
 </script>
