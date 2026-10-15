@@ -24,34 +24,41 @@ const sortedArticles = articles.sort((a, b) => {
 			}
 		</PageHeader>
 
-		<div class="posts">
-			{
-				sortedArticles.map((article, i) => (
-					<article class="post-row" data-reveal data-reveal-delay={String(Math.min(i, 4) * 0.06)}>
-						<div class="post-row-main">
-							<h2 class="post-row-title">
-								<a href={withBase(`/blog/${article.id}`)}>{article.data.title}</a>
-							</h2>
-							<p class="post-row-desc">{article.data.description}</p>
-							{article.data.relatedProject && (
-								<a href={withBase(`/projects/${article.data.relatedProject}`)} class="related-link">
-									<Icon icon="arrow-right" size="0.85em" />
-									相关项目
-								</a>
-							)}
-						</div>
-						<div class="post-row-meta">
-							{article.data.date && <time datetime={article.data.date}>{article.data.date}</time>}
-							<div class="post-tags">
-								{article.data.tags.map((tag) => (
-									<span class="post-tag">{tag}</span>
-								))}
+		{
+			sortedArticles.length > 0 ? (
+				<div class="posts">
+					{sortedArticles.map((article, i) => (
+						<article class="post-row" data-reveal data-reveal-delay={String(Math.min(i, 4) * 0.06)}>
+							<div class="post-row-main">
+								<h2 class="post-row-title">
+									<a href={withBase(`/blog/${article.id}`)}>{article.data.title}</a>
+								</h2>
+								<p class="post-row-desc">{article.data.description}</p>
+								{article.data.relatedProject && (
+									<a href={withBase(`/projects/${article.data.relatedProject}`)} class="related-link">
+										<Icon icon="arrow-right" size="0.85em" />
+										相关项目
+									</a>
+								)}
 							</div>
-						</div>
-					</article>
-				))
-			}
-		</div>
+							<div class="post-row-meta">
+								{article.data.date && <time datetime={article.data.date}>{article.data.date}</time>}
+								<div class="post-tags">
+									{article.data.tags.map((tag) => (
+										<span class="post-tag">{tag}</span>
+									))}
+								</div>
+							</div>
+						</article>
+					))}
+				</div>
+			) : (
+				<div class="empty" data-reveal>
+					<span class="empty-glyph">∅</span>
+					<p>笔记簿还空着——项目里的思考与复盘，写好了就放进来。</p>
+				</div>
+			)
+		}
 		<div class="page-end"></div>
 	</div>
 
@@ -162,6 +169,26 @@ const sortedArticles = articles.sort((a, b) => {
 
 		.page-end {
 			height: clamp(3rem, 8vw, 6rem);
+		}
+
+		.empty {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1rem;
+			padding: clamp(3rem, 8vw, 5rem) 1rem;
+			text-align: center;
+		}
+
+		.empty-glyph {
+			font-family: var(--font-mono);
+			font-size: 3.5rem;
+			color: color-mix(in srgb, var(--accent) 60%, transparent);
+		}
+
+		.empty p {
+			color: var(--muted-foreground);
+			margin: 0;
 		}
 
 		@media (min-width: 50em) {
