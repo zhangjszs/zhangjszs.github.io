@@ -1,0 +1,666 @@
+---
+// The fallback and live renderer share the same original procedural course.
+import { createFsacCourse } from '../../scripts/fsac-track';
+
+const fallbackCourse = createFsacCourse('autocross');
+const bounds = fallbackCourse.cones.reduce(
+	(box, cone) => ({
+		minX: Math.min(box.minX, cone.x),
+		maxX: Math.max(box.maxX, cone.x),
+		minZ: Math.min(box.minZ, cone.z),
+		maxZ: Math.max(box.maxZ, cone.z),
+	}),
+	{ minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity }
+);
+const scale = Math.min(760 / (bounds.maxX - bounds.minX), 390 / (bounds.maxZ - bounds.minZ));
+const project = (point: { x: number; z: number }) => ({
+	x: 500 + (point.x - (bounds.minX + bounds.maxX) / 2) * scale,
+	y: 315 - (point.z - (bounds.minZ + bounds.maxZ) / 2) * scale,
+});
+const fallbackPath =
+	fallbackCourse.samples
+		.map((point, i) => {
+			const p = project(point);
+			return `${i ? 'L' : 'M'}${p.x.toFixed(2)},${p.y.toFixed(2)}`;
+		})
+		.join(' ') + 'Z';
+const fallbackCar = project(fallbackCourse.samples[0]);
+---
+
+<div class="perception-scene" data-perception-scene data-mode="perception" data-state="static">
+	<div class="scene-fallback" aria-hidden="true">
+		<svg viewBox="0 0 1000 680" fill="none" preserveAspectRatio="xMidYMid meet">
+			<defs>
+				<pattern id="sandbox-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+					<path d="M40 0H0V40" stroke="#293025" stroke-width="1"></path>
+				</pattern>
+			</defs>
+			<rect width="1000" height="680" fill="#10120f"></rect>
+			<rect width="1000" height="680" fill="url(#sandbox-grid)"></rect>
+			<path d={fallbackPath} stroke="#20291a" stroke-width={fallbackCourse.width * scale} stroke-linejoin="round"
+			></path>
+			<path d={fallbackPath} stroke="#ceff56" stroke-opacity=".75" stroke-width="1.6" stroke-dasharray="6 7"></path>
+			{
+				fallbackCourse.cones.map((cone) => {
+					const point = project(cone);
+					return (
+						<path
+							d={`M${point.x},${point.y - 3.3}l3.1,5.8h-6.2Z`}
+							fill={cone.side === 'left' ? '#ff6458' : cone.side === 'right' ? '#66b9ff' : '#f5d35d'}
+						/>
+					);
+				})
+			}
+			<g transform={`translate(${fallbackCar.x} ${fallbackCar.y})`}>
+				<circle r="38" stroke="#ceff56" stroke-opacity=".3" stroke-dasharray="3 5"></circle>
+				<rect x="-5" y="-9" width="10" height="18" rx="2" fill="#ceff56"></rect>
+				<rect x="-3" y="-3" width="6" height="6" fill="#1a2115"></rect>
+			</g>
+		</svg>
+	</div>
+	<canvas class="scene-canvas" aria-hidden="true"></canvas>
+	<div
+		class="scene-interaction"
+		data-scene-interaction
+		tabindex="-1"
+		role="group"
+		aria-label="三维场景：拖动或按方向键旋转视角，按 R 重置"
+	>
+	</div>
+	<div class="scene-detection-labels" data-fsac-labels aria-hidden="true"></div>
+
+	<div class="scene-topline">
+		<span class="scene-id"><i></i> KZ / SPATIAL ENGINE</span>
+		<span class="scene-origin scene-origin-fsac">FSAC 2025 规则 · 程序化算法示意 <span>/ 非实测</span></span>
+		<span class="scene-origin scene-origin-orbit">ORBITAL SANDBOX <span>/ 程序化轨道示意</span></span>
+	</div>
+
+	<div class="fsac-toolbar" data-fsac-toolbar>
+		<label class="scene-course">
+			<span>赛道</span>
+			<select data-fsac-course aria-label="选择 FSAC 演示赛道" disabled>
+				<option value="autocross">高速循迹 / AUTOCROSS</option>
+				<option value="skidpad">八字环绕 / SKIDPAD</option>
+				<option value="acceleration">直线加速 / ACCELERATION</option>
+			</select>
+		</label>
+		<div class="scene-counts" aria-label="程序化演示计算结果" data-fsac-counts>
+			<span>视域锥桶 <strong data-fsac-visible>—</strong></span>
+			<span>累计地图 <strong data-fsac-known>—</strong></span>
+			<span class="scene-total-count">赛道总数 <strong data-fsac-total>—</strong></span>
+			<span class="scene-plan-count">局部轨迹 <strong data-fsac-lookahead>—</strong></span>
+		</div>
+	</div>
+	<div class="scene-legend" data-fsac-legend aria-label="左侧红色锥桶、右侧蓝色锥桶、停车区域黄色锥桶">
+		<span><i class="cone-left"></i> 左红</span>
+		<span><i class="cone-right"></i> 右蓝</span>
+		<span><i class="cone-stop"></i> 停车黄</span>
+		<small>灰桶为未观测参考 · 车辆预设行驶</small>
+	</div>
+
+	<div class="scene-coordinate" aria-hidden="true"><span>Y ↑</span><span>└─ X</span><span>↙ Z</span></div>
+	<div class="scene-caption">
+		<span class="scene-caption-kicker" data-scene-kicker>01 / CONE PERCEPTION</span>
+		<p data-scene-caption>从局部回波到锥桶地标，再到可行驶路径。</p>
+	</div>
+
+	<div class="scene-control-deck">
+		<div class="fsac-control-row" data-fsac-controls>
+			<div class="scene-layers" role="group" aria-label="感知显示层" data-fsac-layers>
+				<button type="button" data-fsac-layer="raw" aria-pressed="false" disabled>原始回波</button>
+				<button type="button" data-fsac-layer="clusters" aria-pressed="true" disabled>锥桶聚类</button>
+				<button type="button" data-fsac-layer="map" aria-pressed="false" disabled>累计地图</button>
+			</div>
+			<div class="scene-view-controls">
+				<button type="button" data-fsac-follow aria-pressed="true" disabled>跟车视角</button>
+				<button type="button" data-fsac-reset disabled>重放 ↺</button>
+			</div>
+		</div>
+		<div class="scene-controls" aria-label="三维演示控制">
+			<div class="scene-modes" role="group" aria-label="选择演示模式">
+				<button type="button" data-scene-mode="perception" aria-pressed="true" disabled><span>01</span> 感知</button>
+				<button type="button" data-scene-mode="planning" aria-pressed="false" disabled><span>02</span> 规划</button>
+				<button type="button" data-scene-mode="orbit" aria-pressed="false" disabled><span>03</span> 轨道</button>
+			</div>
+			<label class="scene-speed"
+				>演示速度 <output data-scene-speed-value>1×</output><input
+					type="range"
+					min="0.25"
+					max="2"
+					step="0.25"
+					value="1"
+					aria-label="程序化演示速度倍数"
+					data-scene-speed
+					disabled
+				/></label
+			>
+			<button type="button" class="scene-pause" data-scene-pause aria-pressed="false" aria-label="暂停三维演示" disabled
+				><span data-scene-pause-label>暂停 II</span></button
+			>
+		</div>
+	</div>
+	<span class="scene-status" role="status" aria-live="polite" data-scene-status
+		>静态赛道预览 · 程序化生成，非官方实测赛道</span
+	>
+</div>
+
+<style>
+	.perception-scene {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		min-height: 560px;
+		isolation: isolate;
+		overflow: hidden;
+		background: #10120f;
+		color: #f1f2e8;
+		font-family: var(--font-mono, monospace);
+	}
+	.scene-fallback,
+	.scene-canvas {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+	.scene-fallback svg {
+		width: 100%;
+		height: 100%;
+	}
+	.scene-canvas {
+		opacity: 0;
+		transition: opacity 0.7s ease;
+	}
+	.scene-interaction {
+		position: absolute;
+		inset: 120px 0 175px;
+		cursor: grab;
+		touch-action: pan-y;
+	}
+	.scene-interaction:active {
+		cursor: grabbing;
+	}
+	[data-state='static'] .scene-interaction {
+		pointer-events: none;
+		cursor: default;
+	}
+	.scene-interaction:focus-visible {
+		outline: 1px solid #ceff56;
+		outline-offset: -12px;
+	}
+	[data-state='ready'] .scene-canvas {
+		opacity: 1;
+	}
+	[data-state='ready'] .scene-fallback {
+		visibility: hidden;
+	}
+	.scene-detection-labels {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		overflow: hidden;
+	}
+	.scene-detection-labels :global(.fsac-cone-label) {
+		position: absolute;
+		top: -12px;
+		left: 5px;
+		font-size: 9px;
+		font-family: var(--font-mono);
+		padding: 1px 3px;
+		background: #10120fcc;
+		white-space: nowrap;
+	}
+	.scene-detection-labels :global(.fsac-cone-label[hidden]) {
+		display: none;
+	}
+	.scene-counts > .scene-plan-count {
+		display: none;
+	}
+	[data-mode='planning'] .scene-counts > .scene-plan-count {
+		display: flex;
+	}
+	[data-mode='planning'] .scene-total-count {
+		display: none;
+	}
+	.scene-topline {
+		position: absolute;
+		inset: 20px 25px auto;
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		font-size: 9px;
+		letter-spacing: 0.05em;
+		color: #b4bea5;
+		pointer-events: none;
+	}
+	.scene-id {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		white-space: nowrap;
+	}
+	.scene-id i {
+		height: 5px;
+		width: 5px;
+		background: #ceff56;
+	}
+	.scene-origin {
+		text-align: right;
+	}
+	.scene-origin span {
+		color: #d4dec8;
+	}
+	.scene-origin-orbit {
+		display: none;
+	}
+	.fsac-toolbar {
+		position: absolute;
+		inset: 51px 25px auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+	.scene-course {
+		display: flex;
+		align-items: center;
+		gap: 9px;
+		color: #a6b296;
+		font-size: 10px;
+		min-width: 0;
+	}
+	.scene-course select {
+		color: #e3edd8;
+		background: #171c13;
+		border: 1px solid #3a4431;
+		border-radius: 0;
+		font: inherit;
+		font-size: 10px;
+		min-height: 34px;
+		max-width: 240px;
+		padding: 0 28px 0 10px;
+		cursor: pointer;
+	}
+	.scene-course select:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+	.scene-counts {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		color: #9ba98a;
+		font-size: 9px;
+	}
+	.scene-counts > span {
+		display: flex;
+		align-items: baseline;
+		gap: 7px;
+		white-space: nowrap;
+	}
+	.scene-counts strong {
+		color: #e3f8bc;
+		font-size: 14px;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+	}
+	.scene-legend {
+		position: absolute;
+		left: 25px;
+		top: 96px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		color: #aeb9a0;
+		font-size: 9px;
+		pointer-events: none;
+	}
+	.scene-legend > span {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+	.scene-legend i {
+		width: 6px;
+		height: 7px;
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.cone-left {
+		background: #ff6458;
+	}
+	.cone-right {
+		background: #66b9ff;
+	}
+	.cone-stop {
+		background: #f5d35d;
+	}
+	.scene-legend small {
+		font-size: 9px;
+		color: #829174;
+	}
+	.scene-coordinate {
+		position: absolute;
+		left: 26px;
+		top: 48%;
+		display: grid;
+		color: #8b9978;
+		font-size: 11px;
+		line-height: 1.8;
+		pointer-events: none;
+	}
+	.scene-caption {
+		position: absolute;
+		left: 25px;
+		bottom: 151px;
+		pointer-events: none;
+	}
+	.scene-caption-kicker {
+		color: #ceff56;
+		font-size: 10px;
+		letter-spacing: 0.15em;
+	}
+	.scene-caption p {
+		font-family: var(--font-system, sans-serif);
+		color: #b6bfaa;
+		font-size: 11px;
+		margin: 7px 0 0;
+	}
+	.scene-control-deck {
+		position: absolute;
+		bottom: 37px;
+		left: 25px;
+		right: 25px;
+		display: grid;
+		gap: 9px;
+	}
+	.fsac-control-row,
+	.scene-controls {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		min-width: 0;
+	}
+	.scene-modes,
+	.scene-layers,
+	.scene-view-controls {
+		display: flex;
+		gap: 4px;
+	}
+	.scene-control-deck button {
+		font: inherit;
+		font-size: 10px;
+		color: #bbc6ab;
+		background: #171c13;
+		border: 1px solid #3a4431;
+		border-radius: 0;
+		min-height: 36px;
+		padding: 0 13px;
+		cursor: pointer;
+		transition:
+			background 0.2s,
+			color 0.2s;
+		white-space: nowrap;
+	}
+	.scene-control-deck button span {
+		font-size: 8px;
+		margin-right: 6px;
+		opacity: 0.7;
+	}
+	.scene-control-deck button[aria-pressed='true'] {
+		color: #10120f;
+		background: #ceff56;
+		border-color: #ceff56;
+	}
+	.scene-layers button {
+		min-height: 30px;
+		padding: 0 11px;
+		font-size: 9px;
+		background: transparent;
+	}
+	.scene-layers button[aria-pressed='true'] {
+		color: #ceff56;
+		background: #28351b;
+		border-color: #6d8545;
+	}
+	.scene-view-controls button {
+		min-height: 30px;
+		font-size: 9px;
+		background: transparent;
+	}
+	.scene-control-deck button:hover:enabled {
+		border-color: #9fbc59;
+	}
+	.scene-control-deck button:focus-visible,
+	.scene-course select:focus-visible,
+	.scene-speed input:focus-visible {
+		outline: 2px solid #f1f2e8;
+		outline-offset: 3px;
+	}
+	.scene-control-deck button:disabled {
+		opacity: 0.45;
+		cursor: default;
+	}
+	.scene-speed {
+		margin-left: auto;
+		align-self: center;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: #a9b69a;
+		font-size: 9px;
+		white-space: nowrap;
+	}
+	.scene-speed output {
+		color: #ceff56;
+		min-width: 3ch;
+		font-variant-numeric: tabular-nums;
+	}
+	.scene-speed input {
+		width: 72px;
+		accent-color: #ceff56;
+		cursor: ew-resize;
+	}
+	.scene-speed input:disabled {
+		opacity: 0.45;
+		cursor: default;
+	}
+	.scene-pause span {
+		margin: 0 !important;
+		font-size: 10px !important;
+		opacity: 1 !important;
+	}
+	.scene-status {
+		position: absolute;
+		bottom: 13px;
+		right: 25px;
+		left: 25px;
+		color: #94a180;
+		font-size: 9px;
+		letter-spacing: 0.02em;
+		text-align: right;
+	}
+	[data-mode='orbit'] .fsac-toolbar,
+	[data-mode='orbit'] .scene-legend,
+	[data-mode='orbit'] .fsac-control-row,
+	[data-mode='orbit'] .scene-detection-labels {
+		display: none;
+	}
+	[data-mode='orbit'] .scene-origin-fsac {
+		display: none;
+	}
+	[data-mode='orbit'] .scene-origin-orbit {
+		display: inline;
+	}
+	[data-mode='orbit'] .scene-caption {
+		bottom: 106px;
+	}
+	[data-mode='planning'] .scene-layers {
+		display: none;
+	}
+	[data-mode='planning'] .scene-view-controls {
+		margin-left: auto;
+	}
+	@media (max-width: 700px) {
+		.scene-topline {
+			inset: 17px 16px auto;
+			flex-wrap: wrap;
+			row-gap: 8px;
+			font-size: 8px;
+		}
+		.scene-origin {
+			margin-left: auto;
+		}
+		.fsac-toolbar {
+			inset: 62px 16px auto;
+			gap: 8px;
+			align-items: flex-start;
+		}
+		.scene-course {
+			gap: 0;
+		}
+		.scene-course > span {
+			display: none;
+		}
+		.scene-course select {
+			max-width: 152px;
+			width: 152px;
+			font-size: 9px;
+			min-height: 38px;
+			padding-left: 8px;
+			padding-right: 16px;
+		}
+		.scene-counts {
+			gap: 13px;
+		}
+		.scene-counts > span {
+			flex-direction: column;
+			gap: 5px;
+			font-size: 8px;
+		}
+		.scene-counts strong {
+			font-size: 13px;
+		}
+		.scene-legend {
+			left: 16px;
+			top: 113px;
+			gap: 10px;
+			font-size: 8px;
+		}
+		.scene-legend small {
+			margin-left: 3px;
+			font-size: 8px;
+		}
+		.scene-interaction {
+			inset: 139px 0 205px;
+		}
+		.scene-caption {
+			left: 16px;
+			bottom: 176px;
+		}
+		.scene-caption p {
+			font-size: 10px;
+		}
+		.scene-coordinate {
+			left: 17px;
+			font-size: 10px;
+		}
+		.scene-control-deck {
+			left: 16px;
+			right: 16px;
+			bottom: 39px;
+			gap: 8px;
+		}
+		.fsac-control-row {
+			flex-wrap: wrap;
+			gap: 7px;
+		}
+		.scene-control-deck button {
+			padding: 0 11px;
+			min-height: 40px;
+		}
+		.scene-control-deck button span {
+			display: none;
+		}
+		.scene-layers button,
+		.scene-view-controls button {
+			min-height: 34px;
+			padding: 0 10px;
+			font-size: 9px;
+		}
+		.scene-view-controls {
+			margin-left: auto;
+		}
+		.scene-controls {
+			gap: 8px;
+			flex-wrap: wrap;
+		}
+		.scene-speed {
+			order: 3;
+			flex-basis: 100%;
+			justify-content: flex-end;
+		}
+		.scene-pause {
+			margin-left: auto;
+		}
+		.scene-pause span {
+			display: inline !important;
+		}
+		.scene-status {
+			right: 16px;
+			left: 16px;
+			font-size: 8px;
+		}
+		[data-mode='orbit'] .scene-caption {
+			bottom: 129px;
+		}
+	}
+	@media (max-width: 359px) {
+		.scene-topline {
+			font-size: 7px;
+		}
+		.scene-course select {
+			width: 128px;
+			font-size: 8px;
+		}
+		.scene-counts {
+			gap: 8px;
+		}
+		.scene-legend small {
+			display: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.scene-canvas,
+		.scene-control-deck button {
+			transition: none;
+		}
+	}
+	@media (min-width: 701px) {
+		.fsac-toolbar {
+			left: max(250px, 30%);
+			flex-wrap: wrap;
+			justify-content: flex-end;
+		}
+		.scene-legend {
+			left: max(250px, 30%);
+		}
+	}
+	@media (min-width: 701px) and (max-width: 1000px) {
+		.fsac-toolbar {
+			display: grid;
+			justify-items: end;
+			gap: 6px;
+		}
+		.scene-legend {
+			top: 120px;
+			flex-wrap: wrap;
+			gap: 6px 10px;
+		}
+	}
+</style>
+
+<script>
+	import '../../scripts/perception-scene';
+</script>

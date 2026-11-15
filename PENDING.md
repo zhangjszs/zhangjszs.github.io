@@ -1,8 +1,8 @@
 # 还差什么 · 站点上线后的待办清单
 
-站点已全站改版为**暖纸编辑风**并上线（搜索 / 统计与评论位 / RSS / sitemap / 双语简历页均在），开发路线与决策记录见 `.agent/PLAN.md`（进度以 GitHub issue 为准）。
+站点原有**暖纸编辑风**内容页已上线（搜索 / 统计与评论位 / RSS / sitemap / 双语简历页均在）。2026-11-13 按站主选择，将首页本地改为深色 **3D 自动驾驶实验场**，见 `docs/INTERACTIVE-HOMEPAGE.md`；开发路线与决策记录见 `.agent/PLAN.md`（进度以 GitHub issue 为准）。
 
-当前状态说明：首页 Three.js 点云签名交互**暂未挂载**——改版后不再使用合成点云撑门面，组件（`src/components/hero/PointCloudHero.astro`）与转换脚本保留，等真实 LiDAR 数据到位后按暖纸风适配再接入。
+当前状态说明：旧点云签名组件（`src/components/hero/PointCloudHero.astro`）仍**未挂载**，转换脚本保留，等待真实 LiDAR 数据。新版 `PerceptionScene.astro` 使用独立的程序化几何，明确标注“程序化演示”，不代表真实扫描，真实数据接入仍待完成。
 
 ## 1. 用户原料（只有站主能提供）
 

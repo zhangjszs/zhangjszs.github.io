@@ -1,6 +1,8 @@
 # Kerwin Zhang · 个人主页
 
-Kerwin Zhang 的个人展示站：**个人简介 / 作品 / 博客 / 联系方式** 四大板块。技术栈基于 [Astro](https://astro.build) 静态站点，**中文为主**，支持中英双语与明暗主题，已适配移动端。已开启 RSS 订阅与 SEO 元数据。
+Kerwin Zhang 的个人展示站：**个人简介 / 作品 / 博客 / 联系方式** 四大板块。基于 [Astro](https://astro.build) 静态站点，首页为深色荧光绿的 **3D 自动驾驶实验场**，内容页保留暖纸编辑风；中文为主，简历支持中英切换，适配移动端，提供 RSS 与 SEO 元数据。
+
+首页支持感知 / 规划 / 轨道模式、拖动旋转、演示调速与暂停；场景是明确标注的程序化示意。设计与降级说明见 [docs/INTERACTIVE-HOMEPAGE.md](docs/INTERACTIVE-HOMEPAGE.md)。
 
 - 🏎️ 当前在 [FSAC Team of HUAT](https://github.com/HUAT-FSAC) 做自动驾驶相关工作
 - 🛠️ 关注 ROS 2、LiDAR 地面分割、路径规划与感知

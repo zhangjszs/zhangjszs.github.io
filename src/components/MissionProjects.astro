@@ -1,0 +1,573 @@
+---
+import { getCollection } from 'astro:content';
+import { withBase } from '../utils/paths';
+
+const projects = await getCollection('projects');
+const personal = projects.filter((project) => project.data.category === 'personal').slice(0, 2);
+const experiments = projects
+	.filter((project) => project.data.category === 'labwork' && project.data.featured)
+	.slice(0, 2);
+const shortName = (title: string) => title.split('—')[0].trim();
+const subtitle = (title: string) => title.split('—').slice(1).join('—').trim();
+
+// 确定性的程序化工程示意，不表示实测点云或轨道数据。
+const scanPoints = Array.from({ length: 150 }, (_, index) => {
+	const band = Math.floor(index / 30);
+	const step = index % 30;
+	const phase = step / 29;
+	const x = 35 + phase * 350;
+	const y = 172 - Math.sin(phase * Math.PI * 1.6) * 55 + (band - 2) * (8 + phase * 9);
+	return { x, y, r: index % 7 === 0 ? 1.8 : 1, opacity: 0.25 + band * 0.13 };
+});
+---
+
+<section class="mission-projects" id="works" aria-labelledby="mission-projects-title">
+	<header class="mission-heading">
+		<div class="mission-kicker"><span>01 / FIELD WORK</span><span>从想法，到运行中的系统</span></div>
+		<div class="mission-heading-line">
+			<h2 id="mission-projects-title">代码，进入现实。</h2>
+			<a class="all-work" href={withBase('/projects/')}>
+				全部 {projects.length} 个作品 <span aria-hidden="true">↗</span>
+			</a>
+		</div>
+	</header>
+
+	<div class="systems-list">
+		{
+			personal.map((project, index) => {
+				const orbit = project.id.includes('satellite');
+				return (
+					<article class:list={['system-row', { 'system-orbit': orbit }]}>
+						<div class="system-index">
+							<span>{String(index + 1).padStart(2, '0')}</span>
+							<span class="system-kind">{orbit ? 'ORBIT' : 'AUTONOMY'}</span>
+						</div>
+						<div class="system-copy">
+							<div class="system-meta">
+								<span>个人项目</span>
+								<span>{project.data.date?.split('-')[0]}</span>
+							</div>
+							<h3>
+								<a href={withBase(`/projects/${project.id}/`)}>{shortName(project.data.title)}</a>
+							</h3>
+							{subtitle(project.data.title) && <p class="system-subtitle">{subtitle(project.data.title)}</p>}
+							<p class="system-description">{project.data.description}</p>
+							<p class="system-role">{project.data.role ?? '职责待补充'}</p>
+							<ul class="system-stack" aria-label="技术栈">
+								{project.data.techStack.map((tech) => (
+									<li>{tech}</li>
+								))}
+							</ul>
+							<div class="system-links">
+								<a class="system-open" href={withBase(`/projects/${project.id}/`)}>
+									进入项目 <span aria-hidden="true">↗</span>
+								</a>
+								{project.data.repoUrl && (
+									<a class="system-source" href={project.data.repoUrl} target="_blank" rel="noopener noreferrer">
+										SOURCE / GITHUB <span aria-hidden="true">↗</span>
+									</a>
+								)}
+							</div>
+						</div>
+						<figure class="system-diagram">
+							<div class="diagram-header" aria-hidden="true">
+								<span>{orbit ? 'ORBITAL MECHANICS' : 'AUTONOMOUS SYSTEM'}</span>
+								<span>{orbit ? 'SGP4' : 'ROS1'}</span>
+							</div>
+							{orbit ? (
+								<svg viewBox="0 0 420 280" role="img" aria-label="地球、卫星轨道和地面站的工程示意">
+									<g class="diagram-faint" fill="none" stroke="currentColor" stroke-width="0.7">
+										<path d="M24 140h372M210 22v236" stroke-dasharray="3 6" />
+										<circle cx="210" cy="140" r="67" />
+										<ellipse cx="210" cy="140" rx="25" ry="67" />
+										<ellipse cx="210" cy="140" rx="50" ry="67" />
+										<ellipse cx="210" cy="140" rx="67" ry="22" />
+										<ellipse cx="210" cy="140" rx="67" ry="47" />
+										<ellipse cx="210" cy="140" rx="158" ry="63" transform="rotate(-27 210 140)" />
+									</g>
+									<g class="diagram-accent" fill="none" stroke="currentColor" stroke-width="1.2">
+										<ellipse cx="210" cy="140" rx="154" ry="58" transform="rotate(29 210 140)" />
+										<path d="M236 100 336 178 227 183" stroke-dasharray="4 5" />
+										<circle cx="336" cy="178" r="5" fill="currentColor" stroke="none" />
+										<circle cx="236" cy="100" r="3" fill="currentColor" stroke="none" />
+										<path d="M323 169l26 18m-24-7 6-9m8 19 6-9" stroke-width="3" />
+									</g>
+									<g class="diagram-label" fill="currentColor">
+										<text x="247" y="92">
+											GROUND STATION
+										</text>
+										<text x="313" y="207">
+											SATELLITE
+										</text>
+									</g>
+								</svg>
+							) : (
+								<svg viewBox="0 0 420 280" role="img" aria-label="点云感知、规划路径与车辆的工程示意">
+									<g class="diagram-faint" fill="none" stroke="currentColor" stroke-width="0.7">
+										<path d="M18 224h384M40 202h340M64 180h292M86 158h248M108 136h204M128 114h164M148 92h124M168 70h84" />
+										<path d="m24 224 166-154m34 0L394 224M92 224 197 70M162 224l42-154m28 154L211 70m91 154L217 70" />
+									</g>
+									<g class="diagram-accent" fill="currentColor">
+										{scanPoints.map((point) => (
+											<circle cx={point.x} cy={point.y} r={point.r} opacity={point.opacity} />
+										))}
+									</g>
+									<g class="diagram-accent" fill="none" stroke="currentColor">
+										<path d="M206 233C200 209 180 188 188 165S228 137 232 104" stroke-width="2" />
+										<path d="M187 237h36l-4-28h-27zM188 215h-5v15h5m35-15h5v15h-5" stroke-width="1.5" />
+										<path d="m232 100-4 9m4-9 4 9" stroke-width="1.5" />
+										<circle cx="210" cy="141" r="77" opacity="0.2" />
+										<circle cx="210" cy="141" r="105" opacity="0.1" />
+									</g>
+									<g class="diagram-label" fill="currentColor">
+										<text x="30" y="46">
+											POINT CLOUD
+										</text>
+										<text x="280" y="250">
+											PLANNED PATH
+										</text>
+									</g>
+								</svg>
+							)}
+							<figcaption>
+								<span>{orbit ? 'TLE → PROPAGATION → VISIBILITY' : 'PERCEPTION → PLANNING → CONTROL'}</span>
+								<span>程序化示意 · 非实测数据</span>
+							</figcaption>
+						</figure>
+					</article>
+				);
+			})
+		}
+	</div>
+
+	{
+		experiments.length > 0 && (
+			<div class="experiment-list">
+				<p class="experiment-label">MORE EXPERIMENTS / 课程与探索</p>
+				{experiments.map((project, index) => (
+					<a class="experiment-row" href={withBase(`/projects/${project.id}/`)}>
+						<span class="experiment-number">{String(personal.length + index + 1).padStart(2, '0')}</span>
+						<span class="experiment-name">{shortName(project.data.title)}</span>
+						<span class="experiment-tech">{project.data.techStack.slice(0, 3).join(' / ')}</span>
+						<span class="experiment-arrow" aria-hidden="true">
+							↗
+						</span>
+					</a>
+				))}
+			</div>
+		)
+	}
+</section>
+
+<style>
+	.mission-projects {
+		--mp-text: var(--lab-text, #eceee8);
+		--mp-muted: var(--lab-muted, #92988c);
+		--mp-line: var(--lab-line, #2b3029);
+		--mp-accent: var(--lab-accent, #ceff58);
+		color: var(--mp-text);
+		padding: clamp(4.5rem, 9vw, 9rem) 3.2%;
+		scroll-margin-top: 6rem;
+	}
+
+	.mission-kicker,
+	.system-meta,
+	.system-kind,
+	.system-stack,
+	.system-source,
+	.diagram-header,
+	.system-diagram figcaption,
+	.experiment-label,
+	.experiment-number,
+	.experiment-tech {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.6875rem;
+		font-weight: 400;
+		letter-spacing: 0.055em;
+		line-height: 1.6;
+	}
+
+	.mission-kicker,
+	.mission-heading-line,
+	.diagram-header,
+	.system-diagram figcaption {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.mission-kicker {
+		color: var(--mp-muted);
+		margin-bottom: 1.5rem;
+	}
+
+	.mission-kicker span:first-child {
+		color: var(--mp-accent);
+	}
+
+	.mission-heading-line {
+		align-items: flex-end;
+		padding-bottom: 2.75rem;
+	}
+
+	.mission-heading h2 {
+		font-family: var(--font-body, sans-serif);
+		font-size: clamp(2rem, 5.2vw, 4.75rem);
+		font-weight: 600;
+		letter-spacing: -0.065em;
+		line-height: 1.15;
+		margin: 0;
+	}
+
+	.all-work,
+	.system-links a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.all-work {
+		display: inline-flex;
+		align-items: center;
+		gap: 1.25rem;
+		flex-shrink: 0;
+		font-size: 0.8125rem;
+		padding: 0.5rem 0;
+		border-bottom: 1px solid var(--mp-muted);
+	}
+
+	.all-work span {
+		color: var(--mp-accent);
+		font-size: 1.25rem;
+	}
+
+	.system-row {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1.3fr) minmax(0, 1fr);
+		gap: clamp(1.25rem, 3vw, 3rem);
+		align-items: center;
+		border-top: 1px solid var(--mp-line);
+		padding: clamp(2rem, 4.5vw, 4.5rem) 0;
+	}
+
+	.system-index {
+		align-self: start;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding-top: 0.125rem;
+		color: var(--mp-accent);
+	}
+
+	.system-index > span:first-child {
+		font-family: var(--font-mono, monospace);
+		font-size: 1.5rem;
+		letter-spacing: -0.08em;
+	}
+
+	.system-kind {
+		color: var(--mp-muted);
+		writing-mode: vertical-rl;
+	}
+
+	.system-meta {
+		display: flex;
+		gap: 1.5rem;
+		color: var(--mp-muted);
+		margin-bottom: 1rem;
+	}
+
+	.system-copy h3 {
+		font-family: var(--font-body, sans-serif);
+		font-size: clamp(1.75rem, 3.3vw, 3rem);
+		font-weight: 500;
+		letter-spacing: -0.055em;
+		line-height: 1.1;
+		overflow-wrap: anywhere;
+		margin: 0 0 0.625rem;
+	}
+
+	.system-copy h3 a {
+		color: inherit;
+		text-decoration: none;
+		transition: color 0.18s ease;
+	}
+
+	.system-subtitle {
+		font-size: 0.875rem;
+		line-height: 1.6;
+		margin: 0 0 1.5rem;
+	}
+
+	.system-description {
+		font-size: 0.8125rem;
+		line-height: 1.95;
+		color: var(--mp-muted);
+		max-width: 40rem;
+		margin: 0 0 0.875rem;
+	}
+
+	.system-role {
+		font-size: 0.75rem;
+		line-height: 1.8;
+		color: var(--mp-text);
+		margin: 0;
+	}
+
+	.system-stack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem 1rem;
+		color: var(--mp-muted);
+		list-style: none;
+		margin: 1.25rem 0 1.75rem;
+		padding: 0;
+	}
+
+	.system-stack li + li::before {
+		content: '/';
+		margin-right: 1rem;
+		color: var(--mp-line);
+	}
+
+	.system-links {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem 1.75rem;
+	}
+
+	.system-open {
+		display: inline-flex;
+		align-items: center;
+		gap: 2rem;
+		min-height: 2.75rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		border-bottom: 1px solid var(--mp-accent);
+	}
+
+	.system-open span {
+		color: var(--mp-accent);
+		font-size: 1.125rem;
+	}
+
+	.system-source {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		color: var(--mp-muted) !important;
+	}
+
+	.system-diagram {
+		margin: 0;
+		min-width: 0;
+		align-self: stretch;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.diagram-header {
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--mp-line);
+		color: var(--mp-muted);
+	}
+
+	.diagram-header span:last-child {
+		color: var(--mp-accent);
+	}
+
+	.system-diagram svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		min-height: 12rem;
+		max-height: 21rem;
+		overflow: visible;
+	}
+
+	.diagram-faint {
+		color: var(--mp-muted);
+		opacity: 0.35;
+	}
+
+	.diagram-accent {
+		color: var(--mp-accent);
+	}
+
+	.diagram-label {
+		font-family: var(--font-mono, monospace);
+		font-size: 8px;
+		letter-spacing: 0.06em;
+		color: var(--mp-muted);
+	}
+
+	.system-diagram figcaption {
+		align-items: start;
+		flex-wrap: wrap;
+		font-size: 0.625rem;
+		gap: 0.375rem 1rem;
+		color: var(--mp-muted);
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--mp-line);
+	}
+
+	.experiment-list {
+		border-top: 1px solid var(--mp-line);
+	}
+
+	.experiment-label {
+		color: var(--mp-muted);
+		padding: 1.75rem 0 1rem;
+		margin: 0;
+	}
+
+	.experiment-row {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 0.7fr) 1.5rem;
+		align-items: center;
+		gap: clamp(1.25rem, 3vw, 3rem);
+		padding: 1.5rem 0;
+		border-bottom: 1px solid var(--mp-line);
+		color: var(--mp-text);
+		text-decoration: none;
+	}
+
+	.experiment-number,
+	.experiment-tech {
+		color: var(--mp-muted);
+	}
+
+	.experiment-name {
+		font-size: clamp(1rem, 2vw, 1.5rem);
+		font-weight: 500;
+		letter-spacing: -0.025em;
+	}
+
+	.experiment-arrow {
+		font-size: 1.5rem;
+		color: var(--mp-accent);
+		transition: transform 0.18s ease;
+	}
+
+	a:focus-visible {
+		outline: 2px solid var(--mp-accent);
+		outline-offset: 6px;
+	}
+
+	@media (hover: hover) {
+		.system-copy h3 a:hover,
+		.all-work:hover,
+		.experiment-row:hover .experiment-name,
+		.system-source:hover {
+			color: var(--mp-accent) !important;
+		}
+
+		.experiment-row:hover .experiment-arrow {
+			transform: translate(3px, -3px);
+		}
+	}
+
+	@media (max-width: 960px) {
+		.system-row {
+			grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 0.8fr);
+			gap: 1.25rem;
+		}
+
+		.system-copy h3 {
+			font-size: 1.875rem;
+		}
+
+		.experiment-row {
+			grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 0.65fr) 1.5rem;
+			gap: 1.25rem;
+		}
+	}
+
+	@media (max-width: 680px) {
+		.mission-projects {
+			padding-inline: 5%;
+		}
+
+		.mission-kicker {
+			align-items: start;
+			flex-direction: column;
+			gap: 0.375rem;
+		}
+
+		.mission-heading-line {
+			align-items: start;
+			flex-direction: column;
+			gap: 1.25rem;
+			padding-bottom: 2rem;
+		}
+
+		.system-row {
+			grid-template-columns: 2rem minmax(0, 1fr);
+			gap: 1rem;
+		}
+
+		.system-index {
+			gap: 0.75rem;
+		}
+
+		.system-index > span:first-child {
+			font-size: 1.25rem;
+		}
+
+		.system-kind {
+			font-size: 0.625rem;
+		}
+
+		.system-diagram {
+			grid-column: 2;
+			padding-top: 1.5rem;
+		}
+
+		.system-description {
+			font-size: 0.8125rem;
+		}
+
+		.system-copy h3 {
+			font-size: clamp(1.5rem, 7.5vw, 2.25rem);
+		}
+
+		.system-stack {
+			gap: 0.375rem 0.75rem;
+		}
+
+		.system-stack li + li::before {
+			margin-right: 0.75rem;
+		}
+
+		.experiment-row {
+			grid-template-columns: 2rem minmax(0, 1fr) 1.5rem;
+			column-gap: 1rem;
+			row-gap: 0.375rem;
+			padding: 1.25rem 0;
+		}
+
+		.experiment-tech {
+			grid-column: 2;
+			grid-row: 2;
+		}
+
+		.experiment-arrow {
+			grid-column: 3;
+			grid-row: 1 / 3;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.system-copy h3 a,
+		.experiment-arrow {
+			transition: none;
+		}
+
+		.experiment-row:hover .experiment-arrow {
+			transform: none;
+		}
+	}
+</style>
