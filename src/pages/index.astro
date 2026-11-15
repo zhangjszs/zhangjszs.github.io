@@ -15,8 +15,7 @@ const sections = [
 
 // 用字符串常量而不是模板内换行：中文段落里的换行会被折叠成一个空格，渲染出多余间隙
 const DECK =
-	'我在 FSAC 车队负责感知与规划方向的开发：点云地面分割与锥桶检测、基于代价地图的路径规划，以及从仿真到实车的闭环验证。课堂之外，把这些能力落在 C++、Qt、Java 与机器学习的一个个可运行工程上。';
-
+	'从 FSAC 车队的 LiDAR 感知与规控工程实践出发，持续完善 ROS / ROS 2 无人车工作区，也开发物理仿真教学与舆情分析系统。作品以公开源码、可复现实验和明确的验证边界为依据。';
 const allProjects = await getCollection('projects');
 // 个人项目排在前面，课程实验（labwork）靠后
 const orderedProjects = [...allProjects].sort((a, b) => {

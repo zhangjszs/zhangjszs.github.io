@@ -13,21 +13,21 @@ import { UPDATES, UPDATE_TYPE_LABEL } from '../data/updates';
 // ============================================================
 
 /** 身份标签 */
-const ROLE = '自动驾驶工程学生 / 湖北汽车工业学院 FSAC 车队';
+const ROLE = '自动驾驶 / 机器人软件工程 · FSAC 项目经历';
 
 /** 个人简介段落（出现在 About 背景区，可写多段） */
 const ABOUT_PARAGRAPHS: string[] = [
-	'我是 Kerwin Zhang，湖北汽车工业学院的本科生，目前在 FSAC 车队做自动驾驶相关工作，方向覆盖感知、定位、规划与控制全流程。',
-	'研究兴趣集中在 LiDAR 地面分割与锥桶检测 / 聚类，常用 RANSAC 与区域建模做实时点云处理；车队里负责从感知到规控的工程化与 rosbag 复现实验。',
-	'这里记录我在 ROS（C++/Python）、CUDA、PyTorch 上的学习轨迹和项目实践，欢迎通过下方渠道交流。',
+	'我是 Kerwin Zhang，具有计算机科学与技术背景，参与过湖北汽车工业学院 FSAC 无人赛车相关项目，关注从感知、定位到规划与控制的工程落地。',
+	'主要使用 C++、Python 与 ROS / ROS 2 开展 LiDAR 感知、模块集成和仿真回归实践，也持续维护 TypeScript / React 物理计算可视化与 Python / Vue 数据分析项目。',
+	'这里主要展示有公开代码和可核查资料的工程实践；软件仿真结果与实车验收、演示数据与真实结果会明确区分。',
 ];
 
 /** 时间线「现在」段（手动维护；其余按年聚合自项目数据） */
 const NOW_ITEM = {
 	period: '现在',
-	title: '核心成员',
-	org: 'FSAC Team of HUAT · https://github.com/HUAT-FSAC',
-	desc: '本科生在读，关注 LiDAR 地面分割、自动驾驶赛车算法与 ROS 2 工程化。',
+	title: '关注方向',
+	org: '自动驾驶 · 工程系统 · 交互仿真',
+	desc: '持续关注 ROS 2 工程化、LiDAR 感知与可复现的仿真验证。',
 };
 
 /** 联系方式 */
@@ -138,7 +138,7 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 
 <BaseLayout
 	title="关于 | Kerwin Zhang"
-	description="Kerwin Zhang · 自动驾驶工程学生，FSAC 车队成员，研究方向 LiDAR 感知与自动驾驶算法。"
+	description="Kerwin Zhang · 自动驾驶与软件工程实践，关注 ROS 2、LiDAR 感知及可靠的仿真验证。"
 >
 	<div class="wrapper" data-pagefind-body>
 		<PageHeader eyebrow="03 · about" title="关于我" description={ROLE} />
