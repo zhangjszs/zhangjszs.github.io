@@ -1,0 +1,30 @@
+---
+title: 'ROS2-LTS-Final — FSAC 无人车 ROS 2 工程框架'
+description: '基于 ROS 2 Jazzy 与 C++20 的 FSAC 无人车工作区，涵盖锥桶感知、赛项规划、车辆控制、安全仲裁及可复现的闭环仿真和故障注入。'
+category: personal
+repoUrl: 'https://github.com/zhangjszs/ROS2-LTS-Final'
+tags: ['自动驾驶', 'ROS 2', 'LiDAR', '控制', '仿真验证']
+techStack: ['ROS 2 Jazzy', 'C++20', 'Python', 'PCL', 'Eigen', 'colcon']
+role: 'FSAC 项目工程实践；参与工作区维护、系统集成与仿真验证'
+featured: true
+date: '2026'
+difficulty: '深度'
+status: In Progress
+---
+
+## 项目背景
+
+面向 Formula Student Autonomous China（FSAC）无人赛车，从 ROS 1 工程向 ROS 2 Jazzy 迁移，重点在于明确模块接口、降低算法与 ROS 适配层的耦合，并建立可回归的控制闭环与安全验证流程。
+
+## 技术方案
+
+- **感知与状态**：LiDAR 点云处理、锥桶聚类、坐标变换与跟踪；车辆状态节点消费 INS 数据并发布状态消息。
+- **多赛项规划**：赛道循迹、八字绕环与直线加速规划器通过路径选择模块衔接，独立提供速度剖面模块。
+- **控制与安全**：Pure Pursuit、可选 MPC、规划输入监控与停车请求处理；实现基于消息校验、新鲜度和任务状态的指令仲裁逻辑。当前主系统默认未启用仲裁器，不将可选机制描述为全车强制安全门禁。
+- **工程组织**：C++20 / Python，使用 ROS 2 消息契约、colcon / CMake 构建与独立的 Core / ROS 适配层。
+
+## 成果与数据
+
+- 公开仓库包含感知、规划、控制、状态管理、仿真和可视化相关源码及对应测试目录。
+- `scripts/demo.sh` 将闭环仿真与故障注入分为两条验证链；测试脚本检查车辆状态、指令帧、停车响应并生成可检查的 JSON 证据。
+- 仿真演示使用确定性参考路径；**不等于完成真实点云驱动的整车闭环或实车验收**。底盘标定、硬件急停与实际赛道验证仍属于独立工作。

@@ -1,0 +1,30 @@
+---
+title: 'PhysVis — 高中物理交互仿真与教学工作台'
+description: '以零依赖 TypeScript 物理引擎驱动 React、Canvas 2D 与 Three.js 3D 教学场景，提供物理模型求解、实验操作、动态曲线和分步导学。'
+category: personal
+repoUrl: 'https://github.com/zhangjszs/physical-modelvis'
+demoUrl: 'https://zhangjszs.github.io/physical-modelvis/'
+tags: ['物理仿真', '教学可视化', 'TypeScript', 'React', '3D']
+techStack: ['TypeScript', 'React 18', 'Three.js', 'Canvas 2D', 'Vite', 'Vitest']
+role: '项目开发与维护；参与物理模型实现、可视化交互和测试完善'
+featured: true
+date: '2026'
+difficulty: '深度'
+status: In Progress
+---
+
+## 项目背景
+
+希望让高中物理实验不仅能够观看动画，还能通过调参、受力分析、图表与分步引导理解物理规律。项目将计算内核与 UI 渲染分开，降低图形表现与求解公式相互影响的风险。
+
+## 技术方案
+
+- **物理计算**：`physics-core` 使用 TypeScript 实现模型注册、参数约束和统一 `SimulationResult` 输出；经典场景采用解析解，电磁复合场包含 Boris 数值积分实现。
+- **交互可视化**：React 18 / Vite 工作台组织教材实验；Canvas 2D 绘制受力与曲线辅助图，Three.js 呈现三维器材与空间轨迹。
+- **一致性与质量**：渲染层消费核心计算结果，配有单元测试、物理自检与构建检查，避免在展示层重复计算同一物理量。
+
+## 成果与数据
+
+- 项目 README 登记 **176 个教材实验、123 个可视化场景、113 个物理模型**；相关实现分布在 `experiments/`、`visualization/` 与 `physics-core/src/models/`。
+- 公开提供课堂工作台、二维图表、三维实验、电磁组合实验台等界面截图，以及生产构建与演示页面配置。
+- 仓库包含物理计算和前端两套测试及 CI；上述数量来自项目清单，**不将文档中的测试通过记录冒充本次独立复测结果**。

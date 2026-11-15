@@ -3,7 +3,7 @@
 export const SITE_NAME = 'Kerwin Zhang';
 export const SITE_ROLE = '自动驾驶 · 感知与规划';
 export const SITE_DESCRIPTION =
-	'湖北汽车工业学院 · FSAC 车队成员，专注 ROS 2、激光雷达感知与路径规划。本站收录项目作品、技术笔记与联系方式。';
+	'具有 FSAC 项目经历，关注 ROS 2、激光雷达感知、路径规划与交互仿真。本站收录项目作品、技术笔记与联系方式。';
 export const SITE_AUTHOR = 'Kerwin Zhang';
 export const SITE_LOCALE = 'zh_CN';
 

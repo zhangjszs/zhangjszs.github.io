@@ -4,10 +4,10 @@ Kerwin Zhang 的个人展示站：**个人简介 / 作品 / 博客 / 联系方�
 
 首页支持感知 / 规划 / 轨道模式、拖动旋转、演示调速与暂停；场景是明确标注的程序化示意。设计与降级说明见 [docs/INTERACTIVE-HOMEPAGE.md](docs/INTERACTIVE-HOMEPAGE.md)。
 
-- 🏎️ 当前在 [FSAC Team of HUAT](https://github.com/HUAT-FSAC) 做自动驾驶相关工作
+- 🏎️ 参与过 [FSAC Team of HUAT](https://github.com/HUAT-FSAC) 自动驾驶相关项目
 - 🛠️ 关注 ROS 2、LiDAR 地面分割、路径规划与感知
 - 📫 [zhangjszs@foxmail.com](mailto:zhangjszs@foxmail.com)
-- 🌐 站点地址：[zhangjszs.github.io](https://zhangjszs.github.io)（部署后生效）
+- 🌐 站点地址：[zhangjszs.github.io](https://zhangjszs.github.io)
 - 📡 博客 RSS：[zhangjszs.github.io/rss.xml](https://zhangjszs.github.io/rss.xml)
 
 ## 快速开始

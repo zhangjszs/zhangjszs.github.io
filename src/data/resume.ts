@@ -15,21 +15,21 @@ export interface ResumeEntry {
 export const RESUME = {
 	// TODO-RESUME: 中文姓名与头衔
 	name: 'Kerwin Zhang',
-	title: { zh: '自动驾驶工程学生 · ROS 2 / LiDAR 方向', en: 'Autonomous Driving Engineering Student · ROS 2 / LiDAR' },
+	title: { zh: '自动驾驶工程实践 · ROS 2 / LiDAR 方向', en: 'Autonomous Driving Engineering · ROS 2 / LiDAR' },
 	contact: {
 		email: 'zhangjszs@foxmail.com',
 		github: 'https://github.com/zhangjszs',
 		website: 'https://zhangjszs.github.io',
 	},
 	summary: {
-		zh: '湖北汽车工业学院本科生，FSAC（中国大学生方程式）车队成员，专注激光雷达感知、路径规划与 ROS 2 工程化，具备从仿真到实车闭环的完整项目经验。',
-		en: 'Undergraduate at Hubei University of Automotive Technology and member of the FSAC team, focused on LiDAR perception, path planning and ROS 2 engineering, with full project experience from simulation to on-vehicle closed-loop validation.',
+		zh: '具有计算机科学与技术背景，参与过湖北汽车工业学院 FSAC 无人赛车相关项目，关注激光雷达感知、路径规划与 ROS / ROS 2 工程化。通过公开源码和可复现的仿真实验展示工程实践，也持续开发交互式物理仿真与数据分析项目。',
+		en: 'With a background in Computer Science and Technology and FSAC project experience at Hubei University of Automotive Technology, I focus on LiDAR perception, path planning and ROS / ROS 2 engineering. My work includes public-source projects, reproducible simulations, interactive physics visualization and data analysis.',
 	},
 	education: [
 		{
 			title: { zh: '本科 · 计算机科学与技术', en: 'B.Eng. · Computer Science and Technology' },
 			org: { zh: '湖北汽车工业学院', en: 'Hubei University of Automotive Technology' },
-			period: { zh: '2022.09 – 至今', en: '2022.09 – Present' },
+			period: { zh: '2022.09 入学', en: 'Entered Sep 2022' },
 			bullets: [
 				{
 					zh: '核心课程:数据结构、算法设计与分析、操作系统、计算机网络、编译原理、数据库系统',
@@ -44,13 +44,13 @@ export const RESUME = {
 	],
 	experience: [
 		{
-			title: { zh: '感知与规划方向核心成员', en: 'Core Member, Perception & Planning' },
+			title: { zh: '感知与规划工程实践', en: 'Perception & Planning Engineering' },
 			org: { zh: 'FSAC 车队 · HUAT', en: 'FSAC Team · HUAT' },
-			period: { zh: '至今', en: 'Present' },
+			period: { zh: 'FSAC 项目经历', en: 'FSAC Project Experience' },
 			bullets: [
 				{
-					zh: '负责激光雷达点云的地面分割与锥桶检测（RANSAC + 区域建模），满足实时性要求。',
-					en: 'Implemented LiDAR ground segmentation and cone detection (RANSAC + region modeling) under real-time constraints.',
+					zh: '参与激光雷达点云地面分割与锥桶检测，使用 RANSAC 与区域建模方法。',
+					en: 'Worked on LiDAR ground segmentation and cone detection using RANSAC and region modeling.',
 				},
 				{
 					zh: '搭建感知到规控的工程链路，使用 rosbag 做可复现实验。',
@@ -70,8 +70,8 @@ export const RESUME = {
 					en: 'Implemented SGP4/SDP4 orbit propagation in C++20, outputting pass time windows with elevation and azimuth',
 				},
 				{
-					zh: '高精度坐标转换链路(地心惯性系 ↔ 地固系 ↔ 站地平坐标系),Google Test 全覆盖',
-					en: 'High-precision coordinate transformation chain (ECI ↔ ECEF ↔ NEU) with full Google Test coverage',
+					zh: '实现坐标转换链路(地心惯性系 ↔ 地固系 ↔ 站地平坐标系)，配有 Google Test 测试',
+					en: 'Implemented the coordinate transformation chain (ECI ↔ ECEF ↔ NEU) with Google Test tests',
 				},
 			],
 		},
@@ -81,11 +81,11 @@ export const RESUME = {
 				en: 'Modular Autonomous Driving Framework (Perception / Planning / Control)',
 			},
 			org: { zh: 'FSAC 车队', en: 'FSAC Team' },
-			period: { zh: '至今', en: 'Present' },
+			period: { zh: 'ROS 1 / ROS 2 工程实践', en: 'ROS 1 / ROS 2 Engineering' },
 			bullets: [
 				{
-					zh: '激光雷达点云地面分割与锥桶检测(RANSAC + 区域建模),满足实时性要求',
-					en: 'LiDAR ground segmentation and cone detection (RANSAC + region modeling) under real-time constraints',
+					zh: '激光雷达点云地面分割与锥桶检测，使用 RANSAC 与区域建模方法',
+					en: 'LiDAR ground segmentation and cone detection using RANSAC and region modeling',
 				},
 				{
 					zh: '搭建感知到规控的端到端工程链路,rosbag 可复现实验',

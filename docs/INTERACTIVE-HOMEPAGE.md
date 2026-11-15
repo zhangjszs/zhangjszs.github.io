@@ -11,7 +11,7 @@
 - `src/scripts/fsac-track.ts`：高速循迹、八字环绕、直线加速的原创锥桶几何。
 - `src/scripts/fsac-model.ts`：有限视域观测、累计地标与局部锥桶配对轨迹。
 - `src/scripts/fsac-world.ts`：场景、感知图层、可通行走廊和跟车视角。
-- `src/components/MissionProjects.astro`：从内容集合读取核心项目与精选课程项目。
+- `src/components/MissionProjects.astro`：从内容集合读取最多四个 `featured` 项目，个人项目优先，再按年份排序；同年优先自动驾驶项目。其他个人项目展示在「更多探索」，课程作品保留在全部作品页。
 - `src/scripts/lab-home.ts`：渐进式入场与锚点焦点转移。
 
 ## 操作

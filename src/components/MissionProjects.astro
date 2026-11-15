@@ -3,9 +3,20 @@ import { getCollection } from 'astro:content';
 import { withBase } from '../utils/paths';
 
 const projects = await getCollection('projects');
-const personal = projects.filter((project) => project.data.category === 'personal').slice(0, 2);
-const experiments = projects
-	.filter((project) => project.data.category === 'labwork' && project.data.featured)
+const featured = projects
+	.filter((project) => project.data.featured)
+	.sort((a, b) => {
+		if (a.data.category !== b.data.category) return a.data.category === 'personal' ? -1 : 1;
+		return (
+			(b.data.date ?? '').slice(0, 4).localeCompare((a.data.date ?? '').slice(0, 4)) ||
+			Number(b.data.tags.includes('自动驾驶')) - Number(a.data.tags.includes('自动驾驶')) ||
+			a.id.localeCompare(b.id)
+		);
+	})
+	.slice(0, 4);
+const moreProjects = projects
+	.filter((project) => project.data.category === 'personal' && !project.data.featured)
+	.sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? '') || a.id.localeCompare(b.id))
 	.slice(0, 2);
 const shortName = (title: string) => title.split('—')[0].trim();
 const subtitle = (title: string) => title.split('—').slice(1).join('—').trim();
@@ -34,17 +45,19 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 
 	<div class="systems-list">
 		{
-			personal.map((project, index) => {
+			featured.map((project, index) => {
 				const orbit = project.id.includes('satellite');
+				const physics = project.data.tags.includes('物理仿真');
+				const ros2 = project.data.tags.includes('ROS 2');
 				return (
 					<article class:list={['system-row', { 'system-orbit': orbit }]}>
 						<div class="system-index">
 							<span>{String(index + 1).padStart(2, '0')}</span>
-							<span class="system-kind">{orbit ? 'ORBIT' : 'AUTONOMY'}</span>
+							<span class="system-kind">{orbit ? 'ORBIT' : physics ? 'SIMULATION' : 'AUTONOMY'}</span>
 						</div>
 						<div class="system-copy">
 							<div class="system-meta">
-								<span>个人项目</span>
+								<span>{project.data.category === 'personal' ? '个人项目' : '课程实验'}</span>
 								<span>{project.data.date?.split('-')[0]}</span>
 							</div>
 							<h3>
@@ -62,6 +75,11 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 								<a class="system-open" href={withBase(`/projects/${project.id}/`)}>
 									进入项目 <span aria-hidden="true">↗</span>
 								</a>
+								{project.data.demoUrl && (
+									<a class="system-source" href={project.data.demoUrl} target="_blank" rel="noopener noreferrer">
+										在线体验 <span aria-hidden="true">↗</span>
+									</a>
+								)}
 								{project.data.repoUrl && (
 									<a class="system-source" href={project.data.repoUrl} target="_blank" rel="noopener noreferrer">
 										SOURCE / GITHUB <span aria-hidden="true">↗</span>
@@ -71,8 +89,8 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 						</div>
 						<figure class="system-diagram">
 							<div class="diagram-header" aria-hidden="true">
-								<span>{orbit ? 'ORBITAL MECHANICS' : 'AUTONOMOUS SYSTEM'}</span>
-								<span>{orbit ? 'SGP4' : 'ROS1'}</span>
+								<span>{orbit ? 'ORBITAL MECHANICS' : physics ? 'PHYSICS WORKBENCH' : 'AUTONOMOUS SYSTEM'}</span>
+								<span>{orbit ? 'SGP4' : physics ? 'TYPESCRIPT' : ros2 ? 'ROS 2' : 'ROS 1'}</span>
 							</div>
 							{orbit ? (
 								<svg viewBox="0 0 420 280" role="img" aria-label="地球、卫星轨道和地面站的工程示意">
@@ -98,6 +116,34 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 										</text>
 										<text x="313" y="207">
 											SATELLITE
+										</text>
+									</g>
+								</svg>
+							) : physics ? (
+								<svg viewBox="0 0 420 280" role="img" aria-label="物理仿真的摆运动、受力和动态曲线工程示意">
+									<g class="diagram-faint" fill="none" stroke="currentColor" stroke-width="0.7">
+										<path d="M28 56h364M28 224h364M210 28v224M28 196h364M28 168h364M28 140h364M28 112h364M28 84h364" />
+										<path d="M28 28v224M70 28v224M112 28v224M154 28v224M252 28v224M294 28v224M336 28v224M378 28v224" />
+										<path d="M47 159A112 112 0 0 0 177 159" stroke-dasharray="3 6" />
+										<path d="M112 56v131" stroke-dasharray="3 6" />
+									</g>
+									<g class="diagram-accent" fill="none" stroke="currentColor" stroke-width="1.5">
+										<path d="m112 56 64 103M88 56h48" />
+										<circle cx="112" cy="56" r="3" fill="currentColor" />
+										<circle cx="176" cy="159" r="10" fill="currentColor" />
+										<path d="M176 173v33m-4-6 4 6 4-6M166 144l-18-27m0 8v-8l8 3" />
+										<path d="M238 177c12-47 24-47 36 0s24 47 36 0 24-47 36 0 24 47 36 0" stroke-width="2" />
+										<path d="M238 224V94m0 130h154" opacity="0.55" />
+									</g>
+									<g class="diagram-label" fill="currentColor">
+										<text x="30" y="32">
+											FORCE / MOTION
+										</text>
+										<text x="254" y="79">
+											SIMULATION RESULT
+										</text>
+										<text x="255" y="249">
+											TIME →
 										</text>
 									</g>
 								</svg>
@@ -130,7 +176,13 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 								</svg>
 							)}
 							<figcaption>
-								<span>{orbit ? 'TLE → PROPAGATION → VISIBILITY' : 'PERCEPTION → PLANNING → CONTROL'}</span>
+								<span>
+									{orbit
+										? 'TLE → PROPAGATION → VISIBILITY'
+										: physics
+											? 'MODEL → SOLVE → VISUALIZE'
+											: 'PERCEPTION → PLANNING → CONTROL'}
+								</span>
 								<span>程序化示意 · 非实测数据</span>
 							</figcaption>
 						</figure>
@@ -141,12 +193,12 @@ const scanPoints = Array.from({ length: 150 }, (_, index) => {
 	</div>
 
 	{
-		experiments.length > 0 && (
+		moreProjects.length > 0 && (
 			<div class="experiment-list">
-				<p class="experiment-label">MORE EXPERIMENTS / 课程与探索</p>
-				{experiments.map((project, index) => (
+				<p class="experiment-label">MORE EXPLORATIONS / 更多探索</p>
+				{moreProjects.map((project, index) => (
 					<a class="experiment-row" href={withBase(`/projects/${project.id}/`)}>
-						<span class="experiment-number">{String(personal.length + index + 1).padStart(2, '0')}</span>
+						<span class="experiment-number">{String(featured.length + index + 1).padStart(2, '0')}</span>
 						<span class="experiment-name">{shortName(project.data.title)}</span>
 						<span class="experiment-tech">{project.data.techStack.slice(0, 3).join(' / ')}</span>
 						<span class="experiment-arrow" aria-hidden="true">
