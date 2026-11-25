@@ -5,7 +5,7 @@ category: personal
 repoUrl: 'https://github.com/zhangjszs/ROS2-LTS-Final'
 tags: ['自动驾驶', 'ROS 2', 'LiDAR', '控制', '仿真验证']
 techStack: ['ROS 2 Jazzy', 'C++20', 'Python', 'PCL', 'Eigen', 'colcon']
-role: 'FSAC 项目工程实践；参与工作区维护、系统集成与仿真验证'
+role: '参与 FSAC 工作区维护、系统集成与仿真验证，使用 Codex 协作实现离线定位对照'
 featured: true
 date: '2026'
 difficulty: '深度'
@@ -20,11 +20,13 @@ status: In Progress
 
 - **感知与状态**：LiDAR 点云处理、锥桶聚类、坐标变换与跟踪；车辆状态节点消费 INS 数据并发布状态消息。
 - **多赛项规划**：赛道循迹、八字绕环与直线加速规划器通过路径选择模块衔接，独立提供速度剖面模块。
-- **控制与安全**：Pure Pursuit、可选 MPC、规划输入监控与停车请求处理；实现基于消息校验、新鲜度和任务状态的指令仲裁逻辑。当前主系统默认未启用仲裁器，不将可选机制描述为全车强制安全门禁。
+- **控制与安全**：使用 Pure Pursuit、可选 MPC、规划输入监控与停车请求处理。[主启动配置](https://github.com/zhangjszs/ROS2-LTS-Final/blob/88d574db88447f2ef4e9ecc3a8cb9701f56caf1c/src/launch/huat_launch/launch/main/fsac.launch.py#L42)要求实车模式经过最终指令仲裁器，并由任务层显式发出 ARM、START。这个约束属于软件启动与命令链。
 - **工程组织**：C++20 / Python，使用 ROS 2 消息契约、colcon / CMake 构建与独立的 Core / ROS 适配层。
+- **迁移验证**：离线比较器按固定输入步对齐 ROS 1 / ROS 2 定位记录，分别用独立参考值核对位置、航向和速度。JSON 报告保留逐步偏差与采集缺口。
 
 ## 成果与数据
 
 - 公开仓库包含感知、规划、控制、状态管理、仿真和可视化相关源码及对应测试目录。
 - `scripts/demo.sh` 将闭环仿真与故障注入分为两条验证链；测试脚本检查车辆状态、指令帧、停车响应并生成可检查的 JSON 证据。
-- 仿真演示使用确定性参考路径；**不等于完成真实点云驱动的整车闭环或实车验收**。底盘标定、硬件急停与实际赛道验证仍属于独立工作。
+- 定位对照使用合成数据完成 7 项回归，覆盖两侧同时超差、缺失采集以及明确观测到的静默。实现仍在 [草稿 PR #109](https://github.com/zhangjszs/ROS2-LTS-Final/pull/109)，对应 [GitHub CI 已通过](https://github.com/zhangjszs/ROS2-LTS-Final/actions/runs/45597837680)。真实 bag 回放与两侧数据导出有待接入。
+- 仿真演示使用确定性参考路径。真实点云驱动的闭环、底盘标定、硬件急停与实际赛道验证仍需单独取证。

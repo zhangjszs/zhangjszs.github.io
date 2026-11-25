@@ -6,6 +6,7 @@ import type { iconPaths } from '../components/IconPaths';
 import PageHeader from '../components/PageHeader.astro';
 import RadarChart from '../components/RadarChart.astro';
 import { UPDATES, UPDATE_TYPE_LABEL } from '../data/updates';
+import { withBase } from '../utils/paths';
 
 // ============================================================
 // 静态个人信息（站名、身份、时间线"现在"段、联系方式）
@@ -18,8 +19,34 @@ const ROLE = '自动驾驶 / 机器人软件工程 · FSAC 项目经历';
 /** 个人简介段落（出现在 About 背景区，可写多段） */
 const ABOUT_PARAGRAPHS: string[] = [
 	'我是 Kerwin Zhang，具有计算机科学与技术背景，参与过湖北汽车工业学院 FSAC 无人赛车相关项目，关注从感知、定位到规划与控制的工程落地。',
-	'主要使用 C++、Python 与 ROS / ROS 2 开展 LiDAR 感知、模块集成和仿真回归实践，也持续维护 TypeScript / React 物理计算可视化与 Python / Vue 数据分析项目。',
-	'这里主要展示有公开代码和可核查资料的工程实践；软件仿真结果与实车验收、演示数据与真实结果会明确区分。',
+	'主要使用 C++、Python 与 ROS / ROS 2 开展 LiDAR 感知、系统集成和仿真回归。我也做教学可视化、数据分析和轨道计算，将运行流程和验证结果写进作品页。',
+];
+
+const PROJECT_AREAS = [
+	{
+		title: '无人车与机器人软件',
+		description: '从 LiDAR 锥桶感知到规划控制，用闭环仿真和故障注入检查软件行为，并以合成数据验证跨版本定位对照。',
+		projects: [
+			{ id: 'ros2-lts-final', label: 'ROS 2 无人车框架' },
+			{ id: 'ros1-lts-final', label: 'ROS 1 工程基线' },
+		],
+	},
+	{
+		title: '教学可视化',
+		description: '让高中物理模型和操作系统事件都能通过调参或逐步操作观察。',
+		projects: [
+			{ id: 'physvis', label: 'PhysVis 物理工作台' },
+			{ id: 'keyboard-interrupt-lab', label: '408 键盘中断实验' },
+		],
+	},
+	{
+		title: '数据应用与科学计算',
+		description: '实现文章和评论的舆情分析工作流，以及基于 TLE 的卫星过境预报。',
+		projects: [
+			{ id: 'weibo-sentiment-analysis', label: '微博舆情分析' },
+			{ id: 'satellite-overpass', label: 'SatelliteOverpass' },
+		],
+	},
 ];
 
 /** 时间线「现在」段（手动维护；其余按年聚合自项目数据） */
@@ -150,6 +177,21 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 			<div class="about-grid">
 				<div class="about-text">
 					{ABOUT_PARAGRAPHS.map((p) => <p>{p}</p>)}
+					<ul class="project-areas" aria-label="代表项目">
+						{
+							PROJECT_AREAS.map(({ title, description, projects }) => (
+								<li>
+									<h3>{title}</h3>
+									<p>{description}</p>
+									<div class="project-area-links">
+										{projects.map(({ id, label }) => (
+											<a href={withBase(`/projects/${id}/`)}>{label}</a>
+										))}
+									</div>
+								</li>
+							))
+						}
+					</ul>
 				</div>
 				<div class="timeline">
 					{
@@ -326,6 +368,37 @@ const timeline = [NOW_ITEM, ...autoTimeline];
 			line-height: 1.9;
 			margin: 0;
 			font-size: var(--text-md);
+		}
+
+		.project-areas {
+			display: grid;
+			list-style: none;
+			margin: 0.5rem 0 0;
+			padding: 0;
+		}
+
+		.project-areas li {
+			display: grid;
+			gap: 0.4rem;
+			padding: 0.9rem 0;
+			border-top: 1px solid var(--border);
+		}
+
+		.project-areas h3 {
+			margin: 0;
+			font-size: var(--text-md);
+		}
+
+		.project-area-links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.45rem 1.15rem;
+		}
+
+		.project-area-links a {
+			color: var(--accent);
+			text-decoration: underline;
+			text-underline-offset: 0.2em;
 		}
 
 		/* ===== 时间线 ===== */
