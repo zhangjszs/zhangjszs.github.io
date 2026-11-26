@@ -1,6 +1,7 @@
 ---
 // The fallback and live renderer share the same original procedural course.
 import { createFsacCourse } from '../../scripts/fsac-track';
+import { withBase } from '../../utils/paths';
 
 const fallbackCourse = createFsacCourse('autocross');
 const bounds = fallbackCourse.cones.reduce(
@@ -57,6 +58,20 @@ const fallbackCar = project(fallbackCourse.samples[0]);
 				<rect x="-3" y="-3" width="6" height="6" fill="#1a2115"></rect>
 			</g>
 		</svg>
+	</div>
+	<div class="static-guide">
+		<div class="static-heading">
+			<h2>高速循迹赛道</h2>
+			<p>程序化场景俯视图，虚线表示参考路径。</p>
+		</div>
+		<div class="static-footer">
+			<ul class="static-legend" aria-label="赛道图例">
+				<li><i class="cone-left" aria-hidden="true"></i>左侧边界</li>
+				<li><i class="cone-right" aria-hidden="true"></i>右侧边界</li>
+				<li><i class="cone-stop" aria-hidden="true"></i>停车区域</li>
+			</ul>
+			<a class="static-link" href={withBase('/projects/ros2-lts-final/')}>查看 ROS 2 无人车项目</a>
+		</div>
 	</div>
 	<canvas class="scene-canvas" aria-hidden="true"></canvas>
 	<div
@@ -194,6 +209,98 @@ const fallbackCar = project(fallbackCourse.samples[0]);
 	}
 	[data-state='ready'] .scene-fallback {
 		visibility: hidden;
+	}
+	[data-state='ready'] .static-guide,
+	[data-state='static']
+		:is(
+			.scene-canvas,
+			.scene-interaction,
+			.scene-detection-labels,
+			.scene-topline,
+			.fsac-toolbar,
+			.scene-legend,
+			.scene-coordinate,
+			.scene-caption,
+			.scene-control-deck
+		) {
+		display: none;
+	}
+	[data-state='static'] .scene-status {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+	.static-guide {
+		position: absolute;
+		z-index: 1;
+		inset: 22px 25px 22px auto;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: space-between;
+		max-width: calc(100% - 50px);
+		pointer-events: none;
+	}
+	.static-heading {
+		text-align: right;
+	}
+	.static-heading h2 {
+		color: #f1f2e8;
+		font-size: 1.125rem;
+		line-height: 1.35;
+		margin: 0 0 0.3rem;
+	}
+	.static-heading p {
+		color: #b4bea5;
+		font-size: 0.875rem;
+		line-height: 1.5;
+		margin: 0;
+	}
+	.static-footer {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem 1rem;
+		align-items: center;
+		justify-content: flex-end;
+	}
+	.static-legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.8rem;
+		list-style: none;
+		color: #d4dec8;
+		padding: 0;
+		margin: 0;
+		font-size: 0.875rem;
+	}
+	.static-legend li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.36rem;
+	}
+	.static-legend i {
+		width: 7px;
+		height: 8px;
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.static-link {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		padding: 0.3rem 0.75rem;
+		border: 1px solid #819750;
+		color: #ceff56;
+		background: #192314;
+		pointer-events: auto;
+		font-size: 0.875rem;
+		font-weight: 650;
+	}
+	.static-link:hover {
+		background: #26361d;
 	}
 	.scene-detection-labels {
 		position: absolute;
@@ -629,6 +736,19 @@ const fallbackCar = project(fallbackCourse.samples[0]);
 		}
 		.scene-legend small {
 			display: none;
+		}
+	}
+	@media (max-width: 680px) {
+		.static-guide {
+			inset: 16px;
+			max-width: none;
+			align-items: flex-start;
+		}
+		.static-heading {
+			text-align: left;
+		}
+		.static-footer {
+			justify-content: flex-start;
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
